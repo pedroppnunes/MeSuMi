@@ -70,7 +70,7 @@ public class Prestige implements CommandExecutor {
      *     <li>Player must be in the last store for their prestige level.</li>
      *     <li>Player must have enough balance multiplied by their prestige boost.</li>
      * </ul>
-     * </p>
+     *
      *
      * @param sender the command sender
      * @param command the command object
