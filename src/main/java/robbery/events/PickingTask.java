@@ -1,0 +1,162 @@
+package robbery.events;
+
+import org.bukkit.Location;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+import robbery.Robbery;
+import robbery.booster.Booster;
+import robbery.booster.BoosterManager;
+import robbery.items.Items;
+import robbery.keys.KeyManager;
+import robbery.messages.Messages;
+import robbery.player.PlayerData;
+import robbery.player.PlayerDataManager;
+import robbery.tool.Tools;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
+public class PickingTask extends BukkitRunnable {
+    private final Player player;
+    private final Items item;
+    private final ArmorStand stand;
+    private final Tools tool;
+    private final boolean chanceProc;
+    private final Robbery main;
+    private final Random random = new Random();
+
+    private final Set<Player> activePickers = new HashSet<>();
+
+    public PickingTask(Player player, Items item, ArmorStand stand, Tools tool, Robbery main, boolean chanceProc) {
+        this.player = player;
+        this.item = item;
+        this.stand = stand;
+        this.tool = tool;
+        this.main = main;
+        this.chanceProc = chanceProc;
+    }
+
+    @Override
+    public void run() {
+        PlayerData p = PlayerDataManager.getPlayerData(player);
+        if (item.getHp() <= 0) {
+            this.cancel();
+            item.resetspawn(item.getTime());
+            activePickers.remove(player);
+            p.addItemToBackpack(item);
+            String itemName = item.getName().substring(0,1).toUpperCase() + item.getName().substring(1);
+            double value = item.getValue();
+            double bonus = (value * p.getBoost()) - value;
+            if (p.getBoost() != 1.0) {
+                Messages.sendActionBarFormatted(player, "events.picking.item_stolen_with_boost", Map.of(
+                        "item", itemName,
+                        "value", KeyManager.formatNumber(value) + "$",
+                        "bonus", KeyManager.formatNumber(bonus) + "$"
+                ));
+            } else {
+                Messages.sendActionBarFormatted(player, "events.picking.item_stolen", Map.of(
+                        "item", itemName,
+                        "value", KeyManager.formatNumber(value) + "$"
+                ));
+            }
+            if(p.getSPShop().doubleItemChance() != 0){
+                int roll = random.nextInt((int) (1/p.getSPShop().doubleItemChance())) + 1;
+                if(roll == 1 && !p.getBackpack().isFull()) {
+                    p.addItemToBackpack(item);
+                    Messages.sendActionBarFormatted(player, "events.picking.double_item", Map.of(
+                            "item", itemName,
+                            "value", KeyManager.formatNumber(value) + "$"
+                    ));
+
+                }
+            }
+            Booster booster = BoosterManager.getRandomBoosterWithChance(p.getKey().getOrder(),p);
+            if(booster != null) {
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        Messages.sendActionBarFormatted(player, "events.picking.booster_reward", Map.of(
+                                "booster", booster.getName()
+                        ));
+
+                    }
+                }.runTaskLater(main, 5L);
+                p.addBoosters(booster);
+            }
+            int roll = random.nextInt(1000) + 1;
+            if(p.getSPShop().skillpointChance() + p.getOutSpChance() != 0)
+                roll = random.nextInt((int) (1000*(1-p.getSPShop().skillpointChance()-p.getOutSpChance()))) + 1;
+            if(roll == 11){
+                player.sendTitle(Messages.get("events.picking.skillpoint_reward_title"), Messages.get("events.picking.skillpoint_reward_subtitle"), 10, 60, 10);
+                p.addSkillpoint();
+            }
+
+            return;
+        }
+
+        if (!isLookingAtStand(player, stand) || !isPlayerPicking(player) || !player.isOnline()) {
+            this.cancel();
+            item.setHp(item.getInitialhp());
+            item.setPickable();
+            activePickers.remove(player);
+            Messages.sendActionBar(player, "events.picking.canceled");
+            return;
+        }
+        if(chanceProc)
+            item.setHp(0);
+        else
+            item.setHp(item.getHp() - (tool.getDamage() + tool.getDamage()*p.getExtraDamage()));
+        sendProgressBar(player, item.getHp(), item.getInitialhp());
+    }
+
+    private boolean isLookingAtStand(Player player, ArmorStand stand) {
+        Location eyeLocation = player.getEyeLocation();
+        Vector direction = eyeLocation.getDirection();
+
+        double maxDistance = 2.2;
+
+        for (double distance = 0; distance <= maxDistance; distance += 0.1) {
+            Location currentLocation = eyeLocation.clone().add(direction.clone().multiply(distance));
+
+            if (currentLocation.distance(stand.getLocation()) <= 1.0) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean isPlayerPicking(Player player) {
+        return activePickers.contains(player);
+    }
+    public void startPicking(Player player) {
+        activePickers.add(player);
+    }
+    public void cancelPicking(Player player) {
+        activePickers.remove(player);
+    }
+    private void sendProgressBar(Player player, double currentHp, double maxHp) {
+        int totalBars = 10;
+        int filledBars = (int) ((1 - (currentHp / maxHp)) * totalBars);
+        int percentage = (int) ((1 - (currentHp / maxHp)) * 100);
+
+        StringBuilder bar = new StringBuilder();
+        for (int i = 0; i < totalBars; i++) {
+            if (i < filledBars) {
+                bar.append("§a█");
+            } else {
+                bar.append("§c█");
+            }
+        }
+
+        Messages.sendActionBarFormatted(player, "events.picking.progress_bar", Map.of(
+                "bar", bar.toString(),
+                "percent", String.valueOf(percentage)
+        ));
+
+    }
+
+}
+

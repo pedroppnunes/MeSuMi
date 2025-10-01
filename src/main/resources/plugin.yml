@@ -1,0 +1,160 @@
+name: Robbery
+version: '1.0'
+main: robbery.Robbery
+api-version: '1.21'
+
+softdepend: [PlaceholderAPI]
+depend: [Vault]
+
+commands:
+  additem:
+    description: Spawns item
+    usage: /additem <item_name>
+    permission: robbery.op
+  baltop:
+    description: Shows the top balances
+    usage: /baltop [page]
+  boosters:
+    description: Opens the booster menu
+    usage: /boosters
+  busted:
+    usage: /busted [player]
+    permission: robbery.op
+  buyback:
+    usage: /buyback <back_name> [player]
+    permission: robbery.op
+  buykey:
+    usage: /buykey <key_name> [player]
+    permission: robbery.op
+  buytool:
+    usage: /buytool <back_name> [player]
+    permission: robbery.op
+  chatcolor:
+    usage: /chatcolor
+  claim:
+    usage: /claim
+  ct:
+    usage: /ct [player] <color>
+    permission: robbery.op
+  help:
+    description: Shows help command
+    usage: /help
+  hp:
+    usage: /hp
+  load:
+    usage: /load
+    permission: robbery.op
+  lobby:
+    usage: /lobby
+  mall:
+    usage: /mall
+    permission: robbery.mall
+  mute:
+    usage: /mute <player> <time> [reason]
+    permission: robbery.staff
+  muteinfo:
+    usage: /muteinfo
+  nv:
+    usage: /nv
+  outpost:
+    usage: /outpost
+  outpostinfo:
+    usage: /outpostinfo
+  prestige:
+    usage: /prestige [player]
+    permission: robbery.op
+  pv:
+    description: Open your private chest
+    usage: /pv [slot]
+  ranks:
+    usage: /ranks
+  rankupdate:
+    usage: /rankupdate <rank> [player]
+    permission: robbery.op
+  rankup:
+    usage: /rankup
+  rcrate:
+    usage: /rcrate <item> <quantity> <player>
+    permission: robbery.op
+  removeitem:
+    description: Removes an item
+    usage: /removeitem
+    permission: robbery.op
+  robbery:
+    description: Main command for Robbery
+    usage: /robbery <reload>
+    permission: robbery.op
+  sellrob:
+    usage: /sellrob [player]
+    permission: robbery.op
+  skillpointbuy:
+    usage: /skillpointbuy <operation> [player]
+    permission: robbery.op
+  skillpoints:
+    description: Opens the skill points menu
+    usage: /skillpoints
+  spawn:
+    description: Teleports you to spawn
+    usage: /spawn
+  store:
+    description: Teleport to your current store
+    usage: /store
+  toggledoublejump:
+    usage: /toggledoublejump
+    permission: robbery.rank7
+  unmute:
+    usage: /unmute <player>
+    permission: robbery.staff
+  usebooster:
+    usage: /usebooster <boostern_n> [player]
+    permission: robbery.op
+  warn:
+    description: Warn a player
+    usage: /warn <player> <reason>
+    permission: robbery.op
+  warnings:
+    usage: /warnings
+  weeklyleaderboard:
+    usage: /weeklyleaderboard
+    permission: robbery.op
+
+permissions:
+  robbery.op:
+    description: Allows the user to reload the plugin configuration.
+    default: op
+  robbery.bypass:
+    description: Allows bypassing anything
+    default: op
+  robbery.rank1:
+    description: Burglar
+    default: false
+  robbery.rank2:
+    description: Robber
+    default: false
+  robbery.rank3:
+    description: Bandit
+    default: false
+  robbery.rank4:
+    description: Outlaw
+    default: false
+    children:
+      robbery.mall: true
+  robbery.rank5:
+    description: Heister
+    default: false
+    children:
+      robbery.mall: true
+  robbery.rank6:
+    description: Kingpin
+    default: false
+    children:
+      robbery.mall: true
+  robbery.rank7:
+    description: Mafia Boss
+    default: false
+    children:
+      robbery.mall: true
+  robbery.staff:
+    default: false
+  robbery.noitems:
+    default: false

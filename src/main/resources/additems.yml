@@ -1,0 +1,32 @@
+items:
+  melon:
+    hp: 2.0
+    value: 2
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGU0MTgxMTM1ODdhM2NhZGQ2YmM4NGE3MWUxZDU3ZDI1MWZmZjgwOTVmYTQ2YjY5ODE3NDk4NjVlMjAwM2UwYyJ9fX0="
+    time: 4
+  pumpkin:
+    hp: 5.0
+    value: 5
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzAyZTZiMDljNzE0YzliOTNhMGY2Y2JiZDZjMTM0YTJlYTc1OTYyM2ZkMTgyNjY4MzEzMjUxYTkyNjM3YWFlZSJ9fX0="
+    time: 4
+  milk:
+    hp: 7.0
+    value: 7
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjUxYzAzYjVlNjU5Mjc1ZWQ4NWNhMmM4YWQ5ODhjNzU1Y2NmYmE0NWFmZjNmNmQ4ZDZmMjczOGIwOTY3Y2NjZCJ9fX0="
+    time: 5
+  juice:
+    hp: 9.0
+    value: 12
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzk1NDQ5YzM3OWQwOWJlNmQ2ZjMwMzVhNzBkODhjMTMxZjYxZmE0OTI0NWY5Njk4Yjc5NGI0MWM2YTMzNDdkMiJ9fX0"
+    time: 5
+  apple:
+    hp: 11.0
+    value: 20
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzVlMmUwOTU5NzEyZGNkMzM1N2NjM2NlYTg1Zjk5YjNmZDgwOTc4NTVjNzU0YjliMTcxZjk2MzUxNDIyNWQifX19"
+    time: 7
+  hamburger:
+    hp: 15.0
+    value: 30
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTQxMWNiNTRhYWExZTNkYjU1NWM3ODVmNmI3NWJlMWJmOGU2OGIyOGU1Y2ZjNTljOWE4NzY4OTRmNjFjZGMxNyJ9fX0"
+    time: 10
+
