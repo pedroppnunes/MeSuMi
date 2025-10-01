@@ -48,7 +48,7 @@ public class Backpacks {
      * @param items initial list of items to store, can be null
      * @param material material of the backpack item
      * @param price purchase price of the backpack
-     * @param colorname color-coded name string using '&' codes
+     * @param colorname color-coded name string using codes
      */
     public Backpacks(String name, int capacity, List<Items> items, Material material, int price, String colorname) {
         this.name = name;

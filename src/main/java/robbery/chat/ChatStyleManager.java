@@ -46,7 +46,7 @@ public class ChatStyleManager {
      * Retrieves the chat color for a specific player.
      *
      * @param uuid the UUID of the player
-     * @return an {@link Optional} containing the player's color, or "&7" (gray) if not set
+     * @return an {@link Optional} containing the player's color, or (gray) if not set
      */
     public Optional<String> getColor(UUID uuid) {
         String val = yml.getString("players." + uuid + ".color", null);

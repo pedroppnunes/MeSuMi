@@ -15,7 +15,7 @@ import java.util.UUID;
  * Manages player mutes in the Robbery plugin.
  * <p>
  * This class handles muting, unmuting, and checking mute status for players.
- * Each player has a dedicated "mute.yml" file stored under "player/<uuid>/mute.yml".
+ * Each player has a dedicated "mute.yml" file stored under "player/uuid/mute.yml".
  * <p>
  * Supported duration formats:
  * <ul>

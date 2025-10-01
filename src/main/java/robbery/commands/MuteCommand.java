@@ -33,7 +33,6 @@ public class MuteCommand implements CommandExecutor {
 
     /**
      * Executes the /mute command.
-     *
      * Command format: /mute <player> <duration> [reason]
      *
      * @param sender the command sender

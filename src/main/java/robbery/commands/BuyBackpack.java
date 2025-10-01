@@ -26,7 +26,7 @@ import java.util.Map;
  * it is simply given to their inventory without charging.
  * </p>
  * <p>
- * Usage: /buybackpack <backpack_name> <player_name>
+ * Usage: /buybackpack backpack_name player_name
  * </p>
  */
 public class BuyBackpack implements CommandExecutor {
@@ -45,7 +45,7 @@ public class BuyBackpack implements CommandExecutor {
      * @param sender  the sender of the command
      * @param command the command object
      * @param label   the command alias used
-     * @param args    the command arguments: <backpack_name> <player_name>
+     * @param args    the command arguments: backpack_name player_name
      * @return true if the command executed successfully
      */
     @Override

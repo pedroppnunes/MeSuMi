@@ -35,7 +35,7 @@ import java.util.UUID;
  *     <li>Creating new inventories if they don't exist.</li>
  *     <li>Saving and loading inventories from disk in YAML format.</li>
  * </ul>
- * </p>
+ *
  */
 public class PvCommand implements CommandExecutor {
 

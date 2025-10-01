@@ -29,7 +29,7 @@ import java.util.Map;
  * to their owned keys, and the player is added to the corresponding region.
  * </p>
  * <p>
- * Usage: /buykey <key_name> <player_name>
+ * Usage: /buykey key_name player_name
  * </p>
  */
 public class BuyKey implements CommandExecutor {
@@ -48,7 +48,7 @@ public class BuyKey implements CommandExecutor {
      * @param sender  the sender of the command
      * @param command the command object
      * @param label   the command alias used
-     * @param args    the command arguments: <key_name> <player_name>
+     * @param args    the command arguments: key_name player_name
      * @return true if the command executed successfully
      */
     @Override

@@ -19,7 +19,7 @@ import robbery.player.PlayerDataManager;
  *     <li>Player must have permission "robbery.rank7"</li>
  *     <li>Player must be in the world named "world"</li>
  * </ul>
- * </p>
+ *
  * <p>
  * Toggling this command will also disable the standard flight mode.
  * </p>

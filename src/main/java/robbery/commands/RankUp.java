@@ -32,7 +32,7 @@ import java.util.Map;
  *     <li>Checks the player's balance before attempting a purchase.</li>
  *     <li>Updates player's key and store membership upon success.</li>
  * </ul>
- * </p>
+ *
  */
 public class RankUp implements CommandExecutor {
 

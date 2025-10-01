@@ -29,7 +29,7 @@ import java.util.Map;
  * to their owned tools, and the tool is given to their inventory.
  * </p>
  * <p>
- * Usage: /buytool <tool_name> <player_name>
+ * Usage: /buytool tool_name player_name
  * </p>
  */
 public class BuyTool implements CommandExecutor {
@@ -48,7 +48,7 @@ public class BuyTool implements CommandExecutor {
      * @param sender  the sender of the command
      * @param command the command object
      * @param label   the command alias used
-     * @param args    the command arguments: <tool_name> <player_name>
+     * @param args    the command arguments: tool_name player_name
      * @return true if the command executed successfully
      */
     @Override

@@ -21,7 +21,7 @@ import robbery.player.PlayerDataManager;
  *     <li>Prevents access to certain world-specific interactive commands in "world" (hideout chests, enchanter, tinkerer, alchemist, workbench).</li>
  *     <li>Prevents copper oxidation in the world to keep copper blocks intact.</li>
  * </ul>
- * </p>
+ *
  */
 public class HideoutListener implements Listener {
 

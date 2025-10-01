@@ -20,7 +20,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
  * </ul>
  * Players with the permission {@code robbery.bypass} are exempt.
  * Only applies in the world named "world".
- * </p>
+ *
  */
 public class InventoryLockListener implements Listener {
 

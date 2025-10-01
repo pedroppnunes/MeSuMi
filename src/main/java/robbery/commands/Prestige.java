@@ -36,7 +36,7 @@ import java.util.List;
  *     <li>Fireworks are displayed at predefined locations.</li>
  *     <li>A broadcast announces the player's prestige.</li>
  * </ul>
- * </p>
+ *
  */
 public class Prestige implements CommandExecutor {
 

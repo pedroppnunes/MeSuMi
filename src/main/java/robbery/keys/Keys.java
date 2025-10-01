@@ -29,7 +29,7 @@ public class Keys {
      * @param name       The plain name of the store.
      * @param price      The base price of the key.
      * @param order      The store's order number.
-     * @param colorname  The display name with color codes (e.g., "&cStore").
+     * @param colorname  The display name with color codes.
      */
     public Keys(String name, int price, int order, String colorname) {
         this.name = name;

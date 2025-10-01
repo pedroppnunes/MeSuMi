@@ -27,7 +27,7 @@ import java.util.*;
  *     <li>/help &lt;category&gt; [page] - Shows commands of a specific category, optionally on a given page.</li>
  *     <li>/help - Shows the main help menu with all categories.</li>
  * </ul>
- * </p>
+ *
  */
 public class HelpCommand implements CommandExecutor {
 

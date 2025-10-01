@@ -166,7 +166,7 @@ public class Messages {
     /**
      * Translates color codes in a string.
      *
-     * @param message The message with '&' color codes.
+     * @param message The message with color codes.
      * @return Message with Bukkit color codes.
      */
     public static String colorize(String message) {
