@@ -173,7 +173,9 @@ public class Robbery extends JavaPlugin implements Listener {
             String playername = section.getString(key + ".playername");
             int time = section.getInt(key + ".time");
 
-            Items it = new Items(hp, value, key, playername, time);
+            String name = key.substring(key.indexOf('_') + 1);
+            name = name.substring(0, 1).toUpperCase() + name.substring(1);
+            Items it = new Items(hp, value, name, playername, time);
             itemsMap.put(key.toLowerCase(), it);
         }
     }
