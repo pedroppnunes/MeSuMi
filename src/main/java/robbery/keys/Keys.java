@@ -1,7 +1,13 @@
 package robbery.keys;
 
-import org.bukkit.ChatColor;
+import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import robbery.player.PlayerData;
+
+import java.util.List;
+
+import static org.bukkit.Bukkit.getWorld;
 
 /**
  * Represents a store key in the Robbery plugin.
@@ -22,6 +28,8 @@ public class Keys {
 
     /** The display name of the store key with color codes translated. */
     private final String colorname;
+    private final String id;
+    private final List<DoorArea> doorAreas;
 
     /**
      * Constructs a new store key.
@@ -31,11 +39,13 @@ public class Keys {
      * @param order      The store's order number.
      * @param colorname  The display name with color codes.
      */
-    public Keys(String name, int price, int order, String colorname) {
+    public Keys(String name, int price, int order, String colorname, String id, List<DoorArea> doorAreas) {
         this.name = name;
         this.price = price;
         this.order = order;
         this.colorname = ChatColor.translateAlternateColorCodes('&', colorname);
+        this.id = id;
+        this.doorAreas = doorAreas;
     }
 
     /**
@@ -84,5 +94,38 @@ public class Keys {
      */
     public String getColorname() {
         return colorname;
+    }
+    public String getId() {
+        return id;
+    }
+    /** Adds player as region member for this store */
+    public void addPlayerToRegion(Player p) {
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                "rg addmember -w world " + id + " " + p.getName());
+    }
+
+    /** Places iron bars in the defined door area */
+    public void showIronBars() {
+        for (DoorArea area : doorAreas) {
+            area.setMaterial(Material.IRON_BARS);
+        }
+    }
+
+    /** Removes iron bars (restores air) */
+    public void hideIronBars() {
+        for (DoorArea area : doorAreas) {
+            area.setMaterial(Material.AIR);
+        }
+    }
+
+    /** Updates visibility for a player — hide bars if they own it, show otherwise */
+    public void updateStoreVisibility(PlayerData data, Player player) {
+        boolean owns = data.hasKey(id);
+        if (owns) {
+            hideIronBars();
+            addPlayerToRegion(player);
+        } else {
+            showIronBars();
+        }
     }
 }

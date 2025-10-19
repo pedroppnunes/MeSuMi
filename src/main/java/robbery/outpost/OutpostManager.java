@@ -196,7 +196,7 @@ public class OutpostManager {
 
         Bukkit.broadcastMessage(Messages.getFormatted("events.outpost.capture_broadcast", Map.of("island_name", is.getName())));
 
-        applyPerksToIsland();
+        applyPerksToIsland(islandOwner);
 
         lastBoosterIsland = islandOwner;
         long delayTicks = 4L * 60 * 60 * 20;
@@ -349,12 +349,12 @@ public class OutpostManager {
         Bukkit.broadcastMessage(Messages.get("events.outpost.perk_announcement_border"));
         Bukkit.broadcastMessage("");
 
-        applyPerksToIsland();
+        applyPerksToIsland(ownerIsland);
     }
 
-    public void applyPerksToIsland() {
-        if(currentIsland != null){
-        Island curIsle = SuperiorSkyblockAPI.getIslandByUUID(currentIsland);
+    public void applyPerksToIsland(UUID islandUUID) {
+        if(islandUUID != null){
+        Island curIsle = SuperiorSkyblockAPI.getIslandByUUID(islandUUID);
         if (curIsle != null) {
             for (SuperiorPlayer coop : curIsle.getIslandMembers(true)) {
                 PlayerData pd = PlayerDataManager.getPlayerData(coop.asPlayer());

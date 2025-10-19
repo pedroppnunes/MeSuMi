@@ -82,7 +82,6 @@ public class RankUp implements CommandExecutor {
         double price = next.getPrice(data);
         String priceString = KeyManager.formatNumber(price);
         String store = KeyManager.getStoreNameR(next.getName());
-
         // Check if player has enough money
         if (econ.getBalance(p) < price) {
             Messages.sendFormatted(p, "command.rankup.not-enough-money", Map.of("price", priceString, "store", next.getName()));
@@ -95,7 +94,7 @@ public class RankUp implements CommandExecutor {
         data.setKey(next);
 
         // Add player to the region corresponding to the store
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"rg addmember -w world " + store + " " + p.getName());
+        next.updateStoreVisibility(data,p);
 
         Messages.sendFormatted(p, "command.rankup.success", Map.of("store", next.getName(), "price", priceString));
 

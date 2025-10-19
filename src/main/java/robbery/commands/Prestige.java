@@ -114,12 +114,8 @@ public class Prestige implements CommandExecutor {
             p.getBackpack().emptyBackpack();
             p.prestigeKeys();
             PrestigeLeaderboard.updateLeaderboard(player);
-
             // Remove from store regions
-            for (int i = 2; i <= 12; i++) {
-                String region = "store" + i;
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rg removemember -w world " + region + " " + player.getName());
-            }
+            KeyManager.removePlayerFromAllRegions(p,player);
 
             // Broadcast prestige message
             String border = Messages.colorize("&c&l■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
