@@ -47,11 +47,13 @@ public class KeyManager {
 
     /** Removes player from all store regions */
     public static void removePlayerFromAllRegions(PlayerData pd,Player p) {
-        for (int i = 1; i <= 12; i++) {
+        for (int i = 2; i <= 12; i++) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                     "rg removemember -w world store" + i + " " + p.getName());
-            assert getStoreName("store" + i) != null;
-            getStoreName("store"+i).updateStoreVisibility(pd,p);
+            Keys k = getStoreName("store"+i);
+            if (k != null) {
+                k.updateStoreVisibility(pd,p);
+            }
         }
     }
 

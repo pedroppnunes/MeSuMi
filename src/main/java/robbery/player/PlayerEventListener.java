@@ -22,6 +22,7 @@ import robbery.backpacks.BackpackManager;
 import robbery.commands.PvCommand;
 import robbery.commands.Rcrate;
 import robbery.keys.KeyManager;
+import robbery.keys.Keys;
 import robbery.messages.Messages;
 import robbery.tool.ToolManager;
 
@@ -29,6 +30,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
+
+import static robbery.keys.KeyManager.getStoreName;
 
 
 public class PlayerEventListener implements Listener {
@@ -66,13 +69,19 @@ public class PlayerEventListener implements Listener {
             memory.setToolsunlocked(cfg.getString("stats.hastool"));
             memory.setTool(ToolManager.getToolsName(cfg.getString("stats.tool")));
             memory.setKeys(cfg.getString("stats.haskeys"));
-            memory.setKey(KeyManager.getStoreName(cfg.getString("stats.key")));
+            memory.setKey(getStoreName(cfg.getString("stats.key")));
             memory.setPrestige(Integer.parseInt(cfg.getString("stats.prestige")));
             memory.setActiveBooster(cfg.getString("stats.booster"));
             memory.setBoostersFromString(cfg.getString("stats.hasbooster"));
             memory.setSP(cfg.getString("stats.skillpoints"));
             memory.setSPShopString(cfg.getString("stats.spshop"));
             memory.setRank(cfg.getString("stats.rank"));
+            for (int i = 2; i <= 12; i++) {
+                Keys k = getStoreName("store"+i);
+                if (k != null) {
+                    k.updateStoreVisibility(memory,player);
+                }
+            }
             if (cfg.contains("stats.location.world") && cfg.contains("stats.location.x") && cfg.contains("stats.location.y") && cfg.contains("stats.location.z") && cfg.contains("stats.location.yaw") && cfg.contains("stats.location.pitch")) {
                 String worldName = cfg.getString("stats.location.world");
                 double x = cfg.getDouble("stats.location.x");
@@ -80,7 +89,6 @@ public class PlayerEventListener implements Listener {
                 double z = cfg.getDouble("stats.location.z");
                 float yaw = (float) cfg.getDouble("stats.location.yaw");
                 float pitch = (float) cfg.getDouble("stats.location.pitch");
-
                 World world = Bukkit.getWorld(worldName);
                 if (world != null) {
                     Location savedLoc = new Location(world, x, y, z, yaw, pitch);
