@@ -65,7 +65,7 @@ public class ChatColorCommand implements CommandExecutor {
 
         // Handle bold toggle
         if (choice.equals("bold")) {
-            if (target.hasPermission("robbery.rank6") || target.hasPermission("robbery.rank7")) {
+            if (target.hasPermission("robbery.rank6") || target.hasPermission("robbery.rank7") || target.hasPermission("robbery.bypass")) {
                 boolean current = styles.isBold(target.getUniqueId());
                 boolean newState = !current;
 
@@ -84,7 +84,7 @@ public class ChatColorCommand implements CommandExecutor {
 
         // Handle color selection
         ChatColor selected = parseColor(choice);
-        if (selected == null || selected == ChatColor.RED || !selected.isColor()) {
+        if (selected == null || !selected.isColor()) {
             Messages.send(sender, "command.chatcolor.invalid-color");
             return true;
         }
@@ -126,8 +126,8 @@ public class ChatColorCommand implements CommandExecutor {
     private static final List<ChatColor> RANK5 = concat(List.of(ChatColor.GOLD, ChatColor.GREEN, ChatColor.DARK_GREEN), RANK4);
     private static final List<ChatColor> RANK6 = concat(List.of(ChatColor.DARK_PURPLE, ChatColor.LIGHT_PURPLE), RANK5);
     private static final List<ChatColor> RANK7 = Arrays.stream(ChatColor.values())
-            .filter(c -> c.isColor() && c != ChatColor.RED && c != ChatColor.BLACK)
-            .collect(Collectors.toList());
+            .filter(c -> c.isColor() && c != ChatColor.RED && c != ChatColor.BLACK && c != ChatColor.DARK_RED)
+            .toList();
 
     /**
      * Returns the list of allowed chat colors for a player based on their rank permissions.
@@ -144,6 +144,7 @@ public class ChatColorCommand implements CommandExecutor {
         if (p.hasPermission("robbery.rank5")) out.addAll(RANK5);
         if (p.hasPermission("robbery.rank6")) out.addAll(RANK6);
         if (p.hasPermission("robbery.rank7")) out.addAll(RANK7);
+        if(p.hasPermission("robbery.bypass")) out.addAll(List.of(ChatColor.values()));
         return out;
     }
 
