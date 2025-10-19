@@ -4,11 +4,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import robbery.Robbery;
 import robbery.player.PlayerData;
 
 import java.text.DecimalFormat;
-import java.util.Arrays;
 import java.util.List;
 
 public class KeyManager {
