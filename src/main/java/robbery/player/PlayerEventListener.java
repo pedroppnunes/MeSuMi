@@ -76,12 +76,6 @@ public class PlayerEventListener implements Listener {
             memory.setSP(cfg.getString("stats.skillpoints"));
             memory.setSPShopString(cfg.getString("stats.spshop"));
             memory.setRank(cfg.getString("stats.rank"));
-            for (int i = 2; i <= 12; i++) {
-                Keys k = getStoreName("store"+i);
-                if (k != null) {
-                    k.updateStoreVisibility(memory,player);
-                }
-            }
             if (cfg.contains("stats.location.world") && cfg.contains("stats.location.x") && cfg.contains("stats.location.y") && cfg.contains("stats.location.z") && cfg.contains("stats.location.yaw") && cfg.contains("stats.location.pitch")) {
                 String worldName = cfg.getString("stats.location.world");
                 double x = cfg.getDouble("stats.location.x");

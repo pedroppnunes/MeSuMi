@@ -166,4 +166,7 @@ public class KeyManager {
     }
 
 
+    public static List<Keys> getAllKeys() {
+        return List.of(STORE1,STORE2,STORE3,STORE4,STORE5,STORE6,STORE7,STORE8,STORE9,STORE10,STORE11,STORE12);
+    }
 }

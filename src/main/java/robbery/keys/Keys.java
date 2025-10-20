@@ -105,27 +105,35 @@ public class Keys {
     }
 
     /** Places iron bars in the defined door area */
-    public void showIronBars() {
+    public void showIronBars(Player p) {
         for (DoorArea area : doorAreas) {
-            area.setMaterial(Material.IRON_BARS);
+            if (area.isChunkLoadedFor(p)) {
+                area.setMaterial(p, Material.IRON_BARS);
+            }
         }
     }
 
     /** Removes iron bars (restores air) */
-    public void hideIronBars() {
+    public void hideIronBars(Player p) {
         for (DoorArea area : doorAreas) {
-            area.setMaterial(Material.AIR);
+            if (area.isChunkLoadedFor(p)) {
+                area.setMaterial(p, Material.AIR);
+            }
         }
     }
+
 
     /** Updates visibility for a player — hide bars if they own it, show otherwise */
     public void updateStoreVisibility(PlayerData data, Player player) {
         boolean owns = data.hasKey(id);
         if (owns) {
-            hideIronBars();
+            showIronBars(player);
             addPlayerToRegion(player);
         } else {
-            showIronBars();
+            hideIronBars(player);
         }
     }
+
+
+
 }
