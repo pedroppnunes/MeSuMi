@@ -199,6 +199,7 @@ public class Robbery extends JavaPlugin implements Listener {
 
     public void addItems(Items i){
         items.add(i);
+        saveBackupItems();
     }
     public List<Items> getItems(){
         return items;
@@ -207,6 +208,7 @@ public class Robbery extends JavaPlugin implements Listener {
     public void removeItem(Items i){
         items.remove(i);
         i.remove();
+        saveBackupItems();
     }
     public static Robbery getInstance() {
         return main;
@@ -235,6 +237,7 @@ public class Robbery extends JavaPlugin implements Listener {
     public void loadItems() {
         File itemsFile = new File(getDataFolder(), "items.yml");
         if (!itemsFile.exists()) {
+            loadBackupItems();
             return;
         }
 
@@ -259,6 +262,50 @@ public class Robbery extends JavaPlugin implements Listener {
         }
     }
 
+    public void saveBackupItems() {
+        File backupFile = new File(getDataFolder(), "backupitems.yml");
+        FileConfiguration backupConfig = YamlConfiguration.loadConfiguration(backupFile);
+
+        List<Map<String, Object>> serializedItems = new ArrayList<>();
+        for (Items item : items) {
+            serializedItems.add(item.serialize());
+        }
+
+        backupConfig.set("items", serializedItems);
+
+        try {
+            backupConfig.save(backupFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadBackupItems() {
+        File backupFile = new File(getDataFolder(), "backupitems.yml");
+        if (!backupFile.exists()) {
+            return;
+        }
+
+        FileConfiguration backupConfig = YamlConfiguration.loadConfiguration(backupFile);
+        List<Map<String, Object>> serializedItems = (List<Map<String, Object>>) backupConfig.getList("items");
+
+        if (serializedItems != null) {
+            for (Map<String, Object> itemData : serializedItems) {
+                Object droppedIdObj = itemData.get("droppedItem");
+                if (droppedIdObj instanceof String droppedId) {
+                    try {
+                        UUID droppedUUID = UUID.fromString(droppedId);
+                        if (Bukkit.getEntity(droppedUUID) != null) {
+                            Items item = new Items(itemData);
+                            items.add(item);
+                        }
+                    } catch (IllegalArgumentException e) {
+                        getLogger().warning("Invalid UUID in backupitems.yml: " + droppedId);
+                    }
+                }
+            }
+        }
+    }
 
 
 

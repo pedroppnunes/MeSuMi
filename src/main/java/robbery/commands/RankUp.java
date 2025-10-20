@@ -81,7 +81,6 @@ public class RankUp implements CommandExecutor {
         Economy econ   = Robbery.getEconomy();
         double price = next.getPrice(data);
         String priceString = KeyManager.formatNumber(price);
-        String store = KeyManager.getStoreNameR(next.getName());
         // Check if player has enough money
         if (econ.getBalance(p) < price) {
             Messages.sendFormatted(p, "command.rankup.not-enough-money", Map.of("price", priceString, "store", next.getName()));
@@ -90,11 +89,12 @@ public class RankUp implements CommandExecutor {
 
         // Deduct price and update player's key
         econ.withdrawPlayer(p, price);
-        data.addKey(store);
+        data.addKey(next.getId());
         data.setKey(next);
 
         // Add player to the region corresponding to the store
-        next.updateStoreVisibility(data,p);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                "rg addmember -w world " + next.getId() + " " + p.getName());
 
         Messages.sendFormatted(p, "command.rankup.success", Map.of("store", next.getName(), "price", priceString));
 

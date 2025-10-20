@@ -29,7 +29,6 @@ public class Keys {
     /** The display name of the store key with color codes translated. */
     private final String colorname;
     private final String id;
-    private final List<DoorArea> doorAreas;
 
     /**
      * Constructs a new store key.
@@ -39,13 +38,12 @@ public class Keys {
      * @param order      The store's order number.
      * @param colorname  The display name with color codes.
      */
-    public Keys(String name, int price, int order, String colorname, String id, List<DoorArea> doorAreas) {
+    public Keys(String name, int price, int order, String colorname, String id) {
         this.name = name;
         this.price = price;
         this.order = order;
         this.colorname = ChatColor.translateAlternateColorCodes('&', colorname);
         this.id = id;
-        this.doorAreas = doorAreas;
     }
 
     /**
@@ -98,42 +96,5 @@ public class Keys {
     public String getId() {
         return id;
     }
-    /** Adds player as region member for this store */
-    public void addPlayerToRegion(Player p) {
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                "rg addmember -w world " + id + " " + p.getName());
-    }
-
-    /** Places iron bars in the defined door area */
-    public void showIronBars(Player p) {
-        for (DoorArea area : doorAreas) {
-            if (area.isChunkLoadedFor(p)) {
-                area.setMaterial(p, Material.IRON_BARS);
-            }
-        }
-    }
-
-    /** Removes iron bars (restores air) */
-    public void hideIronBars(Player p) {
-        for (DoorArea area : doorAreas) {
-            if (area.isChunkLoadedFor(p)) {
-                area.setMaterial(p, Material.AIR);
-            }
-        }
-    }
-
-
-    /** Updates visibility for a player — hide bars if they own it, show otherwise */
-    public void updateStoreVisibility(PlayerData data, Player player) {
-        boolean owns = data.hasKey(id);
-        if (owns) {
-            showIronBars(player);
-            addPlayerToRegion(player);
-        } else {
-            hideIronBars(player);
-        }
-    }
-
-
 
 }

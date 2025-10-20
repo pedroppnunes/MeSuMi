@@ -115,7 +115,7 @@ public class Prestige implements CommandExecutor {
             p.prestigeKeys();
             PrestigeLeaderboard.updateLeaderboard(player);
             // Remove from store regions
-            KeyManager.removePlayerFromAllRegions(p,player);
+            KeyManager.removePlayerFromAllRegions(player);
 
             // Broadcast prestige message
             String border = Messages.colorize("&c&l■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");

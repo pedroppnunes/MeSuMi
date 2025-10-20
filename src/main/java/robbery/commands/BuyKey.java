@@ -110,7 +110,8 @@ public class BuyKey implements CommandExecutor {
             data.setKey(key);
 
             // Add player to the key's region
-            key.updateStoreVisibility(data,player);
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                    "rg addmember -w world " + keyName + " " + player.getName());
 
             Map<String, String> ph = new HashMap<>();
             ph.put("key", KeyManager.getStoreN(keyName));
