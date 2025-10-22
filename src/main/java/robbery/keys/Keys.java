@@ -1,13 +1,7 @@
 package robbery.keys;
 
 import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 import robbery.player.PlayerData;
-
-import java.util.List;
-
-import static org.bukkit.Bukkit.getWorld;
 
 /**
  * Represents a store key in the Robbery plugin.

@@ -119,10 +119,10 @@ public class Prestige implements CommandExecutor {
 
             // Broadcast prestige message
             String border = Messages.colorize("&c&l■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
-            String msg = Messages.colorize("&e&l" + player.getDisplayName() + " has prestiged to &6Prestige " + (prestige + 1) + "&e&l!");
+            String msg = Messages.colorize("&e&l" + player.getDisplayName() + " &e&lhas prestiged to &6Prestige " + (prestige + 1) + "&e&l!");
             Bukkit.broadcastMessage(border);
             Bukkit.broadcastMessage(msg);
-            Bukkit.broadcastMessage(border);
+            Bukkit.broadcastMessage(border+"\u200B");
 
             // Teleport player to prestige start
             player.teleport(new Location(player.getWorld(), 20025, 100, 20015));

@@ -29,6 +29,9 @@ public class OutpostManager {
     private UUID lastBoosterIsland;
     private BukkitTask boostExpireTask;
     private long ownershipExpiryMillis = 0L;
+    private boolean captureAnnounced = false;
+    private boolean neutralizeAnnounced = false;
+
 
     private double moneyMultiplier = 1.0;
     private String perk2Type = "None";
@@ -60,6 +63,9 @@ public class OutpostManager {
     }
 
     private void tickCapture() {
+        // Keep the previous progress so we can detect threshold crossings (e.g. from 9 -> 10).
+        double oldProgress = progress;
+
         if (ownerIsland != null && System.currentTimeMillis() >= ownershipExpiryMillis) {
             expireBoost();
         }
@@ -70,6 +76,7 @@ public class OutpostManager {
             SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(p);
             Island isle = sp.getIsland();
             if (isle == null) {
+                // If a player inside the region doesn't have an island, show actionbar and stop processing this tick.
                 Messages.sendActionBar(p, "events.outpost.need_island");
                 return;
             }
@@ -79,6 +86,7 @@ public class OutpostManager {
         if (present.size() == 1) {
             UUID capturingIsland = present.keySet().iterator().next();
 
+            // If the owner island is the same as the capturing island, show remaining owned time to owners.
             if (ownerIsland != null && ownerIsland.equals(capturingIsland)) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (!region.isInside(p.getLocation())) continue;
@@ -93,11 +101,11 @@ public class OutpostManager {
                 return;
             }
 
+            // Start or switch capturing island, or decrease progress if another island tries to take over.
             if (currentIsland == null) {
                 currentIsland = capturingIsland;
                 progress = 1.0;
-            }
-            else if (!currentIsland.equals(capturingIsland)) {
+            } else if (!currentIsland.equals(capturingIsland)) {
                 if (progress > 0) {
                     progress--;
                 } else {
@@ -105,6 +113,7 @@ public class OutpostManager {
                     progress = 1.0;
                 }
             } else {
+                // Same island continues capturing; count how many members from that island are inside
                 int count = 0;
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (!region.isInside(p.getLocation())) continue;
@@ -116,14 +125,41 @@ public class OutpostManager {
                 if (count > 0) {
                     double increment = 1.0 * count;
                     if (ownerIsland == null) {
+                        // Normal capture: max at totalTime
                         progress = Math.min(progress + increment, totalTime);
                     } else {
+                        // Neutralizing an owned outpost: needs up to totalTime * 2 (first totalTime to neutralize, then totalTime to recapture)
                         progress = Math.min(progress + increment, totalTime * 2);
+                    }
+                }
+            }
+
+            // ---- Announcement logic: trigger once when crossing the threshold (oldProgress < 10 && progress >= 10)
+            // Use currentIsland (UUID) to fetch island name for the message.
+            if (oldProgress < 10 && progress >= 10 && currentIsland != null) {
+                SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(currentIsland);
+                Island capturingIsle = sp != null ? sp.getIsland() : null;
+                if (capturingIsle != null) {
+                    if (ownerIsland == null) {
+                        // This is a capture attempt (outpost is unclaimed) -> announce capturing
+                        if (!captureAnnounced) {
+                            Bukkit.broadcastMessage(Messages.getFormatted("events.outpost.capturing_broadcast",
+                                    Map.of("island_name", capturingIsle.getName())));
+                            captureAnnounced = true;
+                        }
+                    } else {
+                        // This is a neutralizing attempt against an owned outpost -> announce neutralizing
+                        if (!neutralizeAnnounced) {
+                            Bukkit.broadcastMessage(Messages.getFormatted("events.outpost.neutralizing_broadcast",
+                                    Map.of("island_name", capturingIsle.getName())));
+                            neutralizeAnnounced = true;
+                        }
                     }
                 }
             }
         }
         else if (present.size() > 1) {
+            // Contested: show actionbar to players in region and stop processing capture this tick.
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (region.isInside(p.getLocation())) {
                     Messages.sendActionBar(p, "events.outpost.contested");
@@ -132,6 +168,7 @@ public class OutpostManager {
             return;
         }
         else {
+            // No players present: decay progress; when it reaches 0, clear current island
             if (progress > 0) {
                 progress--;
             } else {
@@ -139,6 +176,7 @@ public class OutpostManager {
             }
         }
 
+        // Send progress bar to players inside the region (account for neutralize phase showing second half)
         if (currentIsland != null) {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (!region.isInside(p.getLocation())) continue;
@@ -147,33 +185,68 @@ public class OutpostManager {
                     sendProgressBar(p, progress, totalTime);
                 } else {
                     if (progress < totalTime) {
+                        // neutralizing phase (0..totalTime)
                         sendProgressBar(p, progress, totalTime);
                     } else {
+                        // recapture phase (progress - totalTime .. totalTime)
                         sendProgressBar(p, progress - totalTime, totalTime);
                     }
                 }
             }
         }
 
+        // ---- Completion & neutralization handling
         if (currentIsland != null) {
             if (ownerIsland == null && progress >= totalTime) {
+                // Capture completed on an unowned outpost
                 completeCapture(currentIsland);
                 ownerIsland = currentIsland;
                 currentIsland = null;
                 progress = 0;
+
+                // Reset neutralize flag because this outpost is now owned (future neutralizes may happen)
+                neutralizeAnnounced = false;
+                // captureAnnounced is logically reset in next block (or can remain true until currentIsland==null clears)
             }
             else if (ownerIsland != null) {
+                // We're dealing with an owned outpost being neutralized / recaptured
                 if (progress >= totalTime && ownerIsland != null) {
+                    // First stage completed: the outpost was neutralized (ownership lost).
+                    // Announce neutralized by the capturing island (preferably include island name).
+                    SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(currentIsland);
+                    Island capturingIsle = sp != null ? sp.getIsland() : null;
+                    if (capturingIsle != null) {
+                        Bukkit.broadcastMessage(Messages.getFormatted("events.outpost.neutralized_broadcast",
+                                Map.of("island_name", capturingIsle.getName())));
+                    } else {
+                        // Fallback generic neutralized message
+                        Bukkit.broadcastMessage(Messages.get("events.outpost.neutralized_broadcast"));
+                    }
+
+                    // Clear owner so region becomes neutral; allow recapture to proceed.
                     ownerIsland = null;
-                    broadcast(Messages.get("events.outpost.neutralized_broadcast"));
+
+                    // Reset capture announcement so that the next recapture crossing 10 can announce "capturing".
+                    captureAnnounced = false;
                 }
+
                 if (progress >= totalTime * 2) {
+                    // Second stage completed: the capturing island has fully captured the outpost (reclaimed).
                     completeCapture(currentIsland);
                     ownerIsland = currentIsland;
                     currentIsland = null;
                     progress = 0;
+
+                    // Reset announcement flags because capture cycle completed.
+                    neutralizeAnnounced = false;
                 }
             }
+        }
+
+        // When there's no active capturing island, reset announcements so later attempts can trigger messages again.
+        if (currentIsland == null) {
+            captureAnnounced = false;
+            neutralizeAnnounced = false;
         }
     }
 
@@ -231,7 +304,7 @@ public class OutpostManager {
             Bukkit.broadcastMessage(Messages.get("events.outpost.boost_expired_border"));
             Bukkit.broadcastMessage(Messages.get("events.outpost.boost_expired_title"));
             Bukkit.broadcastMessage(Messages.get("events.outpost.boost_expired_desc"));
-            Bukkit.broadcastMessage(Messages.get("events.outpost.boost_expired_border"));
+            Bukkit.broadcastMessage(Messages.get("events.outpost.boost_expired_border")+"\u200B");
             Bukkit.broadcastMessage("");
         }
         lastBoosterIsland = null;
@@ -346,7 +419,7 @@ public class OutpostManager {
         Bukkit.broadcastMessage(Messages.get("events.outpost.perk_announcement_border"));
         Bukkit.broadcastMessage(Messages.getFormatted("events.outpost.perk_announcement_money", Map.of("amount", String.valueOf(moneyMultiplier))));
         Bukkit.broadcastMessage(Messages.getFormatted("events.outpost.perk_announcement_perk2", Map.of("perk", perk2Type, "value", String.valueOf(perk2Value))));
-        Bukkit.broadcastMessage(Messages.get("events.outpost.perk_announcement_border"));
+        Bukkit.broadcastMessage(Messages.get("events.outpost.perk_announcement_border")+"\u200B");
         Bukkit.broadcastMessage("");
 
         applyPerksToIsland(ownerIsland);
