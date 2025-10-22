@@ -41,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Robbery extends JavaPlugin implements Listener {
 
-    private static final Map<String, Items> itemsMap = new ConcurrentHashMap<>();
+    private static final Map<String, Items> itemsMap = new HashMap<>();
 
     private static Economy econ = null;
     private final List<Items> items = new ArrayList<>();
@@ -131,6 +131,7 @@ public class Robbery extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("ct")).setExecutor(new ChatColorCommand(main));
         Objects.requireNonNull(getCommand("lobby")).setExecutor(new Lobby(main));
         Objects.requireNonNull(getCommand("weeklyleaderboard")).setExecutor(new WeeklyLeaderboardCommand(main));
+        Objects.requireNonNull(getCommand("loadbackup")).setExecutor(new LoadBackup(main));
         getServer().getMessenger().registerOutgoingPluginChannel(main, "BungeeCord");
         World outpostWorld = Bukkit.getWorld("outpost");
         if (outpostWorld == null) {
@@ -153,6 +154,7 @@ public class Robbery extends JavaPlugin implements Listener {
 
         String webhookUrl = "https://discord.com/api/webhooks/1418305594716192830/LqLGQ8B-f6JRkBJw0fyQVndskVuWx8GnLpaD33lHmQwwlZw5IN_CrkBoV-YdpzLHFmqS";
         weeklyLeaderboardTask = new WeeklyLeaderboardTask(this, webhookUrl);
+        migrateOldBackupIfNeeded();
     }
 
     public void addItemstoMap(){
@@ -170,12 +172,11 @@ public class Robbery extends JavaPlugin implements Listener {
         for (String key : section.getKeys(false)) {
             double hp = section.getDouble(key + ".hp");
             int value = section.getInt(key + ".value");
+            String name = section.getString(key + ".name");
             String playername = section.getString(key + ".playername");
             int time = section.getInt(key + ".time");
 
-            String name = key.substring(key.indexOf('_') + 1);
-            name = name.substring(0, 1).toUpperCase() + name.substring(1);
-            Items it = new Items(hp, value, name, playername, time);
+            Items it = new Items(hp, value, name, playername, time,key.toLowerCase());
             itemsMap.put(key.toLowerCase(), it);
         }
     }
@@ -199,7 +200,7 @@ public class Robbery extends JavaPlugin implements Listener {
 
     public void addItems(Items i){
         items.add(i);
-        saveBackupItems();
+        saveBackupItem(i);
     }
     public List<Items> getItems(){
         return items;
@@ -207,8 +208,8 @@ public class Robbery extends JavaPlugin implements Listener {
 
     public void removeItem(Items i){
         items.remove(i);
+        removeBackupItem(i);
         i.remove();
-        saveBackupItems();
     }
     public static Robbery getInstance() {
         return main;
@@ -236,42 +237,48 @@ public class Robbery extends JavaPlugin implements Listener {
 
     public void loadItems() {
         File itemsFile = new File(getDataFolder(), "items.yml");
-        if (!itemsFile.exists()) {
-            loadBackupItems();
-            return;
-        }
+        boolean loadedSomething = false;
 
-        FileConfiguration itemsConfig = YamlConfiguration.loadConfiguration(itemsFile);
-        List<Map<String, Object>> serializedItems = (List<Map<String, Object>>) itemsConfig.getList("items");
+        if (itemsFile.exists()) {
+            FileConfiguration itemsConfig = YamlConfiguration.loadConfiguration(itemsFile);
+            List<Map<String, Object>> serializedItems = (List<Map<String, Object>>) itemsConfig.getList("items");
 
-        if (serializedItems != null) {
-            for (Map<String, Object> itemData : serializedItems) {
-                Object droppedIdObj = itemData.get("droppedItem");
-                if (droppedIdObj instanceof String droppedId) {
-                    try {
-                        UUID droppedUUID = UUID.fromString(droppedId);
-                        if (Bukkit.getEntity(droppedUUID) != null) {
-                            Items item = new Items(itemData);
-                            items.add(item);
+            if (serializedItems != null && !serializedItems.isEmpty()) {
+                for (Map<String, Object> itemData : serializedItems) {
+                    Object droppedIdObj = itemData.get("droppedItem");
+                    if (droppedIdObj instanceof String droppedId) {
+                        try {
+                            UUID droppedUUID = UUID.fromString(droppedId);
+                            if (Bukkit.getEntity(droppedUUID) != null) {
+                                Items item = new Items(itemData);
+                                items.add(item);
+                                loadedSomething = true;
+                            }
+                        } catch (IllegalArgumentException e) {
+                            getLogger().warning("Invalid UUID in items.yml: " + droppedId);
                         }
-                    } catch (IllegalArgumentException e) {
-                        getLogger().warning("Invalid UUID in items.yml: " + droppedId);
                     }
                 }
             }
         }
+
+        // If items.yml didn’t exist, was empty, or loaded nothing valid, use the backup.
+        if (!loadedSomething) {
+            getLogger().warning("No valid items found in items.yml, attempting to load from backup...");
+            loadBackupItems();
+        }
     }
 
-    public void saveBackupItems() {
+
+    public void saveBackupItem(Items item) {
         File backupFile = new File(getDataFolder(), "backupitems.yml");
         FileConfiguration backupConfig = YamlConfiguration.loadConfiguration(backupFile);
 
-        List<Map<String, Object>> serializedItems = new ArrayList<>();
-        for (Items item : items) {
-            serializedItems.add(item.serialize());
-        }
+        Map<String, Object> serialized = item.serialize();
+        String id = (String) serialized.get("droppedItem");
+        if (id == null) return;
 
-        backupConfig.set("items", serializedItems);
+        backupConfig.set("items." + id, serialized);
 
         try {
             backupConfig.save(backupFile);
@@ -280,32 +287,78 @@ public class Robbery extends JavaPlugin implements Listener {
         }
     }
 
-    public void loadBackupItems() {
+    public void removeBackupItem(Items item) {
         File backupFile = new File(getDataFolder(), "backupitems.yml");
-        if (!backupFile.exists()) {
-            return;
-        }
+        if (!backupFile.exists()) return;
+
+        Map<String, Object> serialized = item.serialize();
+        String id = (String) serialized.get("droppedItem");
+        if (id == null) return;
 
         FileConfiguration backupConfig = YamlConfiguration.loadConfiguration(backupFile);
-        List<Map<String, Object>> serializedItems = (List<Map<String, Object>>) backupConfig.getList("items");
+        backupConfig.set("items." + id, null);
 
-        if (serializedItems != null) {
-            for (Map<String, Object> itemData : serializedItems) {
-                Object droppedIdObj = itemData.get("droppedItem");
-                if (droppedIdObj instanceof String droppedId) {
-                    try {
-                        UUID droppedUUID = UUID.fromString(droppedId);
-                        if (Bukkit.getEntity(droppedUUID) != null) {
-                            Items item = new Items(itemData);
-                            items.add(item);
-                        }
-                    } catch (IllegalArgumentException e) {
-                        getLogger().warning("Invalid UUID in backupitems.yml: " + droppedId);
-                    }
+        try {
+            backupConfig.save(backupFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public void loadBackupItems() {
+        File backupFile = new File(getDataFolder(), "backupitems.yml");
+        if (!backupFile.exists()) return;
+
+        FileConfiguration backupConfig = YamlConfiguration.loadConfiguration(backupFile);
+        ConfigurationSection section = backupConfig.getConfigurationSection("items");
+        if (section == null) return;
+
+        for (String key : section.getKeys(false)) {
+            try {
+                UUID droppedUUID = UUID.fromString(key);
+                Map<String, Object> itemData = section.getConfigurationSection(key).getValues(false);
+                if (Bukkit.getEntity(droppedUUID) != null) {
+                    Items item = new Items(itemData);
+                    items.add(item);
                 }
+            } catch (IllegalArgumentException e) {
+                getLogger().warning("Invalid UUID in backupitems.yml: " + key);
             }
         }
     }
+
+    public void migrateOldBackupIfNeeded() {
+        File backupFile = new File(getDataFolder(), "backupitems.yml");
+        if (!backupFile.exists()) return;
+
+        FileConfiguration backupConfig = YamlConfiguration.loadConfiguration(backupFile);
+        Object itemsObj = backupConfig.get("items");
+
+        // Check if it's the old format (a list)
+        if (itemsObj instanceof List<?> oldList) {
+            Map<String, Object> newItems = new LinkedHashMap<>();
+            for (Object obj : oldList) {
+                if (obj instanceof Map<?, ?> map) {
+                    Object droppedItem = map.get("droppedItem");
+                    if (droppedItem instanceof String id) {
+                        newItems.put(id, map);
+                    }
+                }
+            }
+
+            // Replace and save
+            backupConfig.set("items", newItems);
+            try {
+                backupConfig.save(backupFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 
 
 

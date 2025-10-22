@@ -60,6 +60,8 @@ command:
   hideplayers:
     hidden: "&5&lRobbery &8> &cAll players have been hidden."
     visible: "&5&lRobbery &8> &aAll players are now visible."
+  load:
+    success: "&5&lRobbery &8> &aLoaded Successfully."
   mall:
     backpack-not-empty: "&5&lRobbery &8> &cYou cannot use /mall while your backpack has items!"
     world-not-found: "&5&lRobbery &8> &cMall world not found."
@@ -199,7 +201,8 @@ events:
     perk_announcement_border: "&m-----------------------------"
     perk_announcement_money: "&eNew Outpost Money Multiplier: &a+%amount%x"
     perk_announcement_perk2: "&eNew Outpost Perk: &a+%value%% %perk%"
-    neutralized_broadcast: "&cThe outpost has been neutralized!"
+    neutralized_broadcast: "&5&lRobbery &8> &eOutpost being neutralized by &b%island_name%&e!"
+    capturing_broadcast: "&5&lRobbery &8> &cOutpost being captured by &b%island_name%&c!"
 
 reload:
   player-kick: "&cServer is reloading."

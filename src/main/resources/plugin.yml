@@ -44,6 +44,9 @@ commands:
   load:
     usage: /load
     permission: robbery.op
+  loadbackup:
+    usage: /loadbackup
+    permission: robbery.op
   lobby:
     usage: /lobby
   mall:
