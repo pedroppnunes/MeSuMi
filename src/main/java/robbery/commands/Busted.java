@@ -94,6 +94,9 @@ public class Busted implements CommandExecutor {
                 Messages.send(sender, "global.player-not-found");
                 return true;
             }
+            if (sender instanceof Player && !((Player) sender).getUniqueId().equals(player.getUniqueId())) {
+                return true;
+            }
         }
 
         UUID uuid = player.getUniqueId();

@@ -12,6 +12,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import robbery.Robbery;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,13 +25,14 @@ public class Items {
     private final int value;
     private final String name;
     private final ItemStack skull;
-    private final UUID uniqueId;
+    private UUID uniqueId;
     private boolean isPickable = true;
     private Location position;
     private Item droppedItem;
+    private final String id;
     private final int time;
 
-    public Items(double hp, int value, String name, String playername, int time){
+    public Items(double hp, int value, String name, String playername, int time, String id){
         this.hp = hp;
         this.value = value;
         this.name = name;
@@ -39,6 +41,7 @@ public class Items {
         this.skull = getPlayerHead(playername);
         this.initialhp = hp;
         this.time = time;
+        this.id = id;
     }
 
     public Items(Items other) {
@@ -50,6 +53,7 @@ public class Items {
         this.skull = other.skull;
         this.time = other.time;
         this.uniqueId = UUID.randomUUID();
+        this.id = other.id;
     }
     public Items(Map<String, Object> itemData) {
         this.hp = (double) itemData.get("hp");
@@ -62,6 +66,7 @@ public class Items {
         this.time = (int) itemData.get("time");
         this.droppedItem = (Item) Bukkit.getEntity(UUID.fromString((String) itemData.get("droppedItem")));
         this.position = droppedItem.getLocation();
+        this.id = (String) itemData.get("id");
     }
 
     public double getHp(){
@@ -153,15 +158,35 @@ public class Items {
 
 
     public Map<String, Object> serialize() {
-        Map<String, Object> itemData = new ConcurrentHashMap<>();
+        Map<String, Object> itemData = new HashMap<>();
         itemData.put("hp", this.initialhp);
         itemData.put("value", this.value);
         itemData.put("name", this.name);
         itemData.put("playerName", this.playername);
         itemData.put("time", this.time);
         itemData.put("uniqueId",this.uniqueId.toString());
-        itemData.put("droppedItem",this.droppedItem.getUniqueId().toString());
+        itemData.put("droppedItem", this.droppedItem.getUniqueId().toString());
+        itemData.put("id",this.id);
+
         return itemData;
     }
+    // inside class Items
+    public Items copyForBackpack() {
+        Items copy = new Items(this.hp, this.value, this.name, this.playername, this.time,this.id);
+        // ensure the copy has an independent unique id if needed:
+        copy.setUniqueId(UUID.randomUUID());
+        // Don't copy world-only fields like hp, spawn timers or pickable state.
+        // Initialize backpack-relevant fields (if needed) here.
+        return copy;
+    }
+
+    public void setUniqueId(UUID id){
+        this.uniqueId = id;
+    }
+
+    public String getId(){
+        return id;
+    }
+
 
 }

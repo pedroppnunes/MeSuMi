@@ -28,16 +28,16 @@ public class PickingTask extends BukkitRunnable {
     private final boolean chanceProc;
     private final Robbery main;
     private final Random random = new Random();
+    private final Runnable onFinish;
 
-    private final Set<Player> activePickers = new HashSet<>();
-
-    public PickingTask(Player player, Items item, ArmorStand stand, Tools tool, Robbery main, boolean chanceProc) {
+    public PickingTask(Player player, Items item, ArmorStand stand, Tools tool, Robbery main, boolean chanceProc, Runnable onFinish) {
         this.player = player;
         this.item = item;
         this.stand = stand;
         this.tool = tool;
         this.main = main;
         this.chanceProc = chanceProc;
+        this.onFinish = onFinish;
     }
 
     @Override
@@ -46,7 +46,6 @@ public class PickingTask extends BukkitRunnable {
         if (item.getHp() <= 0) {
             this.cancel();
             item.resetspawn(item.getTime());
-            activePickers.remove(player);
             p.addItemToBackpack(item);
             String itemName = item.getName().substring(0,1).toUpperCase() + item.getName().substring(1);
             double value = item.getValue();
@@ -94,16 +93,16 @@ public class PickingTask extends BukkitRunnable {
                 player.sendTitle(Messages.get("events.picking.skillpoint_reward_title"), Messages.get("events.picking.skillpoint_reward_subtitle"), 10, 60, 10);
                 p.addSkillpoint();
             }
-
+            if (onFinish != null) onFinish.run();
             return;
         }
 
-        if (!isLookingAtStand(player, stand) || !isPlayerPicking(player) || !player.isOnline()) {
+        if (!isLookingAtStand(player, stand) || !player.isOnline()) {
             this.cancel();
             item.setHp(item.getInitialhp());
             item.setPickable();
-            activePickers.remove(player);
             Messages.sendActionBar(player, "events.picking.canceled");
+            if (onFinish != null) onFinish.run();
             return;
         }
         if(chanceProc)
@@ -127,15 +126,6 @@ public class PickingTask extends BukkitRunnable {
             }
         }
         return false;
-    }
-    public boolean isPlayerPicking(Player player) {
-        return activePickers.contains(player);
-    }
-    public void startPicking(Player player) {
-        activePickers.add(player);
-    }
-    public void cancelPicking(Player player) {
-        activePickers.remove(player);
     }
     private void sendProgressBar(Player player, double currentHp, double maxHp) {
         int totalBars = 10;

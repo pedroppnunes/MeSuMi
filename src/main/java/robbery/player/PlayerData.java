@@ -1,5 +1,6 @@
 package robbery.player;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -215,11 +216,9 @@ public class PlayerData {
     }
 
     public void setBackpack(Backpacks b) {
-        if (b == null)
-            this.backpack = BACK1;
-        else
-            this.backpack = b;
+        this.backpack = Objects.requireNonNullElse(b, BACK1);
     }
+
 
     public double getBoost() {
         return (1 + prestige * 0.15 + rank.boost() + sp.extraMoney() + outboost) * boostx;

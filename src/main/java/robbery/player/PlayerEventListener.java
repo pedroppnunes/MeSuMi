@@ -64,8 +64,7 @@ public class PlayerEventListener implements Listener {
 
         if (file.exists()) {
             FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-            memory.setBackpack(BackpackManager.toBackpack(cfg.getString("stats.backpack"),cfg.getString("stats.material"),cfg.getString("stats.itemsbackpack"),cfg.getString("stats.colorbackpack")));
-            memory.setBackpackunlucked(cfg.getString("stats.hasbackpack"));
+            memory.setRank(cfg.getString("stats.rank"));
             memory.setToolsunlocked(cfg.getString("stats.hastool"));
             memory.setTool(ToolManager.getToolsName(cfg.getString("stats.tool")));
             memory.setKeys(cfg.getString("stats.haskeys"));
@@ -75,7 +74,8 @@ public class PlayerEventListener implements Listener {
             memory.setBoostersFromString(cfg.getString("stats.hasbooster"));
             memory.setSP(cfg.getString("stats.skillpoints"));
             memory.setSPShopString(cfg.getString("stats.spshop"));
-            memory.setRank(cfg.getString("stats.rank"));
+            memory.setBackpack(BackpackManager.toBackpack(cfg.getString("stats.backpack"),cfg.getString("stats.material"),cfg.getString("stats.itemsbackpack"),cfg.getString("stats.colorbackpack")));
+            memory.setBackpackunlucked(cfg.getString("stats.hasbackpack"));
             if (cfg.contains("stats.location.world") && cfg.contains("stats.location.x") && cfg.contains("stats.location.y") && cfg.contains("stats.location.z") && cfg.contains("stats.location.yaw") && cfg.contains("stats.location.pitch")) {
                 String worldName = cfg.getString("stats.location.world");
                 double x = cfg.getDouble("stats.location.x");
@@ -100,9 +100,12 @@ public class PlayerEventListener implements Listener {
         UUID currentOutpostOwner = plugin.getOutpostManager().getCurrentIsland();
 
         if (island != null && currentOutpostOwner != null && island.getOwner().getUniqueId().equals(currentOutpostOwner)) {
-            memory.setOutpostBoost(1.0);
+            plugin.getOutpostManager().applyPerksToIsland(currentOutpostOwner);
         } else {
-            memory.setOutpostBoost(0.0);
+            memory.setOutpostBoost(0);
+            memory.setSkillpointChance(0);
+            memory.setBoosterChance(0);
+            memory.setSpeedBonus(0);
         }
 
         if (!hasLoaded) {

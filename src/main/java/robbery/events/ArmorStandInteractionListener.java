@@ -20,8 +20,10 @@ import robbery.player.PlayerDataManager;
 import robbery.tool.ToolManager;
 import robbery.tool.Tools;
 
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Listens for player interactions with ArmorStands representing items in the world.
@@ -33,9 +35,9 @@ import java.util.UUID;
  */
 public class ArmorStandInteractionListener implements Listener {
 
-    private final NamespacedKey key = new NamespacedKey("robbery", "item_uuid");
+    private final NamespacedKey key;
+    private final Map<UUID, PickingTask> pickingTasks = new ConcurrentHashMap<>();
     private final Robbery main;
-    private PickingTask pickingTask;
     private final Random random = new Random();
 
     /**
@@ -45,6 +47,7 @@ public class ArmorStandInteractionListener implements Listener {
      */
     public ArmorStandInteractionListener(Robbery main) {
         this.main = main;
+        this.key = new NamespacedKey(main, "item_uuid");
     }
 
     /**
@@ -77,7 +80,7 @@ public class ArmorStandInteractionListener implements Listener {
                 Tools tool = ToolManager.getToolFromItem(player.getItemInHand());
                 PlayerData p = PlayerDataManager.getPlayerData(player);
 
-                if (pickingTask != null && pickingTask.isPlayerPicking(player)) return;
+                if (pickingTasks.containsKey(player.getUniqueId())) return;
 
                 if (p.getBackpack().isFull()) {
                     Messages.sendActionBar(player, "events.backpack-full");
@@ -85,14 +88,16 @@ public class ArmorStandInteractionListener implements Listener {
                 }
 
                 if (item != null && tool != null && item.isPickable() && item.getHp() > 0 && !p.getBackpack().isFull()) {
+                    if (pickingTasks.containsKey(player.getUniqueId())) return;
                     item.setPickable();
                     int roll = 0;
                     if (p.getSPShop().instastealChance() != 0)
                         roll = random.nextInt((int) (1 / p.getSPShop().instastealChance())) + 1;
 
-                    pickingTask = new PickingTask(player, item, stand, tool, main, roll == 1);
-                    pickingTask.startPicking(player);
-                    pickingTask.runTaskTimer(main, 0, 1);
+                    Runnable onFinish = () -> pickingTasks.remove(player.getUniqueId());
+                    PickingTask task = new PickingTask(player, item, stand, tool, main, roll == 1, onFinish);
+                    pickingTasks.put(player.getUniqueId(), task);
+                    task.runTaskTimer(main, 0L, 1L);
                 }
             }
         }
@@ -106,9 +111,10 @@ public class ArmorStandInteractionListener implements Listener {
     @EventHandler
     public void onItemHeldChange(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
-        if (pickingTask != null && pickingTask.isPlayerPicking(player)) {
+        PickingTask task = pickingTasks.remove(player.getUniqueId());
+        if (task != null) {
+            task.cancel();
             Messages.sendActionBar(player, "events.picking-canceled");
-            pickingTask.cancelPicking(player);
         }
     }
 
@@ -120,9 +126,10 @@ public class ArmorStandInteractionListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
-        if (pickingTask != null && pickingTask.isPlayerPicking(player)) {
+        PickingTask task = pickingTasks.remove(player.getUniqueId());
+        if (task != null) {
+            task.cancel();
             Messages.sendActionBar(player, "events.picking-canceled");
-            pickingTask.cancelPicking(player);
         }
     }
 
