@@ -1,5 +1,6 @@
 package robbery.backpacks;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import robbery.Robbery;
 import robbery.items.Items;
@@ -54,15 +55,19 @@ public class BackpackManager {
         Scanner scanner = new Scanner(b);
         scanner.useDelimiter("_");
         List<Items> it = new ArrayList<>();
-        if(items != null) {
-            Scanner scanner1 = new Scanner(items);
-            scanner1.useDelimiter("_");
-            while (scanner1.hasNext()) {
-                Items item = Robbery.getItemsbyName(scanner1.next());
-                if(item != null)
+        if (items != null && !items.trim().isEmpty()) {
+            String[] tokens = items.split(";");
+            for (String token : tokens) {
+                token = token.trim();
+
+                if (token.isEmpty()) continue;
+                Items item = Robbery.getItemsbyName(token);
+                if (item != null) {
                     it.add(item);
+                }
             }
         }
+
         return new Backpacks(scanner.next(),Integer.parseInt(scanner.next()),it,Material.getMaterial(material),Integer.parseInt(scanner.next()),color);
     }
 

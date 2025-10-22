@@ -1,5 +1,6 @@
 package robbery.backpacks;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
@@ -55,26 +56,29 @@ public class Backpacks {
         this.capacity = capacity;
         this.material = material;
         this.backpack = new ArrayList<>(capacity);
-        if (items != null) {
-            backpack.addAll(items);
-        }
         this.price = price;
+        if (items != null) {
+            for (Items it : items) {
+                this.backpack.add(it.copyForBackpack());
+            }
+        }
         this.colorname = ChatColor.translateAlternateColorCodes('&', colorname);
     }
 
-    /**
-     * Creates a copy of an existing backpack with additional slots.
-     *
-     * @param b the backpack to copy
-     * @param extraSlots number of extra slots to add to the capacity
-     */
+    /** Copy constructor that creates a brand-new list and copies items */
     public Backpacks(Backpacks b, int extraSlots) {
         this.name = b.name;
         this.material = b.material;
         this.price = b.price;
-        this.backpack = b.backpack;
-        this.colorname = b.colorname;
         this.capacity = b.capacity + extraSlots;
+        // create a new list; deep-copy every item from the template
+        this.backpack = new ArrayList<>(this.capacity);
+        if (b.backpack != null) {
+            for (Items it : b.backpack) {
+                this.backpack.add(it.copyForBackpack());
+            }
+        }
+        this.colorname = b.colorname;
     }
 
     /**
@@ -108,10 +112,15 @@ public class Backpacks {
     public String toString() {
         String back = "";
         for (Items i : backpack) {
-            back = back.concat(i.getName() + "_");
+            back = back.concat(i.getId() + ";");
         }
         return back;
     }
+
+    public List<Items> getItems(){
+        return backpack;
+    }
+
 
     /** @return the maximum capacity of the backpack. */
     public int getcapacity() {
@@ -149,7 +158,7 @@ public class Backpacks {
      */
     public void addBackpackItem(Items i) {
         if (backpack.size() < capacity)
-            backpack.add(i);
+            backpack.add(i.copyForBackpack());
     }
 
     /** Empties the backpack by clearing all items. */
@@ -196,4 +205,6 @@ public class Backpacks {
     public String getMaterial() {
         return material.toString();
     }
+
+
 }
