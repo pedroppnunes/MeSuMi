@@ -5,6 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,6 +17,7 @@ import robbery.messages.Messages;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -89,20 +91,28 @@ public class Sell implements CommandExecutor {
             if(roll == 1){
                 double newAmount = Double.parseDouble(KeyManager.formatDouble(amountToAdd*(1+chance)));
                 econ.depositPlayer(player, newAmount);
-                player.sendActionBar(Component.text(Messages.get("command.sell.lucky-prefix"))
-                        .color(NamedTextColor.GOLD)
-                        .decorate(TextDecoration.BOLD)
-                        .append(Component.text(Messages.get("command.sell.lucky-chance").replace("%chance%", String.valueOf((int)(chance * 100))) , NamedTextColor.YELLOW))
-                        .append(Component.text(Messages.get("command.sell.lucky-separator"), NamedTextColor.GRAY))
-                        .append(Component.text(KeyManager.formatNumber(newAmount) + " $", NamedTextColor.DARK_GREEN, TextDecoration.UNDERLINED))
+
+                String title = "&aYou sold your items for &2" + KeyManager.formatNumber(newAmount) + "$";
+                String subtitle = "&6You got Lucky! &e+" + (int)(chance * 100) + "% Bonus!";
+
+                // Send title to player
+                player.sendTitle(
+                        ChatColor.translateAlternateColorCodes('&', title),
+                        ChatColor.translateAlternateColorCodes('&', subtitle),
+                        10, 60, 10
                 );
+
                 return true;
             }
         }
         econ.depositPlayer(player, amountToAdd);
-        player.sendActionBar(Component.text(Messages.get("command.sell.success-prefix"))
-                .color(NamedTextColor.GREEN)
-                .append(Component.text(KeyManager.formatNumber(amountToAdd) + " $", NamedTextColor.DARK_GREEN, TextDecoration.UNDERLINED))
+        String title = "&aYou sold your items for &2" + KeyManager.formatNumber(amountToAdd) + "$";
+        String subtitle = "";
+
+        player.sendTitle(
+                ChatColor.translateAlternateColorCodes('&', title),
+                ChatColor.translateAlternateColorCodes('&', subtitle),
+                10, 60, 10
         );
 
         return true;

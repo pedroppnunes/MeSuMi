@@ -113,10 +113,10 @@ command:
     usage: "&5&lRobbery &8> &cUsage: /robbery reload"
     success: "&5&lRobbery &8> &aadditems.yml/language.yml reloaded."
   sell:
-    lucky-prefix: "&aYou got lucky! "
-    lucky-chance: "&aYour bonus chance activated: +%chance%%"
-    lucky-separator: "&a| Total: "
-    success-prefix: "&aYou sold your inventory for "
+    title-lucky: "&7You sold your items for &a%amount%$"
+    subtitle-lucky: "&6You got Lucky! &e+%chance%% Bonus!"
+    title-success: "&7You sold your items for &a%amount%$"
+    subtitle-success: ""
   skillpointbuy:
     usage: "&5&lRobbery &8> &cUsage: /skillpointbuy <operation> <player>"
     unknown-upgrade: "&5&lRobbery &8> &cUnknown upgrade type."
@@ -155,8 +155,10 @@ command:
 
 
 events:
+  already-being-picked: "&eSomeone is already picking this item!"
   backpack-full: "&cYour backpack is full!"
-  picking-canceled: "&ePicking process canceled."
+  picking-canceled: "&cPicking process canceled."
+  wrong-store: "&cYou can't pickup items from this store!"
   craft-blocked: "&5&lRobbery &8> &cThis item is disabled on the server."
   use-blocked: "&5&lRobbery &8> &cYou cannot use this item."
   claim-reward: "&5&lRobbery &8> &aReward claimed!"
@@ -201,7 +203,7 @@ events:
     perk_announcement_border: "&m-----------------------------"
     perk_announcement_money: "&eNew Outpost Money Multiplier: &a+%amount%x"
     perk_announcement_perk2: "&eNew Outpost Perk: &a+%value%% %perk%"
-    neutralized_broadcast: "&5&lRobbery &8> &eOutpost being neutralized by &b%island_name%&e!"
+    neutralizing_broadcast: "&5&lRobbery &8> &eOutpost being neutralized by &b%island_name%&e!"
     capturing_broadcast: "&5&lRobbery &8> &cOutpost being captured by &b%island_name%&c!"
 
 reload:
