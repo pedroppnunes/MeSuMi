@@ -16,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import robbery.booster.BoosterItemListener;
 import robbery.chat.ChatStyleManager;
+import robbery.chunk.LoadChunks;
 import robbery.commands.*;
 import robbery.events.*;
 import robbery.items.Items;
@@ -154,7 +155,6 @@ public class Robbery extends JavaPlugin implements Listener {
 
         String webhookUrl = "https://discord.com/api/webhooks/1418305594716192830/LqLGQ8B-f6JRkBJw0fyQVndskVuWx8GnLpaD33lHmQwwlZw5IN_CrkBoV-YdpzLHFmqS";
         weeklyLeaderboardTask = new WeeklyLeaderboardTask(this, webhookUrl);
-        migrateOldBackupIfNeeded();
     }
 
     public void addItemstoMap(){
@@ -220,13 +220,21 @@ public class Robbery extends JavaPlugin implements Listener {
 
     public void saveItems() {
         File itemsFile = new File(getDataFolder(), "items.yml");
-        FileConfiguration itemsConfig = YamlConfiguration.loadConfiguration(itemsFile);
+        FileConfiguration itemsConfig = new YamlConfiguration();
 
-        List<Map<String, Object>> serializedItems = new ArrayList<>();
+        itemsConfig.set("items", null);
+
+        // Save each item under its dropped item UUID key
         for (Items item : items) {
-            serializedItems.add(item.serialize());
+            Map<String, Object> itemData = item.serialize();
+            Object droppedIdObj = itemData.get("droppedItem");
+
+            if (droppedIdObj instanceof String droppedId) {
+                itemsConfig.createSection("items." + droppedId, itemData);
+            } else {
+                getLogger().warning("Skipping item without valid droppedItem UUID: " + item);
+            }
         }
-        itemsConfig.set("items", serializedItems);
 
         try {
             itemsConfig.save(itemsFile);
@@ -236,38 +244,43 @@ public class Robbery extends JavaPlugin implements Listener {
     }
 
     public void loadItems() {
-        File itemsFile = new File(getDataFolder(), "items.yml");
-        boolean loadedSomething = false;
+        LoadChunks chunkLoader = new LoadChunks(this);
 
-        if (itemsFile.exists()) {
-            FileConfiguration itemsConfig = YamlConfiguration.loadConfiguration(itemsFile);
-            List<Map<String, Object>> serializedItems = (List<Map<String, Object>>) itemsConfig.getList("items");
+        chunkLoader.loadAllChunks(() -> {
+            getLogger().info("Chunks ready. Now loading items...");
 
-            if (serializedItems != null && !serializedItems.isEmpty()) {
-                for (Map<String, Object> itemData : serializedItems) {
-                    Object droppedIdObj = itemData.get("droppedItem");
-                    if (droppedIdObj instanceof String droppedId) {
+            File itemsFile = new File(getDataFolder(), "items.yml");
+            boolean loadedSomething = false;
+
+            if (itemsFile.exists()) {
+                FileConfiguration itemsConfig = YamlConfiguration.loadConfiguration(itemsFile);
+                ConfigurationSection section = itemsConfig.getConfigurationSection("items");
+
+                if (section != null) {
+                    for (String key : section.getKeys(false)) {
                         try {
-                            UUID droppedUUID = UUID.fromString(droppedId);
+                            UUID droppedUUID = UUID.fromString(key);
                             if (Bukkit.getEntity(droppedUUID) != null) {
+                                Map<String, Object> itemData = section.getConfigurationSection(key).getValues(false);
                                 Items item = new Items(itemData);
                                 items.add(item);
                                 loadedSomething = true;
                             }
                         } catch (IllegalArgumentException e) {
-                            getLogger().warning("Invalid UUID in items.yml: " + droppedId);
+                            getLogger().warning("Invalid UUID in items.yml: " + key);
                         }
                     }
                 }
             }
-        }
 
-        // If items.yml didn’t exist, was empty, or loaded nothing valid, use the backup.
-        if (!loadedSomething) {
-            getLogger().warning("No valid items found in items.yml, attempting to load from backup...");
-            loadBackupItems();
-        }
+            if (!loadedSomething) {
+                getLogger().warning("No valid items found in items.yml, attempting to load from backup...");
+                loadBackupItems();
+            }
+        });
     }
+
+
 
 
     public void saveBackupItem(Items item) {
@@ -311,6 +324,7 @@ public class Robbery extends JavaPlugin implements Listener {
         File backupFile = new File(getDataFolder(), "backupitems.yml");
         if (!backupFile.exists()) return;
 
+        items.clear();
         FileConfiguration backupConfig = YamlConfiguration.loadConfiguration(backupFile);
         ConfigurationSection section = backupConfig.getConfigurationSection("items");
         if (section == null) return;
@@ -328,39 +342,6 @@ public class Robbery extends JavaPlugin implements Listener {
             }
         }
     }
-
-    public void migrateOldBackupIfNeeded() {
-        File backupFile = new File(getDataFolder(), "backupitems.yml");
-        if (!backupFile.exists()) return;
-
-        FileConfiguration backupConfig = YamlConfiguration.loadConfiguration(backupFile);
-        Object itemsObj = backupConfig.get("items");
-
-        // Check if it's the old format (a list)
-        if (itemsObj instanceof List<?> oldList) {
-            Map<String, Object> newItems = new LinkedHashMap<>();
-            for (Object obj : oldList) {
-                if (obj instanceof Map<?, ?> map) {
-                    Object droppedItem = map.get("droppedItem");
-                    if (droppedItem instanceof String id) {
-                        newItems.put(id, map);
-                    }
-                }
-            }
-
-            // Replace and save
-            backupConfig.set("items", newItems);
-            try {
-                backupConfig.save(backupFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-
-
 
     private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {

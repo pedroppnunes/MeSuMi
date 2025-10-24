@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import robbery.Robbery;
 import robbery.backpacks.BackpackManager;
 import robbery.commands.PvCommand;
@@ -108,10 +109,6 @@ public class PlayerEventListener implements Listener {
             memory.setSpeedBonus(0);
         }
 
-        if (!hasLoaded) {
-            hasLoaded = true;
-            Bukkit.getScheduler().runTaskLater(plugin, plugin::loadItems, 20L);
-        }
         if(!player.hasPermission(NOITEMS_PERMISSION)) {
             memory.giveToolToInv();
             memory.giveBackpackToInv();
@@ -207,6 +204,15 @@ public class PlayerEventListener implements Listener {
 
         return "&f";
     }
+
+    @EventHandler
+    public void onChunkLoad(ChunkLoadEvent event) {
+        if (!hasLoaded && event.getWorld().getName().equalsIgnoreCase("world")) {
+            hasLoaded = true;
+            plugin.loadItems();
+        }
+    }
+
 
 
 }
