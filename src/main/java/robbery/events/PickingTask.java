@@ -148,5 +148,16 @@ public class PickingTask extends BukkitRunnable {
 
     }
 
+    public Items getItem() {
+        return item;
+    }
+
+    public void resetAndCancel() {
+        this.cancel();
+        item.setHp(item.getInitialhp());
+        item.setPickable();
+        if (onFinish != null) onFinish.run();
+    }
+
 }
 

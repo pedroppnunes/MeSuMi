@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Listens for player interactions with ArmorStands representing items in the world.
@@ -87,7 +89,25 @@ public class ArmorStandInteractionListener implements Listener {
                     return;
                 }
 
-                if (item != null && tool != null && item.isPickable() && item.getHp() > 0 && !p.getBackpack().isFull()) {
+                if (item == null || tool == null) return;
+                String itemId = item.getId();
+                String playerStoreKey = p.getKey().getId();
+
+                int itemStoreNum = extractStoreNumber(itemId);
+                int playerStoreNum = extractStoreNumber(playerStoreKey);
+
+                if (itemStoreNum > playerStoreNum) {
+                    Messages.sendActionBar(player,"events.wrong-store");
+                    return;
+                }
+
+                if (!item.isPickable()) {
+                    Messages.sendActionBar(player, "events.already-being-picked");
+                    return;
+                }
+
+                if (item.getHp() > 0 && !p.getBackpack().isFull()) {
+
                     if (pickingTasks.containsKey(player.getUniqueId())) return;
                     item.setPickable();
                     int roll = 0;
@@ -103,6 +123,14 @@ public class ArmorStandInteractionListener implements Listener {
         }
     }
 
+    private int extractStoreNumber(String id) {
+        Matcher matcher = Pattern.compile("\\d+").matcher(id);
+        if (matcher.find()) {
+            return Integer.parseInt(matcher.group());
+        }
+        return 0;
+    }
+
     /**
      * Cancels any active picking task if the player changes the item held in hand.
      *
@@ -113,7 +141,7 @@ public class ArmorStandInteractionListener implements Listener {
         Player player = event.getPlayer();
         PickingTask task = pickingTasks.remove(player.getUniqueId());
         if (task != null) {
-            task.cancel();
+            task.resetAndCancel();
             Messages.sendActionBar(player, "events.picking-canceled");
         }
     }
@@ -128,7 +156,7 @@ public class ArmorStandInteractionListener implements Listener {
         if (!(event.getWhoClicked() instanceof Player player)) return;
         PickingTask task = pickingTasks.remove(player.getUniqueId());
         if (task != null) {
-            task.cancel();
+            task.resetAndCancel();
             Messages.sendActionBar(player, "events.picking-canceled");
         }
     }
