@@ -7,10 +7,10 @@ import java.text.DecimalFormat;
 
 public class KeyManager {
     public final static Keys STORE1 = new Keys("Supermarket",0,1,"&#FB0808S&#FB0808u&#FB0808p&#FB0808e&#FB0808r&#FB0808m&#FB0808a&#FB0808r&#FB0808k&#FB0808e&#FB0808t","store1");
-    public final static Keys STORE2 = new Keys("The Griffin's",1000,2,"&#084CFBT&#084CFBh&#084CFBe &#084CFBG&#084CFBr&#084CFBi&#084CFBf&#084CFBf&#084CFBi&#084CFBn&#084CFB'&#084CFBs","store2");
-    public final static Keys STORE3 = new Keys("Gym",22_500,3,"&#FFFFFFG&#FFFFFFy&#FFFFFFm","store3");
+    public final static Keys STORE2 = new Keys("The Griffin's",500,2,"&#084CFBT&#084CFBh&#084CFBe &#084CFBG&#084CFBr&#084CFBi&#084CFBf&#084CFBf&#084CFBi&#084CFBn&#084CFB'&#084CFBs","store2");
+    public final static Keys STORE3 = new Keys("Gym",6_000,3,"&#FFFFFFG&#FFFFFFy&#FFFFFFm","store3");
     public final static Keys STORE4 = new Keys("Arcade",75_000,4,"&#FCD05CA&#F4A67Dr&#EB7D9Dc&#E353BEa&#DA2ADEd&#D200FFe","store4");
-    public final static Keys STORE5 = new Keys("School",250_000,5,"&#F1FF00S&#F1FF00c&#F1FF00h&#F1FF00o&#F1FF00o&#F1FF00l","store5");
+    public final static Keys STORE5 = new Keys("School",400_000,5,"&#F1FF00S&#F1FF00c&#F1FF00h&#F1FF00o&#F1FF00o&#F1FF00l","store5");
     public final static Keys STORE6 = new Keys("Casino",1_000_000,6,"&#FF0000&lC&#FC3300&la&#F96600&ls&#F79900&li&#F4CC00&ln&#F1FF00&lo","store6");
     public final static Keys STORE7 = new Keys("Oceanarium",2_500_000,7,"&#00EAFF&lO&#00ECE3&lc&#01EFC6&le&#01F1AA&la&#01F38E&ln&#02F671&la&#02F855&lr&#02FA39&li&#03FD1C&lu&#03FF00&lm","store7");
     public final static Keys STORE8 = new Keys("Steakhouse",12_500_000,8,"&#732F00&lS&#833800&lt&#924000&le&#A24900&la&#B15100&lk&#C15A00&lh&#D06200&lo&#E06B00&lu&#EF7300&ls&#FF7C00&le","store8");
