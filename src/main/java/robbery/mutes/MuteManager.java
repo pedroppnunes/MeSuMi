@@ -55,7 +55,14 @@ public class MuteManager {
         File file = getFile(uuid);
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        Duration duration = parseDuration(durationRaw);
+        Duration duration;
+        try {
+            duration = parseDuration(durationRaw);
+        } catch (IllegalArgumentException e) {
+            duration = Duration.ofMinutes(60);
+            plugin.getLogger().warning("Invalid mute duration for " + uuid + ": '" + durationRaw + "' (defaulting to 10m)");
+        }
+
         long expireMillis = now + duration.toMillis();
 
         cfg.set("muted", true);
@@ -154,9 +161,16 @@ public class MuteManager {
      * @throws IllegalArgumentException If the input is in an invalid format.
      */
     private Duration parseDuration(String input) {
-        if (!input.matches("\\d+[smhdwy]")) throw new IllegalArgumentException("Invalid duration format.");
+        if (input == null || input.isBlank()) throw new IllegalArgumentException("Empty duration");
+        if (input.equalsIgnoreCase("perm") || input.equalsIgnoreCase("permanent"))
+            return Duration.ofDays(365 * 100); // 100 years as "permanent"
+
+        if (!input.matches("\\d+[smhdwy]"))
+            throw new IllegalArgumentException("Invalid duration format: " + input);
+
         int value = Integer.parseInt(input.replaceAll("[^\\d]", ""));
         char unit = input.charAt(input.length() - 1);
+
         return switch (unit) {
             case 's' -> Duration.ofSeconds(value);
             case 'm' -> Duration.ofMinutes(value);
@@ -167,4 +181,5 @@ public class MuteManager {
             default -> throw new IllegalArgumentException("Unknown unit: " + unit);
         };
     }
+
 }

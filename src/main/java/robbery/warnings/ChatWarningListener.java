@@ -144,7 +144,7 @@ public class ChatWarningListener implements Listener {
 
         if (muteManager.isMuted(uuid)) return;
 
-        muteManager.mutePlayer(uuid, "3h", "Server","Spamming in chat");
+        muteManager.mutePlayer(uuid, "Server", "3h","Spamming in chat");
 
         plugin.getWarningManager().addWarning(uuid, "Spamming in chat", "Server", "12h");
 
