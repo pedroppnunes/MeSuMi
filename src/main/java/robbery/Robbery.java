@@ -3,14 +3,18 @@ package robbery;
 import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -25,6 +29,8 @@ import robbery.mutes.MuteManager;
 import robbery.outpost.CombatManager;
 import robbery.outpost.OutpostManager;
 import robbery.outpost.OutpostRegion;
+import robbery.player.PlayerData;
+import robbery.player.PlayerDataManager;
 import robbery.player.PlayerEventListener;
 import robbery.ranks.RankPaperListener;
 import robbery.skillpoints.SkillPointListener;
@@ -57,6 +63,7 @@ public class Robbery extends JavaPlugin implements Listener {
     private VotePartyManager votePartyManager;
     private ChatStyleManager chatStyleManager;
     private WeeklyLeaderboardTask weeklyLeaderboardTask;
+    private PlayerEventListener playerEventListener;
 
     @Override
     public void onEnable() {
@@ -80,12 +87,14 @@ public class Robbery extends JavaPlugin implements Listener {
         this.muteManager = new MuteManager(main);
         this.votePartyManager = new VotePartyManager(main);
         this.chatStyleManager = new ChatStyleManager(getDataFolder());
+        this.playerEventListener = new PlayerEventListener(main);
         getServer().getPluginManager().registerEvents(new VoteListener(main), main);
         BlockCraftListener blockCraft = new BlockCraftListener();
         Messages.init(main);
+        new AutoReloadTask(this).runTaskTimerAsynchronously(this, 0L, 20L);
         getServer().getPluginManager().registerEvents(new InventoryLockListener(), main);
         getServer().getPluginManager().registerEvents(new ArmorStandInteractionListener(main), main);
-        getServer().getPluginManager().registerEvents(new PlayerEventListener(main), main);
+        getServer().getPluginManager().registerEvents(playerEventListener, main);
         getServer().getPluginManager().registerEvents(new BoosterItemListener(main), main);
         getServer().getPluginManager().registerEvents(new DoubleJumpListener(main), main);
         getServer().getPluginManager().registerEvents(new HideoutListener(), main);
@@ -133,6 +142,8 @@ public class Robbery extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("lobby")).setExecutor(new Lobby(main));
         Objects.requireNonNull(getCommand("weeklyleaderboard")).setExecutor(new WeeklyLeaderboardCommand(main));
         Objects.requireNonNull(getCommand("loadbackup")).setExecutor(new LoadBackup(main));
+        Objects.requireNonNull(getCommand("migrate")).setExecutor(new MigrateBackup(main));
+        Objects.requireNonNull(getCommand("stopbooster")).setExecutor(new StopBoosterCommand());
         getServer().getMessenger().registerOutgoingPluginChannel(main, "BungeeCord");
         World outpostWorld = Bukkit.getWorld("outpost");
         if (outpostWorld == null) {
@@ -155,6 +166,8 @@ public class Robbery extends JavaPlugin implements Listener {
 
         String webhookUrl = "https://discord.com/api/webhooks/1418305594716192830/LqLGQ8B-f6JRkBJw0fyQVndskVuWx8GnLpaD33lHmQwwlZw5IN_CrkBoV-YdpzLHFmqS";
         weeklyLeaderboardTask = new WeeklyLeaderboardTask(this, webhookUrl);
+
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, this::saveItems, 20L * 60, 20L * 60 * 5);
     }
 
     public void addItemstoMap(){
@@ -186,6 +199,7 @@ public class Robbery extends JavaPlugin implements Listener {
         this.isBackingUp = true;
 
         for (Player player : Bukkit.getOnlinePlayers()) {
+            playerEventListener.saveOnDisable(player);
             player.kick(Component.text(Messages.get("reload.player-kick")));
         }
         
@@ -219,66 +233,163 @@ public class Robbery extends JavaPlugin implements Listener {
     }
 
     public void saveItems() {
-        File itemsFile = new File(getDataFolder(), "items.yml");
-        FileConfiguration itemsConfig = new YamlConfiguration();
+        if(playerEventListener.getHasLoaded()) {
+            File itemsFile = new File(getDataFolder(), "items.yml");
+            FileConfiguration itemsConfig = new YamlConfiguration();
 
-        itemsConfig.set("items", null);
+            itemsConfig.set("items", null);
 
-        // Save each item under its dropped item UUID key
-        for (Items item : items) {
-            Map<String, Object> itemData = item.serialize();
-            Object droppedIdObj = itemData.get("droppedItem");
+            Set<String> chunkCoords = new HashSet<>();
 
-            if (droppedIdObj instanceof String droppedId) {
-                itemsConfig.createSection("items." + droppedId, itemData);
-            } else {
-                getLogger().warning("Skipping item without valid droppedItem UUID: " + item);
+            for (Items item : items) {
+                Map<String, Object> itemData = item.serialize();
+                Object droppedIdObj = itemData.get("droppedItem");
+
+                if (droppedIdObj instanceof String droppedId) {
+                    itemsConfig.createSection("items." + droppedId, itemData);
+
+                    Object worldObj = itemData.get("world");
+                    Object xObj = itemData.get("x");
+                    Object zObj = itemData.get("z");
+                    if (worldObj instanceof String && xObj instanceof Number && zObj instanceof Number) {
+                        String worldName = (String) worldObj;
+                        int chunkX = (int) Math.floor(((Number) xObj).doubleValue()) >> 4;
+                        int chunkZ = (int) Math.floor(((Number) zObj).doubleValue()) >> 4;
+                        chunkCoords.add(worldName + ":" + chunkX + ":" + chunkZ);
+                    }
+                } else {
+                    getLogger().warning("Skipping item without valid droppedItem UUID: " + item);
+                }
+
             }
-        }
 
-        try {
-            itemsConfig.save(itemsFile);
-        } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                itemsConfig.save(itemsFile);
+            } catch (Exception e) {
+                getLogger().severe("Failed to save items.yml: " + e.getMessage());
+            }
+
+            File chunksFile = new File(getDataFolder(), "chunks.yml");
+            FileConfiguration chunkCfg = YamlConfiguration.loadConfiguration(chunksFile);
+            chunkCfg.set("chunks", new ArrayList<>(chunkCoords));
+            try {
+                chunkCfg.save(chunksFile);
+            } catch (Exception e) {
+                getLogger().severe("Failed to save chunks.yml: " + e.getMessage());
+            }
         }
     }
 
+
     public void loadItems() {
-        LoadChunks chunkLoader = new LoadChunks(this);
+        File itemsFile = new File(getDataFolder(), "items.yml");
+        if (!itemsFile.exists()) {
+            getLogger().warning("items.yml not found, loading backup...");
+            loadBackupItems();
+            return;
+        }
 
-        chunkLoader.loadAllChunks(() -> {
-            getLogger().info("Chunks ready. Now loading items...");
+        FileConfiguration itemsConfig = YamlConfiguration.loadConfiguration(itemsFile);
+        ConfigurationSection section = itemsConfig.getConfigurationSection("items");
+        if (section == null) {
+            getLogger().warning("No items section found in items.yml, loading backup...");
+            loadBackupItems();
+            return;
+        }
 
-            File itemsFile = new File(getDataFolder(), "items.yml");
-            boolean loadedSomething = false;
+        Set<String> chunksToLoad = new HashSet<>();
+        Map<String, Map<String, Object>> itemsData = new HashMap<>();
 
-            if (itemsFile.exists()) {
-                FileConfiguration itemsConfig = YamlConfiguration.loadConfiguration(itemsFile);
-                ConfigurationSection section = itemsConfig.getConfigurationSection("items");
+        for (String key : section.getKeys(false)) {
+            try {
+                UUID.fromString(key);
+                Map<String, Object> itemData = section.getConfigurationSection(key).getValues(false);
+                itemsData.put(key, itemData);
 
-                if (section != null) {
-                    for (String key : section.getKeys(false)) {
-                        try {
-                            UUID droppedUUID = UUID.fromString(key);
-                            if (Bukkit.getEntity(droppedUUID) != null) {
-                                Map<String, Object> itemData = section.getConfigurationSection(key).getValues(false);
-                                Items item = new Items(itemData);
-                                items.add(item);
-                                loadedSomething = true;
+                Object worldObj = itemData.get("world");
+                Object xObj = itemData.get("x");
+                Object zObj = itemData.get("z");
+                if (worldObj instanceof String && xObj instanceof Number && zObj instanceof Number) {
+                    String worldName = (String) worldObj;
+                    int chunkX = ((Number) xObj).intValue() >> 4;
+                    int chunkZ = ((Number) zObj).intValue() >> 4;
+                    chunksToLoad.add(worldName + ":" + chunkX + ":" + chunkZ);
+                }
+            } catch (IllegalArgumentException e) {
+                getLogger().warning("Invalid UUID in items.yml: " + key);
+            }
+        }
+
+        LoadChunks loader = new LoadChunks(this);
+
+        loader.loadSpecificChunks(chunksToLoad, () -> {
+            getLogger().info("Chunks ready. Now restoring items from items.yml...");
+
+            for (Map.Entry<String, Map<String, Object>> entry : itemsData.entrySet()) {
+                String key = entry.getKey();
+                Map<String, Object> itemData = entry.getValue();
+
+                UUID droppedUUID;
+                try {
+                    droppedUUID = UUID.fromString(key);
+                } catch (IllegalArgumentException e) {
+                    continue;
+                }
+
+                if (Bukkit.getEntity(droppedUUID) != null) {
+                    Items item = new Items(itemData);
+                    items.add(item);
+                    continue;
+                }
+
+                Object worldObj = itemData.get("world");
+                Object xObj = itemData.get("x");
+                Object yObj = itemData.get("y");
+                Object zObj = itemData.get("z");
+
+                if (worldObj instanceof String && xObj instanceof Number && yObj instanceof Number && zObj instanceof Number) {
+                    World w = Bukkit.getWorld((String) worldObj);
+                    if (w == null) continue;
+
+                    Location loc = new Location(w,
+                            ((Number) xObj).doubleValue(),
+                            ((Number) yObj).doubleValue(),
+                            ((Number) zObj).doubleValue());
+
+                    boolean found = false;
+                    for (Entity ent : w.getNearbyEntities(loc, 1.5, 1.5, 1.5)) {
+                        if (ent instanceof ArmorStand stand) {
+                            if (stand.getPersistentDataContainer().has(new NamespacedKey(this, "item_uuid"), PersistentDataType.STRING)) {
+                                String id = stand.getPersistentDataContainer().get(new NamespacedKey(this, "item_uuid"), PersistentDataType.STRING);
+                                if (id != null && id.equals(key)) {
+                                    Items item = new Items(itemData);
+                                    items.add(item);
+                                    found = true;
+                                    break;
+                                }
                             }
-                        } catch (IllegalArgumentException e) {
-                            getLogger().warning("Invalid UUID in items.yml: " + key);
                         }
                     }
+
+                    if (!found) {
+                        Items item = new Items(itemData);
+                        items.add(item);
+                    }
+                } else {
+                    Items item = new Items(itemData);
+                    items.add(item);
                 }
             }
 
-            if (!loadedSomething) {
-                getLogger().warning("No valid items found in items.yml, attempting to load from backup...");
+            if (items.isEmpty()) {
+                getLogger().warning("No valid items found in items.yml after chunk load, attempting to load from backup...");
                 loadBackupItems();
+            } else {
+                getLogger().info("Loaded " + items.size() + " items.");
             }
         });
     }
+
 
 
 
@@ -291,7 +402,7 @@ public class Robbery extends JavaPlugin implements Listener {
         String id = (String) serialized.get("droppedItem");
         if (id == null) return;
 
-        backupConfig.set("items." + id, serialized);
+        backupConfig.createSection("items." + id, serialized);
 
         try {
             backupConfig.save(backupFile);
@@ -324,16 +435,37 @@ public class Robbery extends JavaPlugin implements Listener {
         File backupFile = new File(getDataFolder(), "backupitems.yml");
         if (!backupFile.exists()) return;
 
-        items.clear();
         FileConfiguration backupConfig = YamlConfiguration.loadConfiguration(backupFile);
         ConfigurationSection section = backupConfig.getConfigurationSection("items");
         if (section == null) return;
 
+        items.clear();
+        boolean changed = false;
+
         for (String key : section.getKeys(false)) {
             try {
                 UUID droppedUUID = UUID.fromString(key);
-                Map<String, Object> itemData = section.getConfigurationSection(key).getValues(false);
-                if (Bukkit.getEntity(droppedUUID) != null) {
+                ConfigurationSection itemSection = section.getConfigurationSection(key);
+                if (itemSection == null) continue;
+
+                Map<String, Object> itemData = itemSection.getValues(false);
+
+                Entity ent = Bukkit.getEntity(droppedUUID);
+                if (ent instanceof Item droppedEntity) {
+                    if (!itemData.containsKey("world") || !itemData.containsKey("x") || !itemData.containsKey("z") || !itemData.containsKey("y")) {
+                        Location loc = droppedEntity.getLocation();
+                        backupConfig.set("items." + key + ".world", loc.getWorld().getName());
+                        backupConfig.set("items." + key + ".x", loc.getX());
+                        backupConfig.set("items." + key + ".y", loc.getY());
+                        backupConfig.set("items." + key + ".z", loc.getZ());
+                        changed = true;
+                    }
+
+                    Map<String, Object> migratedData = backupConfig.getConfigurationSection("items." + key).getValues(false);
+                    Items item = new Items(migratedData);
+                    item.setDroppedItem(droppedEntity);
+                    items.add(item);
+                } else {
                     Items item = new Items(itemData);
                     items.add(item);
                 }
@@ -341,7 +473,17 @@ public class Robbery extends JavaPlugin implements Listener {
                 getLogger().warning("Invalid UUID in backupitems.yml: " + key);
             }
         }
+
+        if (changed) {
+            try {
+                backupConfig.save(backupFile);
+                getLogger().info("backupitems.yml migrated with location data for found entities.");
+            } catch (IOException e) {
+                getLogger().severe("Failed to save migrated backupitems.yml: " + e.getMessage());
+            }
+        }
     }
+
 
     private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {

@@ -101,12 +101,12 @@ public class ArmorStandInteractionListener implements Listener {
                     return;
                 }
 
-                if (!item.isPickable()) {
+                if (!item.isPickable() && item.getHp() > 0) {
                     Messages.sendActionBar(player, "events.already-being-picked");
                     return;
                 }
 
-                if (item.getHp() > 0 && !p.getBackpack().isFull()) {
+                if (item.isPickable() && item.getHp() > 0 && !p.getBackpack().isFull()) {
 
                     if (pickingTasks.containsKey(player.getUniqueId())) return;
                     item.setPickable();

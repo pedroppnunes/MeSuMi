@@ -82,4 +82,45 @@ public class LoadChunks {
         }
     }
 
+    // Inside LoadChunks class
+    public void loadSpecificChunks(Set<String> chunkCoords, Runnable onComplete) {
+        if (chunkCoords == null || chunkCoords.isEmpty()) {
+            Bukkit.getScheduler().runTask(plugin, onComplete);
+            return;
+        }
+
+        plugin.getLogger().info("Loading " + chunkCoords.size() + " chunks...");
+
+        AtomicInteger remaining = new AtomicInteger(chunkCoords.size());
+
+        for (String entry : chunkCoords) {
+            String[] parts = entry.split(":");
+            if (parts.length != 3) {
+                plugin.getLogger().warning("Invalid chunk format: " + entry);
+                if (remaining.decrementAndGet() == 0) Bukkit.getScheduler().runTask(plugin, onComplete);
+                continue;
+            }
+
+            World world = Bukkit.getWorld(parts[0]);
+            if (world == null) {
+                plugin.getLogger().warning("World not found for chunk: " + entry);
+                if (remaining.decrementAndGet() == 0) Bukkit.getScheduler().runTask(plugin, onComplete);
+                continue;
+            }
+
+            int x = Integer.parseInt(parts[1]);
+            int z = Integer.parseInt(parts[2]);
+
+            world.getChunkAtAsync(x, z, true, chunk -> {
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    chunk.setForceLoaded(true);
+                    if (remaining.decrementAndGet() == 0) {
+                        plugin.getLogger().info("All required chunks have been loaded.");
+                        onComplete.run();
+                    }
+                });
+            });
+        }
+    }
+
 }

@@ -5,6 +5,7 @@ import com.destroystokyo.paper.profile.ProfileProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -15,7 +16,6 @@ import robbery.Robbery;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Items {
     private final double initialhp;
@@ -56,19 +56,73 @@ public class Items {
         this.id = other.id;
     }
     public Items(Map<String, Object> itemData) {
-        this.hp = (double) itemData.get("hp");
-        this.value = (int) itemData.get("value");
-        this.name = (String) itemData.get("name");
-        this.playername = (String) itemData.get("playerName");
-        this.uniqueId = UUID.fromString((String) itemData.get("uniqueId"));
-        this.skull = getPlayerHead(this.playername);
+        this.hp = asDouble(itemData.get("hp"));
+        this.value = asInt(itemData.get("value"));
+        this.name = (String) itemData.getOrDefault("name", "unknown");
+        this.playername = (String) itemData.getOrDefault("playerName", "");
         this.initialhp = this.hp;
-        this.time = (int) itemData.get("time");
-        this.droppedItem = (Item) Bukkit.getEntity(UUID.fromString((String) itemData.get("droppedItem")));
-        this.position = droppedItem.getLocation();
-        this.id = (String) itemData.get("id");
+        this.time = asInt(itemData.get("time"));
+        this.id = (String) itemData.getOrDefault("id", "unknown");
+
+        String uidStr = (String) itemData.get("uniqueId");
+        if (uidStr != null) {
+            try {
+                this.uniqueId = UUID.fromString(uidStr);
+            } catch (IllegalArgumentException e) {
+                this.uniqueId = UUID.randomUUID();
+            }
+        } else {
+            this.uniqueId = UUID.randomUUID();
+        }
+
+        this.skull = getPlayerHead(this.playername);
+
+        this.droppedItem = null;
+        Object droppedObj = itemData.get("droppedItem");
+        if (droppedObj instanceof String droppedUuidStr) {
+            try {
+                UUID droppedUuid = UUID.fromString(droppedUuidStr);
+                if (Bukkit.getEntity(droppedUuid) instanceof Item ent) {
+                    this.droppedItem = ent;
+                    this.position = ent.getLocation();
+                }
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+
+        if (this.droppedItem == null) {
+            Object worldObj = itemData.get("world");
+            Object xObj = itemData.get("x");
+            Object yObj = itemData.get("y");
+            Object zObj = itemData.get("z");
+
+            if (worldObj instanceof String && (xObj != null && zObj != null && yObj != null)) {
+                World w = Bukkit.getWorld((String) worldObj);
+                if (w != null) {
+                    double x = asDouble(xObj);
+                    double y = asDouble(yObj);
+                    double z = asDouble(zObj);
+                    this.position = new Location(w, x, y, z);
+                }
+            }
+        }
     }
 
+    private static double asDouble(Object o) {
+        if (o instanceof Number) return ((Number) o).doubleValue();
+        if (o instanceof String) {
+            try { return Double.parseDouble((String) o); } catch (NumberFormatException ignored) {}
+        }
+        return 0.0;
+    }
+
+    private static int asInt(Object o) {
+        if (o instanceof Number) return ((Number) o).intValue();
+        if (o instanceof String) {
+            try { return Integer.parseInt((String) o); } catch (NumberFormatException ignored) {}
+        }
+        return 0;
+    }
     public double getHp(){
         return Math.max(0,hp);
     }
@@ -164,20 +218,37 @@ public class Items {
         itemData.put("name", this.name);
         itemData.put("playerName", this.playername);
         itemData.put("time", this.time);
-        itemData.put("uniqueId",this.uniqueId.toString());
-        itemData.put("droppedItem", this.droppedItem.getUniqueId().toString());
-        itemData.put("id",this.id);
+        itemData.put("uniqueId", this.uniqueId.toString());
+        itemData.put("id", this.id);
+
+        if (this.droppedItem != null) {
+            itemData.put("droppedItem", this.droppedItem.getUniqueId().toString());
+            Location loc = this.droppedItem.getLocation();
+            itemData.put("world", loc.getWorld().getName());
+            itemData.put("x", loc.getX());
+            itemData.put("y", loc.getY());
+            itemData.put("z", loc.getZ());
+        } else if (this.position != null) {
+            itemData.put("world", this.position.getWorld().getName());
+            itemData.put("x", this.position.getX());
+            itemData.put("y", this.position.getY());
+            itemData.put("z", this.position.getZ());
+            itemData.put("droppedItem", null);
+        } else {
+            itemData.put("droppedItem", null);
+        }
 
         return itemData;
     }
-    // inside class Items
-    public Items copyForBackpack() {
-        Items copy = new Items(this.hp, this.value, this.name, this.playername, this.time,this.id);
-        // ensure the copy has an independent unique id if needed:
+
+    public Items copyForBackpack(double boost) {
+        Items copy = new Items(this.hp, (int) (this.value * boost), this.name, this.playername, this.time,this.id);
         copy.setUniqueId(UUID.randomUUID());
-        // Don't copy world-only fields like hp, spawn timers or pickable state.
-        // Initialize backpack-relevant fields (if needed) here.
         return copy;
+    }
+
+    public Item getDroppedItem(){
+        return droppedItem;
     }
 
     public void setUniqueId(UUID id){
