@@ -14,18 +14,18 @@ public class BoosterManager {
     private static final Random random = new Random();
 
     private static final Booster BOOST0 = new Booster("None", 1.0, 0, 0, "null");
-    private static final Booster BOOST1_1 = new Booster("1.25x Money", 0.25, 5 * 60, 1, "boost1x1");
-    private static final Booster BOOST1_2 = new Booster("1.25x Money", 0.25, 10 * 60, 1, "boost1x2");
-    private static final Booster BOOST1_3 = new Booster("1.25x Money", 0.25, 15 * 60, 1, "boost1x3");
-    private static final Booster BOOST2_1 = new Booster("1.5x Money", 0.5, 5 * 60, 2, "boost2x1");
-    private static final Booster BOOST2_2 = new Booster("1.5x Money", 0.5, 10 * 60, 2, "boost2x2");
-    private static final Booster BOOST2_3 = new Booster("1.5x Money", 0.5, 15 * 60, 2, "boost2x3");
-    private static final Booster BOOST3_1 = new Booster("1.75x Money", 0.75, 5 * 60, 3, "boost3x1");
-    private static final Booster BOOST3_2 = new Booster("1.75x Money", 0.75, 10 * 60, 3, "boost3x2");
-    private static final Booster BOOST3_3 = new Booster("1.75x Money", 0.75, 15 * 60, 3, "boost3x3");
-    private static final Booster BOOST4_1 = new Booster("2x Money", 1, 5 * 60, 4, "boost4x1");
-    private static final Booster BOOST4_2 = new Booster("2x Money", 1, 10 * 60, 4, "boost4x2");
-    private static final Booster BOOST4_3 = new Booster("2x Money", 1, 15 * 60, 4, "boost4x3");
+    private static final Booster BOOST1_1 = new Booster("1.25x Money", 1.25, 5 * 60, 1, "boost1x1");
+    private static final Booster BOOST1_2 = new Booster("1.25x Money", 1.25, 10 * 60, 1, "boost1x2");
+    private static final Booster BOOST1_3 = new Booster("1.25x Money", 1.25, 15 * 60, 1, "boost1x3");
+    private static final Booster BOOST2_1 = new Booster("1.5x Money", 1.5, 5 * 60, 2, "boost2x1");
+    private static final Booster BOOST2_2 = new Booster("1.5x Money", 1.5, 10 * 60, 2, "boost2x2");
+    private static final Booster BOOST2_3 = new Booster("1.5x Money", 1.5, 15 * 60, 2, "boost2x3");
+    private static final Booster BOOST3_1 = new Booster("1.75x Money", 1.75, 5 * 60, 3, "boost3x1");
+    private static final Booster BOOST3_2 = new Booster("1.75x Money", 1.75, 10 * 60, 3, "boost3x2");
+    private static final Booster BOOST3_3 = new Booster("1.75x Money", 1.75, 15 * 60, 3, "boost3x3");
+    private static final Booster BOOST4_1 = new Booster("2x Money", 2, 5 * 60, 4, "boost4x1");
+    private static final Booster BOOST4_2 = new Booster("2x Money", 2, 10 * 60, 4, "boost4x2");
+    private static final Booster BOOST4_3 = new Booster("2x Money", 2, 15 * 60, 4, "boost4x3");
 
     /**
      * Retrieves a booster by its unique identifier.
@@ -107,21 +107,27 @@ public class BoosterManager {
      * @return a {@link Booster} based on chance, or null if no booster was won
      */
     public static Booster getRandomBoosterWithChance(int store, PlayerData pd) {
-        int baseRollRange = 2000 / store;
-        double bonus = pd.getOutBoosterChance();
-        int adjustedRollRange = (int) Math.max(1, baseRollRange * (1.0 - bonus));
-        int roll = random.nextInt(adjustedRollRange) + 1;
+        double startChance = 1.0 / 2000.0;
+        double endChance = 1.0 / 500.0;
+        double baseChance = startChance + (endChance - startChance) * ((store - 1) / 11.0);
 
-        if (roll <= 5) {
+        double bonusMultiplier = 1.0 + pd.getOutBoosterChance();
+        double finalChance = baseChance * bonusMultiplier;
+
+        int rollRange = (int) Math.max(1, Math.round(1.0 / finalChance));
+        int roll = random.nextInt(rollRange) + 1;
+
+        if (roll <= 3) {
             return getRandomBoosterFromMultiplier(0.25);
-        } else if (roll <= 8) {
+        } else if (roll <= 5) {
             return getRandomBoosterFromMultiplier(0.5);
-        } else if (roll <= 10) {
+        } else if (roll <= 7) {
             return getRandomBoosterFromMultiplier(0.75);
-        } else if (roll == 11) {
+        } else if (roll == 8) {
             return getRandomBoosterFromMultiplier(1);
         }
 
         return null;
     }
+
 }
