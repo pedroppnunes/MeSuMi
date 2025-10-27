@@ -112,11 +112,6 @@ command:
   reload:
     usage: "&5&lRobbery &8> &cUsage: /robbery reload"
     success: "&5&lRobbery &8> &aadditems.yml/language.yml reloaded."
-  sell:
-    title-lucky: "&7You sold your items for &a%amount%$"
-    subtitle-lucky: "&6You got Lucky! &e+%chance%% Bonus!"
-    title-success: "&7You sold your items for &a%amount%$"
-    subtitle-success: ""
   skillpointbuy:
     usage: "&5&lRobbery &8> &cUsage: /skillpointbuy <operation> <player>"
     unknown-upgrade: "&5&lRobbery &8> &cUnknown upgrade type."
@@ -127,6 +122,8 @@ command:
   spawn:
     teleporting: "&5&lRobbery &8> &aTeleporting to spawn..."
     world-not-found: "&5&lRobbery &8> &cThe spawn world could not be found!"
+  stopbooster:
+    usage: "&5&lRobbery &8> &cUsage: /stopbooster <player>"
   store:
     no-backpack: "&5&lRobbery &8> &cEmpty your backpack before teleporting!"
     no-permission: "&5&lRobbery &8> &cYou need Heister Rank or higher to use /store."
@@ -190,6 +187,7 @@ events:
     owned_time_left: "&eYour island already owns this outpost. Time left: &b%time%"
     capture_broadcast: "&5&lRobbery &8> &aOutpost captured by &b%island_name%&a!"
     boost_expired_title: "&5&lRobbery &8> &cOutpost boost expired"
+    boost_expired_border: "-----------------------------"
     boost_expired_desc: "&5&lRobbery &8> &7The outpost has no one holding it."
     progress_bar: "%bar% §e%percent%%"
     status-title-unclaimed: "&cOutpost Unclaimed"
@@ -200,7 +198,7 @@ events:
     outpost-material-unclaimed: "REDSTONE"
     outpost-material-not-owner: "LAPIS_LAZULI"
     outpost-material-owner: "EMERALD"
-    perk_announcement_border: "&m-----------------------------"
+    perk_announcement_border: "-----------------------------"
     perk_announcement_money: "&eNew Outpost Money Multiplier: &a+%amount%x"
     perk_announcement_perk2: "&eNew Outpost Perk: &a+%value%% %perk%"
     neutralizing_broadcast: "&5&lRobbery &8> &eOutpost being neutralized by &b%island_name%&e!"
@@ -212,6 +210,9 @@ reload:
 boosters:
   activated: "&5&lRobbery &8> &aYou activated &e%boost_name% &afor &e%minutes% &aminutes."
   added_time: "&5&lRobbery &8> &aYou added &e%minutes% &aminutes to your current boost."
+  queued: "&5&lRobbery &8> &eQueued &e%boost_name% booster. It will activate automatically later."
+  paused: "&5&lRobbery &8> &cYou have stopped your booster."
+  resumed: "&5&lRobbery &8> &eYou have resumed your booster."
 rank:
   already_have: "&5&lRobbery &8> &cYou already have this rank or a better one."
   upgraded: "&5&lRobbery &8> &aYour rank has been upgraded to %rank_name%!"

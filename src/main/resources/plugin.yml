@@ -52,6 +52,9 @@ commands:
   mall:
     usage: /mall
     permission: robbery.mall
+  migrate:
+    usage: /migrate <subcommand>
+    permission: robbery.op
   mute:
     usage: /mute <player> <time> [reason]
     permission: robbery.staff
@@ -99,6 +102,10 @@ commands:
   spawn:
     description: Teleports you to spawn
     usage: /spawn
+  stopbooster:
+    description: Toggles your booster (pause/resume)
+    usage: /stopbooster [player]
+    permission: robbery.op
   store:
     description: Teleport to your current store
     usage: /store

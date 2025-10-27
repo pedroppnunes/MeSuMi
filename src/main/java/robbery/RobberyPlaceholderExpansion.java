@@ -146,7 +146,7 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                     case "backpack_size":
                         return String.valueOf(playerData.getBackpack().getSize());
                     case "backpack_total":
-                        return String.valueOf(Double.parseDouble(KeyManager.formatDouble(playerData.getBackpack().getTotal(playerData))));
+                        return String.valueOf(KeyManager.formatNumber(Double.parseDouble(KeyManager.formatDouble(playerData.getBackpack().getTotal()))));
                     case "tool_name":
                         return String.valueOf(playerData.getTool().getColorname());
                     case "key_name":
@@ -197,6 +197,8 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                         return main.getOutpostManager().getPerk2();
                     case "chatstyle":
                         return getColor(player);
+                    case "booster_paused":
+                        return String.valueOf(playerData.isBoostersPaused());
 
                     case "tool_n":
                         return String.valueOf(ToolManager.getToolsNameR(playerData.getTool().getName()));

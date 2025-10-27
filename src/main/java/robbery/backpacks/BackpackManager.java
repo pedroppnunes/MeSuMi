@@ -61,10 +61,8 @@ public class BackpackManager {
                 token = token.trim();
 
                 if (token.isEmpty()) continue;
-                Items item = Robbery.getItemsbyName(token);
-                if (item != null) {
-                    it.add(item);
-                }
+                Items item = new Items(0.0,Integer.parseInt(token),"","",0,"");
+                it.add(item);
             }
         }
 

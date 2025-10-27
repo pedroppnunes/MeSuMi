@@ -1,6 +1,5 @@
 package robbery.backpacks;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
@@ -59,7 +58,7 @@ public class Backpacks {
         this.price = price;
         if (items != null) {
             for (Items it : items) {
-                this.backpack.add(it.copyForBackpack());
+                this.backpack.add(it.copyForBackpack(1.0));
             }
         }
         this.colorname = ChatColor.translateAlternateColorCodes('&', colorname);
@@ -71,11 +70,10 @@ public class Backpacks {
         this.material = b.material;
         this.price = b.price;
         this.capacity = b.capacity + extraSlots;
-        // create a new list; deep-copy every item from the template
         this.backpack = new ArrayList<>(this.capacity);
         if (b.backpack != null) {
             for (Items it : b.backpack) {
-                this.backpack.add(it.copyForBackpack());
+                this.backpack.add(it.copyForBackpack(1.0));
             }
         }
         this.colorname = b.colorname;
@@ -84,11 +82,10 @@ public class Backpacks {
     /**
      * Sells all items in the backpack, clearing it and returning the total value.
      *
-     * @param p the player whose boost affects item value
      * @return total value of sold items formatted as a double
      */
-    public double sell(PlayerData p) {
-        double t = getTotal(p);
+    public double sell() {
+        double t = getTotal();
         this.backpack.clear();
         return Double.parseDouble(KeyManager.formatDouble(t));
     }
@@ -112,7 +109,7 @@ public class Backpacks {
     public String toString() {
         String back = "";
         for (Items i : backpack) {
-            back = back.concat(i.getId() + ";");
+            back = back.concat(i.getValue() + ";");
         }
         return back;
     }
@@ -135,13 +132,12 @@ public class Backpacks {
     /**
      * Calculates the total value of all items in the backpack for a given player.
      *
-     * @param p player whose boost is applied to item values
      * @return total value of items
      */
-    public double getTotal(PlayerData p) {
+    public double getTotal() {
         double t = 0;
         for (Items i : backpack) {
-            t += i.getValue() * p.getBoost();
+            t += i.getValue();
         }
         return t;
     }
@@ -154,11 +150,12 @@ public class Backpacks {
     /**
      * Adds an item to the backpack if there is available capacity.
      *
-     * @param i the item to add
+     * @param i     the item to add
+     * @param boost
      */
-    public void addBackpackItem(Items i) {
+    public void addBackpackItem(Items i, double boost) {
         if (backpack.size() < capacity)
-            backpack.add(i.copyForBackpack());
+            backpack.add(i.copyForBackpack(boost));
     }
 
     /** Empties the backpack by clearing all items. */
