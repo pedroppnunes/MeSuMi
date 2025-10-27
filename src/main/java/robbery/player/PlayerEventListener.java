@@ -15,15 +15,15 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 import robbery.Robbery;
 import robbery.backpacks.BackpackManager;
 import robbery.commands.PvCommand;
 import robbery.commands.Rcrate;
-import robbery.keys.KeyManager;
-import robbery.keys.Keys;
 import robbery.messages.Messages;
 import robbery.tool.ToolManager;
 
@@ -38,7 +38,7 @@ import static robbery.keys.KeyManager.getStoreName;
 public class PlayerEventListener implements Listener {
 
     private static final String NOITEMS_PERMISSION = "robbery.noitems";
-    private final Robbery plugin;
+    private Robbery plugin;
     private boolean hasLoaded = false;
 
     public PlayerEventListener(Robbery plugin) {
@@ -62,6 +62,18 @@ public class PlayerEventListener implements Listener {
                         Map.of("prefix", prefix, "player", color + "&l" + player.getName()));
             }
         }
+        SuperiorPlayer superiorPlayer = SuperiorSkyblockAPI.getPlayer(player);
+        Island island = superiorPlayer.getIsland();
+        UUID currentOutpostOwner = plugin.getOutpostManager().getCurrentIsland();
+
+        if (island != null && currentOutpostOwner != null && island.getOwner().getUniqueId().equals(currentOutpostOwner)) {
+            plugin.getOutpostManager().applyPerksToIsland(currentOutpostOwner);
+        } else {
+            memory.setOutpostBoost(0);
+            memory.setSkillpointChance(0);
+            memory.setBoosterChance(0);
+            memory.setSpeedBonus(0);
+        }
 
         if (file.exists()) {
             FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
@@ -73,6 +85,7 @@ public class PlayerEventListener implements Listener {
             memory.setPrestige(Integer.parseInt(cfg.getString("stats.prestige")));
             memory.setActiveBooster(cfg.getString("stats.booster"));
             memory.setBoostersFromString(cfg.getString("stats.hasbooster"));
+            memory.setBoostersPaused("stats.boosterpaused");
             memory.setSP(cfg.getString("stats.skillpoints"));
             memory.setSPShopString(cfg.getString("stats.spshop"));
             memory.setBackpack(BackpackManager.toBackpack(cfg.getString("stats.backpack"),cfg.getString("stats.material"),cfg.getString("stats.itemsbackpack"),cfg.getString("stats.colorbackpack")));
@@ -96,19 +109,6 @@ public class PlayerEventListener implements Listener {
             }
         }
 
-        SuperiorPlayer superiorPlayer = SuperiorSkyblockAPI.getPlayer(player);
-        Island island = superiorPlayer.getIsland();
-        UUID currentOutpostOwner = plugin.getOutpostManager().getCurrentIsland();
-
-        if (island != null && currentOutpostOwner != null && island.getOwner().getUniqueId().equals(currentOutpostOwner)) {
-            plugin.getOutpostManager().applyPerksToIsland(currentOutpostOwner);
-        } else {
-            memory.setOutpostBoost(0);
-            memory.setSkillpointChance(0);
-            memory.setBoosterChance(0);
-            memory.setSpeedBonus(0);
-        }
-
         if(!player.hasPermission(NOITEMS_PERMISSION)) {
             memory.giveToolToInv();
             memory.giveBackpackToInv();
@@ -117,21 +117,123 @@ public class PlayerEventListener implements Listener {
             memory.giveFeather();
             plugin.getHidePlayers().handleWorldChange(player);
         }
+
         Rcrate.loadRewards(player.getUniqueId());
         PlayerDataManager.setPlayerData(event.getPlayer(), memory);
         PrestigeLeaderboard.updateLeaderboard(event.getPlayer());
         boolean hasRank = player.hasPermission("robbery.rank1") || player.hasPermission("robbery.rank2") || player.hasPermission("robbery.rank3") || player.hasPermission("robbery.rank4") || player.hasPermission("robbery.rank5") || player.hasPermission("robbery.rank6") || player.hasPermission("robbery.rank7") || player.hasPermission("robbery.staff");
         plugin.getChatStyleManager().ensurePlayerExists(player, hasRank);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!player.isOnline()) {
+                    this.cancel();
+                    return;
+                }
+                savePlayerData(player, memory);
+            }
+        }.runTaskTimer(plugin, 40L, 6000L);
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        PlayerData memory = PlayerDataManager.getPlayerData(event.getPlayer());
-        File playerFolder = new File(plugin.getDataFolder(), "player/" + event.getPlayer().getUniqueId());
+        if(!plugin.getIsBackup()) {
+            PlayerData memory = PlayerDataManager.getPlayerData(event.getPlayer());
+            File playerFolder = new File(plugin.getDataFolder(), "player/" + event.getPlayer().getUniqueId());
+            File file = new File(playerFolder, "general.yml");
+            Player player = event.getPlayer();
+            FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+
+            if (player.hasPermission("robbery.rank7") || player.hasPermission("robbery.staff")) {
+                String prefix = getLuckPermsPrefix(player);
+                String color = extractColorFromPrefix(prefix);
+
+                for (Player online : Bukkit.getOnlinePlayers()) {
+                    Messages.sendComponentMessageFormatted(online, "quit-message",
+                            Map.of("prefix", prefix, "player", color + "&l" + player.getName()));
+                }
+            }
+
+            cfg.set("stats.backpack", memory.getBackpackString());
+            cfg.set("stats.material", memory.getBackpack().getMaterial());
+            cfg.set("stats.itemsbackpack", memory.getBackpackItemsString());
+            cfg.set("stats.hasbackpack", memory.getBackpackunlucked());
+            cfg.set("stats.colorbackpack", memory.getBackpack().getColorname());
+            cfg.set("stats.hastool", memory.getToolsunlucked());
+            cfg.set("stats.tool", memory.getToolString());
+            cfg.set("stats.key", memory.getKeyString());
+            cfg.set("stats.haskeys", memory.getKeysString());
+            cfg.set("stats.prestige", memory.getPrestige());
+            cfg.set("stats.booster", memory.getActiveBoostString());
+            cfg.set("stats.hasbooster", memory.getBoostersString());
+            cfg.set("stats.boosterpaused", memory.isBoostersPaused());
+            cfg.set("stats.rank", memory.getRank());
+            cfg.set("stats.skillpoints", memory.getSP());
+            cfg.set("stats.spshop", memory.getSPShopString());
+            cfg.set("stats.location.world", player.getWorld().getName());
+            cfg.set("stats.location.x", player.getLocation().getX());
+            cfg.set("stats.location.y", player.getLocation().getY());
+            cfg.set("stats.location.z", player.getLocation().getZ());
+            cfg.set("stats.location.yaw", player.getLocation().getYaw());
+            cfg.set("stats.location.pitch", player.getLocation().getPitch());
+            PrestigeLeaderboard.updateLeaderboard(event.getPlayer());
+            PvCommand.saveAllInventories(player.getUniqueId());
+            Rcrate.saveRewards(player.getUniqueId());
+            try {
+                cfg.save(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            PlayerDataManager.setPlayerData(event.getPlayer(), null);
+        }
+        event.quitMessage(null);
+    }
+
+    public void savePlayerData(Player player, PlayerData memory) {
+        File playerFolder = new File(plugin.getDataFolder(), "player/" + player.getUniqueId());
         File file = new File(playerFolder, "general.yml");
-        Player player = event.getPlayer();
         FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-        event.setQuitMessage(null);
+
+        cfg.set("stats.backpack", memory.getBackpackString());
+        cfg.set("stats.material", memory.getBackpack().getMaterial());
+        cfg.set("stats.itemsbackpack", memory.getBackpackItemsString());
+        cfg.set("stats.hasbackpack", memory.getBackpackunlucked());
+        cfg.set("stats.colorbackpack", memory.getBackpack().getColorname());
+        cfg.set("stats.hastool", memory.getToolsunlucked());
+        cfg.set("stats.tool", memory.getToolString());
+        cfg.set("stats.key", memory.getKeyString());
+        cfg.set("stats.haskeys", memory.getKeysString());
+        cfg.set("stats.prestige", memory.getPrestige());
+        cfg.set("stats.booster", memory.getActiveBoostString());
+        cfg.set("stats.hasbooster", memory.getBoostersString());
+        cfg.set("stats.rank", memory.getRank());
+        cfg.set("stats.skillpoints", memory.getSP());
+        cfg.set("stats.spshop", memory.getSPShopString());
+        cfg.set("stats.location.world", player.getWorld().getName());
+        cfg.set("stats.location.x", player.getLocation().getX());
+        cfg.set("stats.location.y", player.getLocation().getY());
+        cfg.set("stats.location.z", player.getLocation().getZ());
+        cfg.set("stats.location.yaw", player.getLocation().getYaw());
+        cfg.set("stats.location.pitch", player.getLocation().getPitch());
+
+        PrestigeLeaderboard.updateLeaderboard(player);
+        PvCommand.saveAllInventories(player.getUniqueId());
+        Rcrate.saveRewards(player.getUniqueId());
+
+        try {
+            cfg.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveOnDisable(Player player){
+        PlayerData memory = PlayerDataManager.getPlayerData(player);
+        if (memory == null) return;
+        File playerFolder = new File(plugin.getDataFolder(), "player/" + player.getUniqueId());
+        File file = new File(playerFolder, "general.yml");
+        FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
         if (player.hasPermission("robbery.rank7") || player.hasPermission("robbery.staff")) {
             String prefix = getLuckPermsPrefix(player);
@@ -145,26 +247,26 @@ public class PlayerEventListener implements Listener {
 
         cfg.set("stats.backpack", memory.getBackpackString());
         cfg.set("stats.material", memory.getBackpack().getMaterial());
-        cfg.set("stats.itemsbackpack",memory.getBackpackItemsString());
-        cfg.set("stats.hasbackpack",memory.getBackpackunlucked());
-        cfg.set("stats.colorbackpack",memory.getBackpack().getColorname());
-        cfg.set("stats.hastool",memory.getToolsunlucked());
+        cfg.set("stats.itemsbackpack", memory.getBackpackItemsString());
+        cfg.set("stats.hasbackpack", memory.getBackpackunlucked());
+        cfg.set("stats.colorbackpack", memory.getBackpack().getColorname());
+        cfg.set("stats.hastool", memory.getToolsunlucked());
         cfg.set("stats.tool", memory.getToolString());
-        cfg.set("stats.key",memory.getKeyString());
-        cfg.set("stats.haskeys",memory.getKeysString());
-        cfg.set("stats.prestige",memory.getPrestige());
-        cfg.set("stats.booster",memory.getActiveBoostString());
-        cfg.set("stats.hasbooster",memory.getBoostersString());
-        cfg.set("stats.rank",memory.getRank());
-        cfg.set("stats.skillpoints",memory.getSP());
-        cfg.set("stats.spshop",memory.getSPShopString());
+        cfg.set("stats.key", memory.getKeyString());
+        cfg.set("stats.haskeys", memory.getKeysString());
+        cfg.set("stats.prestige", memory.getPrestige());
+        cfg.set("stats.booster", memory.getActiveBoostString());
+        cfg.set("stats.hasbooster", memory.getBoostersString());
+        cfg.set("stats.rank", memory.getRank());
+        cfg.set("stats.skillpoints", memory.getSP());
+        cfg.set("stats.spshop", memory.getSPShopString());
         cfg.set("stats.location.world", player.getWorld().getName());
         cfg.set("stats.location.x", player.getLocation().getX());
         cfg.set("stats.location.y", player.getLocation().getY());
         cfg.set("stats.location.z", player.getLocation().getZ());
         cfg.set("stats.location.yaw", player.getLocation().getYaw());
         cfg.set("stats.location.pitch", player.getLocation().getPitch());
-        PrestigeLeaderboard.updateLeaderboard(event.getPlayer());
+        PrestigeLeaderboard.updateLeaderboard(player);
         PvCommand.saveAllInventories(player.getUniqueId());
         Rcrate.saveRewards(player.getUniqueId());
         try {
@@ -172,7 +274,7 @@ public class PlayerEventListener implements Listener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        PlayerDataManager.setPlayerData(event.getPlayer(), null);
+        PlayerDataManager.setPlayerData(player, null);
     }
 
     private String getLuckPermsPrefix(Player player) {
@@ -185,7 +287,7 @@ public class PlayerEventListener implements Listener {
     }
 
     public static String extractColorFromPrefix(String prefix) {
-        if (prefix == null || prefix.isEmpty()) return "&f"; // fallback white
+        if (prefix == null || prefix.isEmpty()) return "&f";
 
         int bracketEnd = prefix.indexOf('[');
         if (bracketEnd != -1) {
@@ -206,12 +308,29 @@ public class PlayerEventListener implements Listener {
     }
 
     @EventHandler
-    public void onChunkLoad(ChunkLoadEvent event) {
-        if (!hasLoaded && event.getWorld().getName().equalsIgnoreCase("world")) {
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+
+        if (!hasLoaded && player.getWorld().getName().equalsIgnoreCase("world")) {
             hasLoaded = true;
-            plugin.loadItems();
+            Bukkit.getScheduler().runTaskLater(plugin, plugin::loadItems, 40L);
         }
     }
+
+    @EventHandler
+    public void onWorldChange(PlayerChangedWorldEvent event) {
+        Player player = event.getPlayer();
+
+        if (!hasLoaded && player.getWorld().getName().equalsIgnoreCase("world")) {
+            hasLoaded = true;
+            Bukkit.getScheduler().runTaskLater(plugin, plugin::loadItems, 40L);
+        }
+    }
+
+    public boolean getHasLoaded(){
+        return hasLoaded;
+    }
+
 
 
 

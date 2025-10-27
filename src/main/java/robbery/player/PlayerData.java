@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import robbery.Robbery;
 import robbery.backpacks.BackpackManager;
 import robbery.backpacks.Backpacks;
@@ -37,7 +38,9 @@ public class PlayerData {
     private Backpacks backpack;
     private Tools tool;
     private Keys key;
-    private Booster activeboost = new Booster("None", 1.0, 0, 0, "null");
+    private final Deque<Booster> activeBoosters = new ArrayDeque<>();
+    private boolean boostersPaused = false;
+    private BukkitTask boosterTask;
     private final Map<String, Integer> boosters = new TreeMap<>();
     private Set<String> keys = new HashSet<>();
     private final Set<String> backpackunlucked = new HashSet<>();
@@ -207,8 +210,12 @@ public class PlayerData {
     }
 
     //General stuff
+    public void setBoostersPaused(String paused){
+        this.boostersPaused = Boolean.parseBoolean(paused);
+    }
+
     public void addItemToBackpack(Items item) {
-        backpack.addBackpackItem(item);
+        backpack.addBackpackItem(item,getBoost());
     }
 
     public void busted() {
@@ -277,51 +284,85 @@ public class PlayerData {
 
     //Boosters
     public void setBoosters(String name, Player player) {
-        if (boosters.containsKey(name) && boosters.get(name) != 0) {
-            Booster boost = BoosterManager.getBooster(name);
-            boosters.put(name, boosters.get(name) - 1);
+        if (!boosters.containsKey(name) || boosters.get(name) == 0) return;
 
-            int minutes = boost.getSeconds() / 60;
+        Booster newBoost = BoosterManager.getBooster(name);
+        boosters.put(name, boosters.get(name) - 1);
+        int minutes = newBoost.getSeconds() / 60;
 
-            if (this.activeboost.getSeconds() == 0) {
-                this.activeboost = boost;
-                startBoosterTask();
-                Messages.sendFormatted(player, "boosters.activated", Map.of(
-                        "boost_name", boost.getName(),
-                        "minutes", String.valueOf(minutes)
-                ));
-            } else if (this.activeboost.getPriority() < boost.getPriority()) {
-                this.activeboost = boost;
-                startBoosterTask();
-                Messages.sendFormatted(player, "boosters.activated", Map.of(
-                        "boost_name", boost.getName(),
-                        "minutes", String.valueOf(minutes)
-                ));
-            } else if (this.activeboost.getPriority() == boost.getPriority()) {
-                this.activeboost.addTime(boost.getSeconds());
-                Messages.sendFormatted(player, "boosters.added_time", "minutes", String.valueOf(minutes));
-            }
+        if (activeBoosters.isEmpty()) {
+            activeBoosters.addLast(newBoost);
+            startNextBooster(player);
+            Messages.sendFormatted(player, "boosters.activated", Map.of(
+                    "boost_name", newBoost.getName(),
+                    "minutes", String.valueOf(minutes)
+            ));
+            return;
+        }
+
+        Booster current = activeBoosters.peekFirst();
+
+        if (current.getPriority() < newBoost.getPriority()) {
+            activeBoosters.addFirst(newBoost);
+            Messages.sendFormatted(player, "boosters.activated", Map.of(
+                    "boost_name", newBoost.getName(),
+                    "minutes", String.valueOf(minutes)
+            ));
+            startNextBooster(player);
+        } else if (current.getPriority() == newBoost.getPriority()) {
+            current.addTime(newBoost.getSeconds());
+            Messages.sendFormatted(player, "boosters.added_time", "minutes", String.valueOf(minutes));
+        } else {
+            activeBoosters.addLast(newBoost);
+            Messages.sendFormatted(player, "boosters.queued", "boost_name", newBoost.getName());
         }
     }
 
-    private void startBoosterTask() {
-        if (this.activeboost == null || this.activeboost.getSeconds() == 0) {
+    private void startNextBooster(Player player) {
+        if (boosterTask != null) boosterTask.cancel();
+        if (activeBoosters.isEmpty()) {
+            boostx = 1.0;
             return;
         }
-        this.boostx += activeboost.getMultiplier();
 
-        new BukkitRunnable() {
+        Booster active = activeBoosters.peekFirst();
+        boostx = active.getMultiplier();
+
+        boosterTask = new BukkitRunnable() {
             @Override
             public void run() {
-                if (activeboost.getSeconds() <= 0 || !player.isOnline()) {
-                    boostx -= activeboost.getMultiplier();
-                    activeboost = new Booster("None", 1.0, 0, 0, "null");
+                if (!player.isOnline()) {
                     this.cancel();
+                    boostx = 1.0;
                     return;
                 }
-                activeboost.setSeconds(activeboost.getSeconds() - 1);
+
+                active.setSeconds(active.getSeconds() - 1);
+                if (active.getSeconds() <= 0) {
+                    activeBoosters.pollFirst();
+                    this.cancel();
+                    startNextBooster(player);
+                }
             }
         }.runTaskTimer(Robbery.getInstance(), 20L, 20L);
+    }
+
+    public void stopBoosters(Player player) {
+        boostersPaused = true;
+        if (boosterTask != null) boosterTask.cancel();
+        boostx = 1.0;
+        Messages.send(player, "boosters.paused");
+    }
+
+    public void resumeBoosters(Player player) {
+        if (!boostersPaused) return;
+        boostersPaused = false;
+        startNextBooster(player);
+        Messages.send(player, "boosters.resumed");
+    }
+
+    public boolean isBoostersPaused() {
+        return boostersPaused;
     }
 
     public void addBoosters(Booster boost) {
@@ -351,24 +392,53 @@ public class PlayerData {
     }
 
     public Booster getActiveboost() {
-        return activeboost;
+        if (activeBoosters.isEmpty()) {
+            return new Booster("None", 1.0, 0, 0, "null");
+        }
+        return activeBoosters.peekFirst();
     }
+
 
     public String getActiveBoostString() {
-        return activeboost.getTag() + "_" + activeboost.getSeconds();
+        if (activeBoosters.isEmpty()) return "none";
+
+        StringBuilder builder = new StringBuilder();
+        for (Booster b : activeBoosters) {
+            if (builder.length() > 0) builder.append("|");
+            builder.append(b.getTag()).append("_").append(b.getSeconds());
+        }
+        return builder.toString();
     }
 
+
     public void setActiveBooster(String string) {
-        if(string == null) {
-            activeboost = new Booster("None", 1.0, 0, 0, "null");
+        activeBoosters.clear();
+
+        if (string == null || string.equalsIgnoreCase("none") || string.isEmpty()) {
+            boostx = 1.0;
             return;
         }
-        Scanner scanner = new Scanner(string);
-        scanner.useDelimiter("_");
-        activeboost = BoosterManager.getBooster(scanner.next());
-        activeboost.setSeconds(Integer.parseInt(scanner.next()));
-        startBoosterTask();
+
+        String[] parts = string.split("\\|");
+        for (String part : parts) {
+            String[] data = part.split("_");
+            if (data.length != 2) continue;
+
+            Booster b = BoosterManager.getBooster(data[0]);
+            if (b == null) continue;
+
+            try {
+                int seconds = Integer.parseInt(data[1]);
+                b.setSeconds(seconds);
+                activeBoosters.addLast(b);
+            } catch (NumberFormatException ignored) {}
+        }
+
+        if (!activeBoosters.isEmpty()) {
+            startNextBooster(player);
+        }
     }
+
 
     public int getBoosterQuantity(String name) {
         return boosters.getOrDefault(name,0);

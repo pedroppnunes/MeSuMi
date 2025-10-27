@@ -1,9 +1,14 @@
 package robbery.events;
 
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -57,4 +62,33 @@ public class InventoryLockListener implements Listener {
             event.setCancelled(true);
         }
     }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onArmorStandInteract(PlayerArmorStandManipulateEvent event) {
+        Player player = event.getPlayer();
+
+        if (!player.hasPermission(BYPASS_PERMISSION) && player.getWorld().getName().equalsIgnoreCase("world")) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPaintingBreak(HangingBreakByEntityEvent event) {
+        if (!(event.getRemover() instanceof Player player)) return;
+
+        if (!player.hasPermission(BYPASS_PERMISSION) && player.getWorld().getName().equalsIgnoreCase("world")) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onItemFrameBreak(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player player)) return;
+        if (!(event.getEntity() instanceof ItemFrame)) return;
+
+        if (!player.hasPermission(BYPASS_PERMISSION) && player.getWorld().getName().equalsIgnoreCase("world")) {
+            event.setCancelled(true);
+        }
+    }
+
 }

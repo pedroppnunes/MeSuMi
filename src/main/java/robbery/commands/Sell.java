@@ -82,7 +82,7 @@ public class Sell implements CommandExecutor {
 
         PlayerData p = PlayerDataManager.getPlayerData(player);
         double chance = p.getSPShop().moneypouchChance();
-        double amountToAdd = p.getBackpack().sell(p);
+        double amountToAdd = p.getBackpack().sell();
         if(amountToAdd == 0)
             return true;
         Economy econ = Robbery.getEconomy();
@@ -95,7 +95,6 @@ public class Sell implements CommandExecutor {
                 String title = "&aYou sold your items for &2" + KeyManager.formatNumber(newAmount) + "$";
                 String subtitle = "&6You got Lucky! &e+" + (int)(chance * 100) + "% Bonus!";
 
-                // Send title to player
                 player.sendTitle(
                         ChatColor.translateAlternateColorCodes('&', title),
                         ChatColor.translateAlternateColorCodes('&', subtitle),
