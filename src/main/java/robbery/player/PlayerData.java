@@ -51,7 +51,7 @@ public class PlayerData {
     private Rank rank;
     private final Player player;
     private int prestige;
-    private double boostx = 1.0;
+    private double boostx = 0.0;
     private boolean doubleJump = true;
     private double outboost = 0.0;
     private double outspchance = 0.0;
@@ -228,7 +228,7 @@ public class PlayerData {
 
 
     public double getBoost() {
-        return (1 + prestige * 0.15 + rank.boost() + sp.extraMoney() + outboost) * boostx;
+        return 1 + prestige * 0.15 + rank.boost() + sp.extraMoney() + outboost + boostx;
     }
     public double getPrestigeBoost(){
         return (1 + prestige*0.15);
@@ -321,7 +321,7 @@ public class PlayerData {
     private void startNextBooster(Player player) {
         if (boosterTask != null) boosterTask.cancel();
         if (activeBoosters.isEmpty()) {
-            boostx = 1.0;
+            boostx = 0.0;
             return;
         }
 
@@ -333,7 +333,7 @@ public class PlayerData {
             public void run() {
                 if (!player.isOnline()) {
                     this.cancel();
-                    boostx = 1.0;
+                    boostx = 0.0;
                     return;
                 }
 
@@ -350,15 +350,13 @@ public class PlayerData {
     public void stopBoosters(Player player) {
         boostersPaused = true;
         if (boosterTask != null) boosterTask.cancel();
-        boostx = 1.0;
-        Messages.send(player, "boosters.paused");
+        boostx = 0.0;
     }
 
     public void resumeBoosters(Player player) {
         if (!boostersPaused) return;
         boostersPaused = false;
         startNextBooster(player);
-        Messages.send(player, "boosters.resumed");
     }
 
     public boolean isBoostersPaused() {
@@ -415,7 +413,7 @@ public class PlayerData {
         activeBoosters.clear();
 
         if (string == null || string.equalsIgnoreCase("none") || string.isEmpty()) {
-            boostx = 1.0;
+            boostx = 0.0;
             return;
         }
 
