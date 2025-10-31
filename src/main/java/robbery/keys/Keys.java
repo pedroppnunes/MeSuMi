@@ -1,6 +1,7 @@
 package robbery.keys;
 
 import org.bukkit.*;
+import robbery.number.NumberFormatter;
 import robbery.player.PlayerData;
 
 /**
@@ -15,7 +16,7 @@ public class Keys {
     private final String name;
 
     /** The base price of the store key before prestige adjustments. */
-    private final int price;
+    private final long price;
 
     /** The order number of the store (1-12). */
     private final int order;
@@ -32,7 +33,7 @@ public class Keys {
      * @param order      The store's order number.
      * @param colorname  The display name with color codes.
      */
-    public Keys(String name, int price, int order, String colorname, String id) {
+    public Keys(String name, long price, int order, String colorname, String id) {
         this.name = name;
         this.price = price;
         this.order = order;
@@ -57,7 +58,7 @@ public class Keys {
      * @return The price after prestige adjustments.
      */
     public double getPrice(PlayerData p) {
-        return KeyManager.applyPrestigeIncrease(price, p);
+        return NumberFormatter.applyPrestigeIncrease(price, p);
     }
 
     /**
@@ -67,7 +68,7 @@ public class Keys {
      * @return Formatted price string.
      */
     public String getPriceformatted(PlayerData p) {
-        return KeyManager.formatNumber(KeyManager.applyPrestigeIncrease(price, p));
+        return NumberFormatter.formatDoubleNumber(NumberFormatter.applyPrestigeIncrease(price, p));
     }
 
     /**
