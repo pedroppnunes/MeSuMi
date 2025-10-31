@@ -15,6 +15,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import robbery.Robbery;
+import robbery.commands.MuteCommand;
+import robbery.messages.Messages;
+import robbery.mutes.MuteManager;
 
 /**
  * Listens to player chat events and replaces the placeholder "[item]" with a hoverable
@@ -28,6 +31,7 @@ public class ChatItemReplacer implements Listener {
 
     /** Reference to the main Robbery plugin instance. */
     private final Robbery plugin;
+    private final MuteManager muteManager;
 
     /** Legacy component serializer used to deserialize color codes into Components. */
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
@@ -37,8 +41,9 @@ public class ChatItemReplacer implements Listener {
      *
      * @param plugin the main Robbery plugin instance
      */
-    public ChatItemReplacer(Robbery plugin) {
+    public ChatItemReplacer(Robbery plugin, MuteManager muteManager) {
         this.plugin = plugin;
+        this.muteManager = muteManager;
     }
 
     /**
@@ -56,7 +61,12 @@ public class ChatItemReplacer implements Listener {
         Player player = event.getPlayer();
         String message = event.getMessage();
 
-        // Cancel the default chat message
+        if (muteManager.isMuted(player.getUniqueId()) && !player.hasPermission("robbery.bypass")) {
+            event.setCancelled(true);
+            Messages.send(player, "chat.muted");
+            return;
+        }
+
         event.setCancelled(true);
 
         // Remove legacy color codes

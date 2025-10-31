@@ -73,7 +73,7 @@ public class ChatWarningListener implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        if (muteManager.isMuted(uuid)) {
+        if (muteManager.isMuted(uuid) && !player.hasPermission("robbery.bypass")) {
             event.setCancelled(true);
             Messages.send(player, "chat.muted");
             return;
@@ -144,7 +144,7 @@ public class ChatWarningListener implements Listener {
 
         if (muteManager.isMuted(uuid)) return;
 
-        muteManager.mutePlayer(uuid, "Server", "3h","Spamming in chat");
+        muteManager.mutePlayer(uuid, "Server", "24h","Spamming in chat");
 
         plugin.getWarningManager().addWarning(uuid, "Spamming in chat", "Server", "12h");
 
