@@ -66,7 +66,7 @@ public class PlayerEventListener implements Listener {
         Island island = superiorPlayer.getIsland();
         UUID currentOutpostOwner = plugin.getOutpostManager().getCurrentIsland();
 
-        if (island != null && currentOutpostOwner != null && island.getOwner().getUniqueId().equals(currentOutpostOwner)) {
+        if (island != null && currentOutpostOwner != null && island.isMember(superiorPlayer)) {
             plugin.getOutpostManager().applyPerksToIsland(currentOutpostOwner);
         } else {
             memory.setOutpostBoost(0);
@@ -207,6 +207,7 @@ public class PlayerEventListener implements Listener {
         cfg.set("stats.prestige", memory.getPrestige());
         cfg.set("stats.booster", memory.getActiveBoostString());
         cfg.set("stats.hasbooster", memory.getBoostersString());
+        cfg.set("stats.boosterpaused", memory.isBoostersPaused());
         cfg.set("stats.rank", memory.getRank());
         cfg.set("stats.skillpoints", memory.getSP());
         cfg.set("stats.spshop", memory.getSPShopString());
