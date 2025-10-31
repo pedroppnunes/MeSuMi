@@ -93,8 +93,8 @@ public class ArmorStandInteractionListener implements Listener {
                 String itemId = item.getId();
                 String playerStoreKey = p.getKey().getId();
 
-                int itemStoreNum = extractStoreNumber(itemId);
-                int playerStoreNum = extractStoreNumber(playerStoreKey);
+                double itemStoreNum = extractStoreNumber(itemId);
+                double playerStoreNum = extractStoreNumber(playerStoreKey);
 
                 if (itemStoreNum > playerStoreNum) {
                     Messages.sendActionBar(player,"events.wrong-store");
@@ -123,10 +123,10 @@ public class ArmorStandInteractionListener implements Listener {
         }
     }
 
-    private int extractStoreNumber(String id) {
-        Matcher matcher = Pattern.compile("\\d+").matcher(id);
+    private double extractStoreNumber(String id) {
+        Matcher matcher = Pattern.compile("\\d+(\\.\\d+)?").matcher(id);
         if (matcher.find()) {
-            return Integer.parseInt(matcher.group());
+            return Double.parseDouble(matcher.group());
         }
         return 0;
     }

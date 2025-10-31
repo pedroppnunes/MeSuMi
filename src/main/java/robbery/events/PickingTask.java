@@ -9,16 +9,16 @@ import robbery.Robbery;
 import robbery.booster.Booster;
 import robbery.booster.BoosterManager;
 import robbery.items.Items;
-import robbery.keys.KeyManager;
 import robbery.messages.Messages;
+import robbery.number.NumberFormatter;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 import robbery.tool.Tools;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PickingTask extends BukkitRunnable {
     private final Player player;
@@ -53,13 +53,13 @@ public class PickingTask extends BukkitRunnable {
             if (p.getBoost() != 1.0) {
                 Messages.sendActionBarFormatted(player, "events.picking.item_stolen_with_boost", Map.of(
                         "item", itemName,
-                        "value", KeyManager.formatNumber(value) + "$",
-                        "bonus", KeyManager.formatNumber(bonus) + "$"
+                        "value", NumberFormatter.formatDoubleNumber(value) + "$",
+                        "bonus", NumberFormatter.formatDoubleNumber(bonus) + "$"
                 ));
             } else {
                 Messages.sendActionBarFormatted(player, "events.picking.item_stolen", Map.of(
                         "item", itemName,
-                        "value", KeyManager.formatNumber(value) + "$"
+                        "value", NumberFormatter.formatDoubleNumber(value) + "$"
                 ));
             }
             if(p.getSPShop().doubleItemChance() != 0){
@@ -68,22 +68,16 @@ public class PickingTask extends BukkitRunnable {
                     p.addItemToBackpack(item);
                     Messages.sendActionBarFormatted(player, "events.picking.double_item", Map.of(
                             "item", itemName,
-                            "value", KeyManager.formatNumber(value) + "$"
+                            "value", NumberFormatter.formatDoubleNumber(value) + "$"
                     ));
 
                 }
             }
-            Booster booster = BoosterManager.getRandomBoosterWithChance(p.getKey().getOrder(),p);
+            int itemStoreNum = extractStoreNumber(item.getId());
+            Booster booster = BoosterManager.getRandomBoosterWithChance(itemStoreNum,p);
             if(booster != null) {
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        Messages.sendActionBarFormatted(player, "events.picking.booster_reward", Map.of(
-                                "booster", booster.getName()
-                        ));
-
-                    }
-                }.runTaskLater(main, 5L);
+                Messages.sendFormatted(player, "events.picking.booster_reward", Map.of(
+                                    "booster", booster.getName()));
                 p.addBoosters(booster);
             }
             int roll = random.nextInt(1000) + 1;
@@ -157,6 +151,14 @@ public class PickingTask extends BukkitRunnable {
         item.setHp(item.getInitialhp());
         item.setPickable();
         if (onFinish != null) onFinish.run();
+    }
+
+    private int extractStoreNumber(String id) {
+        Matcher matcher = Pattern.compile("\\d+").matcher(id);
+        if (matcher.find()) {
+            return Integer.parseInt(matcher.group());
+        }
+        return 0;
     }
 
 }
