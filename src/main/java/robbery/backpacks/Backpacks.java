@@ -6,8 +6,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import robbery.items.Items;
-import robbery.keys.KeyManager;
-import robbery.player.PlayerData;
+import robbery.number.NumberFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +28,7 @@ public class Backpacks {
     private final int capacity;
 
     /** Price of the backpack in in-game currency. */
-    private final int price;
+    private final long price;
 
     /** Material used for the backpack item representation. */
     private final Material material;
@@ -50,7 +49,7 @@ public class Backpacks {
      * @param price purchase price of the backpack
      * @param colorname color-coded name string using codes
      */
-    public Backpacks(String name, int capacity, List<Items> items, Material material, int price, String colorname) {
+    public Backpacks(String name, int capacity, List<Items> items, Material material, long price, String colorname) {
         this.name = name;
         this.capacity = capacity;
         this.material = material;
@@ -84,20 +83,20 @@ public class Backpacks {
      *
      * @return total value of sold items formatted as a double
      */
-    public double sell() {
-        double t = getTotal();
+    public long sell() {
+        long t = getTotal();
         this.backpack.clear();
-        return Double.parseDouble(KeyManager.formatDouble(t));
+        return Long.parseLong(NumberFormatter.formatDouble(t));
     }
 
     /** @return the price of the backpack. */
-    public int getPrice() {
+    public long getPrice() {
         return price;
     }
 
     /** @return formatted price as a String with thousand separators. */
     public String getPriceformatted() {
-        return KeyManager.formatNumber(price);
+        return NumberFormatter.formatLong(price);
     }
 
     /**
@@ -134,8 +133,8 @@ public class Backpacks {
      *
      * @return total value of items
      */
-    public double getTotal() {
-        double t = 0;
+    public long getTotal() {
+        long t = 0;
         for (Items i : backpack) {
             t += i.getValue();
         }
