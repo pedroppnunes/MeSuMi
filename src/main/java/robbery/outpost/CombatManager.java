@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import robbery.Robbery;
@@ -131,6 +132,24 @@ public class CombatManager implements Listener {
         }
     }
 
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player killed = event.getEntity();
+        Player killer = killed.getKiller();
+        event.deathMessage(null);
+        if (!killed.getWorld().getName().equalsIgnoreCase("outpost")) {
+            return;
+        }
+
+        if (killer == null) return;
+
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+                Messages.sendFormatted(player,"events.combat.death-message",Map.of("killed", killed.getName(), "killer", killer.getName()));
+        }
+    }
+
     /**
      * Starts a repeating task that updates combat timers.
      * Sends an action bar countdown to players still in combat.
@@ -139,7 +158,7 @@ public class CombatManager implements Listener {
     private void startCombatTimer() {
         Bukkit.getScheduler().runTaskTimer(main, () -> {
             long currentTime = System.currentTimeMillis();
-            long tagDuration = 10 * 1000; // 10 seconds for countdown display
+            long tagDuration = 30 * 1000; // 10 seconds for countdown display
 
             taggedPlayers.entrySet().removeIf(entry -> {
                 UUID uuid = entry.getKey();
