@@ -18,6 +18,7 @@ import robbery.messages.Messages;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 import robbery.player.PrestigeLeaderboard;
+import robbery.prestige.PrestigeCountManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -51,7 +52,7 @@ public class Prestige implements CommandExecutor {
             new Location(Bukkit.getWorld("world"), 20059, 110, 20180)
     );
 
-    private static final int basePrestige = 1_500_000_000;
+    private static final long basePrestige = 10_000_000_000L;
 
     /**
      * Constructs a Prestige command instance.
@@ -117,11 +118,18 @@ public class Prestige implements CommandExecutor {
             // Remove from store regions
             KeyManager.removePlayerFromAllRegions(player);
 
+            if(prestige+1 >= 3)
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rg addmember -w world store13 " + player.getName());
+
             // Broadcast prestige message
             String border = Messages.colorize("&c&l■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
-            String msg = Messages.colorize("&e&l" + player.getDisplayName() + " &e&lhas prestiged to &6Prestige " + (prestige + 1) + "&e&l!");
+            String msg = Messages.colorize("&e&l" + player.getDisplayName() + " &e&lhas prestiged to &6&lPrestige " + (prestige + 1) + "&e&l!");
+            int count = PrestigeCountManager.incrementPrestigeCount(prestige + 1);
+            String suffix = getOrdinalSuffix(count);
+            String msg2 = Messages.colorize("&e&lWas the &6&l" + count + suffix + "&e&l to reach this prestige!");
             Bukkit.broadcastMessage(border);
             Bukkit.broadcastMessage(msg);
+            Bukkit.broadcastMessage(msg2);
             Bukkit.broadcastMessage(border+"\u200B");
 
             // Teleport player to prestige start
@@ -158,8 +166,9 @@ public class Prestige implements CommandExecutor {
      */
     public static double getPrestigeValue(PlayerData p) {
         int prestige = p.getPrestige();
-        if (prestige == 0) return KeyManager.STORE11.getPrice(p) / 1.5;
-        else if (prestige == 1) return KeyManager.STORE12.getPrice(p) / 1.5;
+        if (prestige == 0) return 1_500_000_000;
+        else if (prestige == 1) return 4_750_000_000L;
+        else if (prestige == 2) return 10_000_000_000L;
         else return basePrestige;
     }
 
@@ -187,4 +196,15 @@ public class Prestige implements CommandExecutor {
         else if (prestige == 1) return KeyManager.STORE11.getName();
         else return KeyManager.STORE12.getName();
     }
+
+    private String getOrdinalSuffix(int number) {
+        if (number >= 11 && number <= 13) return "th";
+        return switch (number % 10) {
+            case 1 -> "st";
+            case 2 -> "nd";
+            case 3 -> "rd";
+            default -> "th";
+        };
+    }
+
 }
