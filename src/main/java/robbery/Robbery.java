@@ -32,6 +32,7 @@ import robbery.outpost.OutpostRegion;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 import robbery.player.PlayerEventListener;
+import robbery.prestige.PrestigeCountManager;
 import robbery.ranks.RankPaperListener;
 import robbery.skillpoints.SkillPointListener;
 import robbery.votes.VotePartyManager;
@@ -99,7 +100,7 @@ public class Robbery extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new DoubleJumpListener(main), main);
         getServer().getPluginManager().registerEvents(new HideoutListener(), main);
         getServer().getPluginManager().registerEvents(new SkillPointListener(main), main);
-        getServer().getPluginManager().registerEvents(new ChatItemReplacer(main), main);
+        getServer().getPluginManager().registerEvents(new ChatItemReplacer(main,muteManager), main);
         getServer().getPluginManager().registerEvents(new CombatManager(main), main);
         getServer().getPluginManager().registerEvents(new ChatWarningListener(main), main);
         getServer().getPluginManager().registerEvents(hidePlayers, main);
@@ -150,8 +151,9 @@ public class Robbery extends JavaPlugin implements Listener {
             getLogger().severe("World 'outpost' not found!");
             return;
         }
+        PrestigeCountManager.load();
         OutpostRegion region = new OutpostRegion(outpostWorld, -3, 1, -3, 4, 1, 4);
-        outpostManager = new OutpostManager(main, region, 30);
+        outpostManager = new OutpostManager(main, region);
         startItemClearTask();
         blockCraft.removeRecipes();
         addItemstoMap();
@@ -197,7 +199,7 @@ public class Robbery extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         this.isBackingUp = true;
-
+        PrestigeCountManager.save();
         for (Player player : Bukkit.getOnlinePlayers()) {
             playerEventListener.saveOnDisable(player);
             player.kick(Component.text(Messages.get("reload.player-kick")));
