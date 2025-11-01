@@ -10,6 +10,7 @@ import robbery.booster.BoosterManager;
 import robbery.chat.ChatStyleManager;
 import robbery.commands.Prestige;
 import robbery.keys.KeyManager;
+import robbery.number.NumberFormatter;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 import robbery.player.PrestigeLeaderboard;
@@ -146,7 +147,7 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                     case "backpack_size":
                         return String.valueOf(playerData.getBackpack().getSize());
                     case "backpack_total":
-                        return String.valueOf(KeyManager.formatNumber(Double.parseDouble(KeyManager.formatDouble(playerData.getBackpack().getTotal()))));
+                        return String.valueOf(NumberFormatter.formatDoubleNumber(Double.parseDouble(NumberFormatter.formatDouble(playerData.getBackpack().getTotal()))));
                     case "tool_name":
                         return String.valueOf(playerData.getTool().getColorname());
                     case "key_name":
@@ -156,7 +157,7 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                     case "prestige_price":
                         return String.valueOf(playerData.getPrestigeBoost() * Prestige.getPrestigeValue(playerData));
                     case "prestige_priceshort":
-                        return KeyManager.formatNumber(playerData.getPrestigeBoost() * Prestige.getPrestigeValue(playerData));
+                        return NumberFormatter.formatDoubleNumber(playerData.getPrestigeBoost() * Prestige.getPrestigeValue(playerData));
                     case "boosterx":
                         return String.valueOf(playerData.getBoost());
                     case "booster_name":
