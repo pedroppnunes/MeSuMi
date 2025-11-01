@@ -1,8 +1,5 @@
 package robbery.commands;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -12,12 +9,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import robbery.Robbery;
-import robbery.keys.KeyManager;
 import robbery.messages.Messages;
+import robbery.number.NumberFormatter;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -82,17 +78,17 @@ public class Sell implements CommandExecutor {
 
         PlayerData p = PlayerDataManager.getPlayerData(player);
         double chance = p.getSPShop().moneypouchChance();
-        double amountToAdd = p.getBackpack().sell();
+        long amountToAdd = p.getBackpack().sell();
         if(amountToAdd == 0)
             return true;
         Economy econ = Robbery.getEconomy();
         if(chance != 0) {
             int roll = random.nextInt((int) (1/chance)) + 1;
             if(roll == 1){
-                double newAmount = Double.parseDouble(KeyManager.formatDouble(amountToAdd*(1+chance)));
+                long newAmount = Long.parseLong(NumberFormatter.formatDouble((long) (amountToAdd*(1+chance))));
                 econ.depositPlayer(player, newAmount);
 
-                String title = "&aYou sold your items for &2" + KeyManager.formatNumber(newAmount) + "$";
+                String title = "&aYou sold your items for &2" + NumberFormatter.formatDoubleNumber(newAmount) + "$";
                 String subtitle = "&6You got Lucky! &e+" + (int)(chance * 100) + "% Bonus!";
 
                 player.sendTitle(
@@ -105,7 +101,7 @@ public class Sell implements CommandExecutor {
             }
         }
         econ.depositPlayer(player, amountToAdd);
-        String title = "&aYou sold your items for &2" + KeyManager.formatNumber(amountToAdd) + "$";
+        String title = "&aYou sold your items for &2" + NumberFormatter.formatDoubleNumber(amountToAdd) + "$";
         String subtitle = "";
 
         player.sendTitle(

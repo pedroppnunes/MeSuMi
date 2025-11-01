@@ -11,6 +11,7 @@ import robbery.Robbery;
 import robbery.keys.KeyManager;
 import robbery.keys.Keys;
 import robbery.messages.Messages;
+import robbery.number.NumberFormatter;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 
@@ -80,7 +81,7 @@ public class RankUp implements CommandExecutor {
 
         Economy econ   = Robbery.getEconomy();
         double price = next.getPrice(data);
-        String priceString = KeyManager.formatNumber(price);
+        String priceString = NumberFormatter.formatDoubleNumber((long) price);
         // Check if player has enough money
         if (econ.getBalance(p) < price) {
             Messages.sendFormatted(p, "command.rankup.not-enough-money", Map.of("price", priceString, "store", next.getName()));
