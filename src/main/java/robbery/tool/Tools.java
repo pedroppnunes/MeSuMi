@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import robbery.keys.KeyManager;
+import robbery.number.NumberFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ public class Tools {
     private final String colorname;
     private final double damage;
     private final Material material;
-    private final int price;
+    private final long price;
 
     /**
      * Constructs a new Tool instance.
@@ -41,7 +41,7 @@ public class Tools {
      * @param price the cost of the tool
      * @param colorname the colored display name (Minecraft formatting codes supported)
      */
-    public Tools(String name, double damage, Material material, int price, String colorname) {
+    public Tools(String name, double damage, Material material, long price, String colorname) {
         this.name = name;
         this.colorname = ChatColor.translateAlternateColorCodes('&', colorname);
         this.damage = damage;
@@ -81,7 +81,7 @@ public class Tools {
      *
      * @return the price
      */
-    public int getPrice() {
+    public long getPrice() {
         return price;
     }
 
@@ -91,7 +91,7 @@ public class Tools {
      * @return the formatted price
      */
     public String getPriceformatted() {
-        return KeyManager.formatNumber(price);
+        return NumberFormatter.formatLong(price);
     }
 
     /**
