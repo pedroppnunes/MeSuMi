@@ -107,6 +107,8 @@ public class PlayerEventListener implements Listener {
                     }, 5L);
                 }
             }
+        } else {
+            memory.setRank(getRank(player));
         }
 
         if(!player.hasPermission(NOITEMS_PERMISSION)) {
@@ -307,6 +309,19 @@ public class PlayerEventListener implements Listener {
 
         return "&f";
     }
+
+    private String getRank(Player player) {
+        if (player.hasPermission("robbery.rank7")) return "rank7";
+        if (player.hasPermission("robbery.rank6")) return "rank6";
+        if (player.hasPermission("robbery.rank5")) return "rank5";
+        if (player.hasPermission("robbery.rank4")) return "rank4";
+        if (player.hasPermission("robbery.rank3")) return "rank3";
+        if (player.hasPermission("robbery.rank2")) return "rank2";
+        if (player.hasPermission("robbery.rank1")) return "rank1";
+
+        return "rank0";
+    }
+
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
