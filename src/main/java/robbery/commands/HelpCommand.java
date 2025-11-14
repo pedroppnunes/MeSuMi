@@ -49,6 +49,7 @@ public class HelpCommand implements CommandExecutor {
     public void loadHelp() {
         helpCategories.put("Robbery", Arrays.asList(
                 new HelpCommandData("/boosters", "Opens boosters menu."),
+                new HelpCommandData("/claim", "Claim your rewards that you got in crates."),
                 new HelpCommandData("/mall", "Teleports you to the mall. Require: Outlaw+ Rank"),
                 new HelpCommandData("/muteinfo", "Information about your mute."),
                 new HelpCommandData("/outpostinfo", "Opens outpost menu."),
@@ -61,7 +62,6 @@ public class HelpCommand implements CommandExecutor {
                 new HelpCommandData("[item]", "In chat, displays the item in your hand. Require: Heister+ Rank")
         ));
         helpCategories.put("Hideout", Arrays.asList(
-                new HelpCommandData("/claim", "Claim your rewards that you got in crates."),
                 new HelpCommandData("/hideout", "Teleports you to the hideout."),
                 new HelpCommandData("/ho", "Teleports you to the hideout."),
                 new HelpCommandData("/ho accept [player-name]", "Accept an invitation from a player."),
@@ -107,7 +107,7 @@ public class HelpCommand implements CommandExecutor {
                 new HelpCommandData("/ho visitors", "Open the visitors menu."),
                 new HelpCommandData("/ho warp [player-name/hideout-name] [warp-name]", "Warp to an hideout warp."),
                 new HelpCommandData("/ho warps", "Open the warps menu."),
-                new HelpCommandData("/pv [page]", "Opens your private chest.")
+                new HelpCommandData("/pv [page]", "Open your private chest.")
         ));
         helpCategories.put("Enchants", Arrays.asList(
                 new HelpCommandData("/alchemist", "Combine books."),
