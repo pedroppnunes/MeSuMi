@@ -1,5 +1,6 @@
 package robbery.events;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -8,10 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.*;
 
 /**
  * Prevents players from interacting with their inventory in specific worlds unless they have a bypass permission.
@@ -67,7 +65,7 @@ public class InventoryLockListener implements Listener {
     public void onArmorStandInteract(PlayerArmorStandManipulateEvent event) {
         Player player = event.getPlayer();
 
-        if (!player.hasPermission(BYPASS_PERMISSION) && player.getWorld().getName().equalsIgnoreCase("world")) {
+        if (!player.hasPermission(BYPASS_PERMISSION) && (player.getWorld().getName().equalsIgnoreCase("world") || player.getWorld().getName().equalsIgnoreCase("outpost"))) {
             event.setCancelled(true);
         }
     }
@@ -76,7 +74,7 @@ public class InventoryLockListener implements Listener {
     public void onPaintingBreak(HangingBreakByEntityEvent event) {
         if (!(event.getRemover() instanceof Player player)) return;
 
-        if (!player.hasPermission(BYPASS_PERMISSION) && player.getWorld().getName().equalsIgnoreCase("world")) {
+        if (!player.hasPermission(BYPASS_PERMISSION) && (player.getWorld().getName().equalsIgnoreCase("world") || player.getWorld().getName().equalsIgnoreCase("outpost"))) {
             event.setCancelled(true);
         }
     }
@@ -86,9 +84,22 @@ public class InventoryLockListener implements Listener {
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof ItemFrame)) return;
 
-        if (!player.hasPermission(BYPASS_PERMISSION) && player.getWorld().getName().equalsIgnoreCase("world")) {
+        if (!player.hasPermission(BYPASS_PERMISSION) && (player.getWorld().getName().equalsIgnoreCase("world") || player.getWorld().getName().equalsIgnoreCase("outpost"))) {
             event.setCancelled(true);
         }
     }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onItemFrameInteract(PlayerInteractEntityEvent event) {
+        Player player = event.getPlayer();
+        Entity entity = event.getRightClicked();
+
+        if (!(entity instanceof ItemFrame)) return;
+
+        if (!player.hasPermission(BYPASS_PERMISSION) && (player.getWorld().getName().equalsIgnoreCase("world") || player.getWorld().getName().equalsIgnoreCase("outpost"))) {
+            event.setCancelled(true);
+        }
+    }
+
 
 }
