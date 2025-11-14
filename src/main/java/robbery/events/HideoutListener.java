@@ -36,7 +36,7 @@ public class HideoutListener implements Listener {
         Player player = event.getPlayer();
         PlayerData pData = PlayerDataManager.getPlayerData(player);
         Backpacks backpack = pData.getBackpack();
-
+        if(player.hasPermission("robbery.bypass")) return;
         // Block hideout entry or teleport commands if player has items
         if ((message.startsWith("/ho") || message.startsWith("/hideout") || message.contains("/ho") || message.contains("/hideout")) ||
                 (message.startsWith("/spawn") || message.startsWith("/lobby") || message.contains("/spawn") || message.contains("/lobby") ||
