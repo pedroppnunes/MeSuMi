@@ -17,15 +17,15 @@ public class BoosterManager {
     private static final Booster BOOST1_1 = new Booster("1.25x Money", 0.25, 5 * 60, 1, "boost1x1");
     private static final Booster BOOST1_2 = new Booster("1.25x Money", 0.25, 10 * 60, 1, "boost1x2");
     private static final Booster BOOST1_3 = new Booster("1.25x Money", 0.25, 15 * 60, 1, "boost1x3");
-    private static final Booster BOOST2_1 = new Booster("1.5x Money", 0.5, 5 * 60, 2, "boost2x1");
+    private static final Booster BOOST2_1 = new Booster("1.5x Money", 0.25, 5 * 60, 2, "boost2x1");
     private static final Booster BOOST2_2 = new Booster("1.5x Money", 0.5, 10 * 60, 2, "boost2x2");
     private static final Booster BOOST2_3 = new Booster("1.5x Money", 0.5, 15 * 60, 2, "boost2x3");
     private static final Booster BOOST3_1 = new Booster("1.75x Money", 0.75, 5 * 60, 3, "boost3x1");
     private static final Booster BOOST3_2 = new Booster("1.75x Money", 0.75, 10 * 60, 3, "boost3x2");
     private static final Booster BOOST3_3 = new Booster("1.75x Money", 0.75, 15 * 60, 3, "boost3x3");
-    private static final Booster BOOST4_1 = new Booster("2x Money", 1, 5 * 60, 4, "boost4x1");
-    private static final Booster BOOST4_2 = new Booster("2x Money", 1, 10 * 60, 4, "boost4x2");
-    private static final Booster BOOST4_3 = new Booster("2x Money", 1, 15 * 60, 4, "boost4x3");
+    private static final Booster BOOST4_1 = new Booster("2x Money", 0, 5 * 60, 4, "boost4x1");
+    private static final Booster BOOST4_2 = new Booster("2x Money", 0, 10 * 60, 4, "boost4x2");
+    private static final Booster BOOST4_3 = new Booster("2x Money", 0, 15 * 60, 4, "boost4x3");
 
     /**
      * Retrieves a booster by its unique identifier.
@@ -107,14 +107,7 @@ public class BoosterManager {
      * @return a {@link Booster} based on chance, or null if no booster was won
      */
     public static Booster getRandomBoosterWithChance(int store, PlayerData pd) {
-        double startChance = 1.0 / 5000.0;
-        double endChance = 1.0 / 2000.0;
-        double baseChance = startChance + (endChance - startChance) * ((store - 1) / 11.0);
-
-        double bonusMultiplier = 1.0 + pd.getOutBoosterChance();
-        double finalChance = baseChance * bonusMultiplier;
-
-        int rollRange = (int) Math.max(1, Math.round(1.0 / finalChance));
+        int rollRange = getRollRange(store, pd);
         int roll = random.nextInt(rollRange) + 1;
 
         if (roll == 1) {
@@ -129,5 +122,18 @@ public class BoosterManager {
 
         return null;
     }
+
+    private static int getRollRange(int store, PlayerData pd) {
+        double startChance = 1.0 / 5000.0;
+        double endChance   = 1.0 / 1400.0;
+        double t = Math.max(0.0, Math.min(1.0, (store - 1) / 12.0));
+        double baseChance = startChance + (endChance - startChance) * t;
+
+        double bonusMultiplier = 1.0 + pd.getOutBoosterChance();
+        double finalChance = baseChance * bonusMultiplier;
+
+        return (int) Math.max(1, Math.round(1.0 / finalChance));
+    }
+
 
 }
