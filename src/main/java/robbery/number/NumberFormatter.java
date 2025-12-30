@@ -37,12 +37,35 @@ public class NumberFormatter {
     }
 
     public static String formatLong(long num) {
-        if (num < 1_000) return String.valueOf(num);
-        if (num < 1_000_000) return (num / 1_000) + "K";
-        if (num < 1_000_000_000) return (num / 1_000_000) + "M";
-        if (num < 1_000_000_000_000L) return (num / 1_000_000_000) + "B";
-        if (num < 1_000_000_000_000_000L) return (num / 1_000_000_000_000L) + "T";
-        return (num / 1_000_000_000_000_000L) + "Q";
+        double value;
+        String suffix;
+
+        if (num < 1_000) {
+            return String.valueOf(num);
+        } else if (num < 1_000_000) {
+            value = num / 1_000.0;
+            suffix = "K";
+        } else if (num < 1_000_000_000) {
+            value = num / 1_000_000.0;
+            suffix = "M";
+        } else if (num < 1_000_000_000_000L) {
+            value = num / 1_000_000_000.0;
+            suffix = "B";
+        } else if (num < 1_000_000_000_000_000L) {
+            value = num / 1_000_000_000_000.0;
+            suffix = "T";
+        } else {
+            value = num / 1_000_000_000_000_000.0;
+            suffix = "Q";
+        }
+
+        String formatted = String.format("%.2f", value);
+        if (formatted.endsWith(".00")) {
+            formatted = formatted.substring(0, formatted.length() - 3);
+        }
+
+        return formatted + suffix;
     }
+
 
 }

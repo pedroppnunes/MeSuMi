@@ -183,9 +183,9 @@ events:
     tag_timer: "&cCombat Tag: &e%time%s"
     death-message: "&6&lOutpost &8> &c%killed% &fwas killed by &c%killer%"
   outpost:
-    need_island: "&cYou need an island to capture the outpost!"
+    need_island: "&cYou need an hideout to capture the outpost!"
     contested: "&cOutpost is being contested!"
-    owned_time_left: "&eYour island already owns this outpost. Time left: &b%time%"
+    owned_time_left: "&eYour hideout already owns this outpost. Time left: &b%time%"
     capture_broadcast: "&6&lOutpost &8> &aOutpost captured by &b%island_name%&a!"
     boost_expired_title: "&6&lOutpost &8> &cOutpost boost expired"
     boost_expired_border: "-----------------------------"
@@ -203,6 +203,7 @@ events:
     perk_announcement_money: "&eNew Outpost Money Multiplier: &a+%amount%x"
     perk_announcement_perk2: "&eNew Outpost Perk: &a+%value%% %perk%"
     neutralizing_broadcast: "&6&lOutpost &8> &eOutpost being neutralized by &b%island_name%&e!"
+    neutralized_broadcast: "&6&lOutpost &8> &eOutpost neutralized by &b%island_name%&e!"
     capturing_broadcast: "&6&lOutpost &8> &cOutpost being captured by &b%island_name%&c!"
 
 reload:

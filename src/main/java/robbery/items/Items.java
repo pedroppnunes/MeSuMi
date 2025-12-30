@@ -27,6 +27,7 @@ public class Items {
     private final ItemStack skull;
     private UUID uniqueId;
     private boolean isPickable = true;
+    private boolean respawning = false;
     private Location position;
     private Item droppedItem;
     private final String id;
@@ -106,6 +107,7 @@ public class Items {
                 }
             }
         }
+        this.respawning = (boolean) itemData.getOrDefault("respawning", false);
     }
 
     private static double asDouble(Object o) {
@@ -183,28 +185,29 @@ public class Items {
 
 
     public void resetspawn(int delayInSeconds) {
-        if (droppedItem != null) {
+        if (droppedItem != null && Robbery.getInstance().isEnabled()) {
+            respawning = true;
             Location itemLocation = droppedItem.getLocation();
             droppedItem.remove();
 
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    // Respawn the item at the original location
                     Item newItem = itemLocation.getWorld().dropItem(itemLocation, skull);
-                    newItem.setPickupDelay(Integer.MAX_VALUE); // Item can't be picked up
-                    newItem.setUnlimitedLifetime(true); // Item will not despawn
-                    newItem.setVelocity(new Vector(0, 0, 0)); // Prevent movement
-                    newItem.setCustomName(uniqueId.toString()); // Set custom name
-                   droppedItem = newItem; // Update the reference
-
+                    newItem.setPickupDelay(Integer.MAX_VALUE);
+                    newItem.setUnlimitedLifetime(true);
+                    newItem.setVelocity(new Vector(0, 0, 0));
+                    newItem.setCustomName(uniqueId.toString());
+                    droppedItem = newItem;
                     hp = initialhp;
                     isPickable = !isPickable;
-
+                    respawning = false;
                 }
-            }.runTaskLater(Robbery.getInstance(), delayInSeconds * 20L); // Convert seconds to ticks
+            }.runTaskLater(Robbery.getInstance(), delayInSeconds * 20L);
         }
+
     }
+
 
     public int getTime() {
         return time;
@@ -220,6 +223,7 @@ public class Items {
         itemData.put("time", this.time);
         itemData.put("uniqueId", this.uniqueId.toString());
         itemData.put("id", this.id);
+        itemData.put("respawning", this.respawning);
 
         if (this.droppedItem != null) {
             itemData.put("droppedItem", this.droppedItem.getUniqueId().toString());
@@ -257,6 +261,20 @@ public class Items {
 
     public String getId(){
         return id;
+    }
+
+    public void forceRespawnNow() {
+        if (droppedItem == null && respawning) {
+            Item newItem = position.getWorld().dropItem(position, skull);
+            newItem.setPickupDelay(Integer.MAX_VALUE);
+            newItem.setUnlimitedLifetime(true);
+            newItem.setVelocity(new Vector(0, 0, 0));
+            newItem.setCustomName(uniqueId.toString());
+            droppedItem = newItem;
+        }
+        hp = initialhp;
+        isPickable = true;
+        respawning = false;
     }
 
 

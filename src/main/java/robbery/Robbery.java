@@ -46,6 +46,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class Robbery extends JavaPlugin implements Listener {
 
@@ -204,9 +205,9 @@ public class Robbery extends JavaPlugin implements Listener {
             playerEventListener.saveOnDisable(player);
             player.kick(Component.text(Messages.get("reload.player-kick")));
         }
-        
-        getLogger().info("Shutting Down Robbery!");
+        Bukkit.getScheduler().cancelTasks(this);
         saveItems();
+        getLogger().info("Shutting Down Robbery!");
     }
 
 
@@ -235,34 +236,77 @@ public class Robbery extends JavaPlugin implements Listener {
     }
 
     public void saveItems() {
-        if(playerEventListener.getHasLoaded()) {
-            File itemsFile = new File(getDataFolder(), "items.yml");
-            FileConfiguration itemsConfig = new YamlConfiguration();
+        if (!playerEventListener.getHasLoaded()) return;
 
-            itemsConfig.set("items", null);
+        File itemsFile = new File(getDataFolder(), "items.yml");
+        FileConfiguration itemsConfig = new YamlConfiguration();
+        itemsConfig.set("items", null);
 
-            Set<String> chunkCoords = new HashSet<>();
+        Set<String> chunkCoords = new HashSet<>();
 
+        boolean shuttingDown = !getServer().getPluginManager().isPluginEnabled(this);
+
+        Runnable saveTask = () -> {
             for (Items item : items) {
                 Map<String, Object> itemData = item.serialize();
                 Object droppedIdObj = itemData.get("droppedItem");
 
                 if (droppedIdObj instanceof String droppedId) {
                     itemsConfig.createSection("items." + droppedId, itemData);
-
+                } else {
                     Object worldObj = itemData.get("world");
                     Object xObj = itemData.get("x");
+                    Object yObj = itemData.get("y");
                     Object zObj = itemData.get("z");
-                    if (worldObj instanceof String && xObj instanceof Number && zObj instanceof Number) {
-                        String worldName = (String) worldObj;
-                        int chunkX = (int) Math.floor(((Number) xObj).doubleValue()) >> 4;
-                        int chunkZ = (int) Math.floor(((Number) zObj).doubleValue()) >> 4;
-                        chunkCoords.add(worldName + ":" + chunkX + ":" + chunkZ);
+
+                    if (worldObj instanceof String worldName &&
+                            xObj instanceof Number xNum &&
+                            yObj instanceof Number yNum &&
+                            zObj instanceof Number zNum) {
+
+                        World world = Bukkit.getWorld(worldName);
+                        if (world == null) {
+                            getLogger().warning("Invalid world while recovering item: " + worldName);
+                            continue;
+                        }
+
+                        Location loc = new Location(world, xNum.doubleValue(), yNum.doubleValue(), zNum.doubleValue());
+                        double radius = 0.8;
+
+                        Collection<Entity> entities = world.getNearbyEntities(loc, radius, radius, radius);
+                        List<Item> nearbyItems = entities.stream()
+                                .filter(e -> e instanceof Item)
+                                .map(e -> (Item) e)
+                                .toList();
+
+                        if (!nearbyItems.isEmpty()) {
+                            Item closestItem = nearbyItems.stream()
+                                    .min(Comparator.comparingDouble(i -> i.getLocation().distanceSquared(loc)))
+                                    .orElse(null);
+
+                            UUID foundId = closestItem.getUniqueId();
+                            itemData.put("droppedItem", foundId.toString());
+                            item.setDroppedItem(closestItem);
+                            itemsConfig.createSection("items." + foundId, itemData);
+
+                            getLogger().info("Recovered missing droppedItem for '" + item.getName() + "' at "
+                                    + worldName + " (" + xNum + ", " + yNum + ", " + zNum + ")");
+                        } else {
+                            getLogger().warning("No nearby item found to recover for: " + item.getName());
+                        }
+                    } else {
+                        getLogger().warning("Skipping item with invalid position data: " + item);
                     }
-                } else {
-                    getLogger().warning("Skipping item without valid droppedItem UUID: " + item);
                 }
 
+                Object worldObj = itemData.get("world");
+                Object xObj = itemData.get("x");
+                Object zObj = itemData.get("z");
+                if (worldObj instanceof String worldName && xObj instanceof Number && zObj instanceof Number) {
+                    int chunkX = (int) Math.floor(((Number) xObj).doubleValue()) >> 4;
+                    int chunkZ = (int) Math.floor(((Number) zObj).doubleValue()) >> 4;
+                    chunkCoords.add(worldName + ":" + chunkX + ":" + chunkZ);
+                }
             }
 
             try {
@@ -279,11 +323,25 @@ public class Robbery extends JavaPlugin implements Listener {
             } catch (Exception e) {
                 getLogger().severe("Failed to save chunks.yml: " + e.getMessage());
             }
+        };
+
+        if (shuttingDown || Bukkit.isPrimaryThread()) {
+            saveTask.run();
+        } else {
+            Bukkit.getScheduler().runTask(this, saveTask);
+        }
+    }
+
+    public void spawnLoadedItems(){
+        for(Items item : items){
+            item.forceRespawnNow();
         }
     }
 
 
     public void loadItems() {
+        items.clear();
+
         File itemsFile = new File(getDataFolder(), "items.yml");
         if (!itemsFile.exists()) {
             getLogger().warning("items.yml not found, loading backup...");
@@ -390,11 +448,8 @@ public class Robbery extends JavaPlugin implements Listener {
                 getLogger().info("Loaded " + items.size() + " items.");
             }
         });
+        Bukkit.getScheduler().runTaskLater(this, this::spawnLoadedItems, 40L);
     }
-
-
-
-
 
     public void saveBackupItem(Items item) {
         File backupFile = new File(getDataFolder(), "backupitems.yml");
@@ -484,6 +539,7 @@ public class Robbery extends JavaPlugin implements Listener {
                 getLogger().severe("Failed to save migrated backupitems.yml: " + e.getMessage());
             }
         }
+        Bukkit.getScheduler().runTaskLater(this, this::spawnLoadedItems, 40L);
     }
 
 
