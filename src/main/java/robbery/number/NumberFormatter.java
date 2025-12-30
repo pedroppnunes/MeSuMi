@@ -27,7 +27,7 @@ public class NumberFormatter {
         if (num < 1000) return formatDouble(num);
         if (num < 1_000_000) return formatDouble(num / 1_000) + "K";
         if (num < 1_000_000_000) return formatDouble(num / 1_000_000) + "M";
-        if (num < 1_000_000_000_000L) return (num / 1_000_000_000) + "B";
+        if (num < 1_000_000_000_000L) return formatDouble(num / 1_000_000_000) + "B";
         return formatDouble(num / 1_000_000_000_000L) + "T";
     }
 
