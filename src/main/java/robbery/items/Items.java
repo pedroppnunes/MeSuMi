@@ -168,7 +168,8 @@ public class Items {
     public boolean isPickable(){
         return isPickable;
     }
-    public void setPickable(){
+    public void setPickable(boolean pickable){ this.isPickable = pickable; }
+    public void togglePickable(){
         this.isPickable = !isPickable;
     }
     public double getInitialhp(){

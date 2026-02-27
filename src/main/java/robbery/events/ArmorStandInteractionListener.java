@@ -67,7 +67,7 @@ public class ArmorStandInteractionListener implements Listener {
         Entity damager = event.getDamager();
 
         if (!entity.getWorld().getName().equalsIgnoreCase("world")) return;
-
+        if(entity instanceof Player) return;
         if (entity.getType() == EntityType.ARMOR_STAND && damager instanceof Player player) {
             event.setCancelled(true);
             ArmorStand stand = (ArmorStand) entity;
@@ -109,7 +109,7 @@ public class ArmorStandInteractionListener implements Listener {
                 if (item.isPickable() && item.getHp() > 0 && !p.getBackpack().isFull()) {
 
                     if (pickingTasks.containsKey(player.getUniqueId())) return;
-                    item.setPickable();
+                    item.togglePickable();
                     int roll = 0;
                     if (p.getSPShop().instastealChance() != 0)
                         roll = random.nextInt((int) (1 / p.getSPShop().instastealChance())) + 1;

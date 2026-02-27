@@ -49,26 +49,63 @@ public class WarningsCommand implements CommandExecutor {
             return true;
         }
 
-        UUID uuid = p.getUniqueId();
-        // Remove expired warnings and save changes
-        warningManager.markExpiredAndSave(uuid);
+        UUID targetUUID;
+        String targetName;
 
-        // Retrieve active warnings
-        List<Map<String, String>> activeWarnings = warningManager.getActiveWarnings(uuid);
+        // CASE 1: /warnings (no args)
+        if (args.length == 0) {
+            targetUUID = p.getUniqueId();
+            targetName = p.getName();
+        }
 
-        if (activeWarnings.isEmpty()) {
-            Messages.send(p, "command.warnings.none");
+        // CASE 2: /warnings <player>
+        else if (args.length == 1) {
+
+            // Permission check
+            if (!p.hasPermission("robbery.staff")) {
+                Messages.send(p, "global.no-permission");
+                return true;
+            }
+
+            Player target = Bukkit.getPlayer(args[0]);
+
+            if (target == null) {
+                Messages.sendFormatted(p, "global.player-not-found", Map.of("player", args[0]));
+                return true;
+            }
+
+            targetUUID = target.getUniqueId();
+            targetName = target.getName();
+        }
+
+        // CASE 3: invalid usage
+        else {
+            Messages.send(p, "command.warnings.usage"); // optional
             return true;
         }
 
-        Messages.send(p, "command.warnings.header");
+        // Update expired warnings
+        warningManager.markExpiredAndSave(targetUUID);
 
-        // Display each active warning with formatted details
+        // Fetch active warnings
+        List<Map<String, String>> activeWarnings = warningManager.getActiveWarnings(targetUUID);
+
+        if (activeWarnings.isEmpty()) {
+            Messages.sendFormatted(p, "command.warnings.none", Map.of("player", targetName));
+            return true;
+        }
+
+        Messages.sendFormatted(p, "command.warnings.header", Map.of("player", targetName));
+
         for (Map<String, String> warning : activeWarnings) {
-            Messages.sendFormatted(p, "command.warnings.entry_start", Map.of("date", warning.get("start_date")));
-            Messages.sendFormatted(p, "command.warnings.entry_reason", Map.of("reason", warning.get("reason")));
-            Messages.sendFormatted(p, "command.warnings.entry_issuer", Map.of("issuer", warning.get("issuer")));
-            Messages.sendFormatted(p, "command.warnings.entry_expires", Map.of("expire", warning.get("expires_at")));
+            Messages.sendFormatted(p, "command.warnings.entry_start",
+                    Map.of("date", warning.get("start_date")));
+            Messages.sendFormatted(p, "command.warnings.entry_reason",
+                    Map.of("reason", warning.get("reason")));
+            Messages.sendFormatted(p, "command.warnings.entry_issuer",
+                    Map.of("issuer", warning.get("issuer")));
+            Messages.sendFormatted(p, "command.warnings.entry_expires",
+                    Map.of("expire", warning.get("expires_at")));
             p.sendMessage("");
         }
 

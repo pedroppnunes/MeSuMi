@@ -94,7 +94,7 @@ public class PickingTask extends BukkitRunnable {
         if (!isLookingAtStand(player, stand) || !player.isOnline()) {
             this.cancel();
             item.setHp(item.getInitialhp());
-            item.setPickable();
+            item.togglePickable();
             Messages.sendActionBar(player, "events.picking.canceled");
             if (onFinish != null) onFinish.run();
             return;
@@ -149,7 +149,7 @@ public class PickingTask extends BukkitRunnable {
     public void resetAndCancel() {
         this.cancel();
         item.setHp(item.getInitialhp());
-        item.setPickable();
+        item.setPickable(true);
         if (onFinish != null) onFinish.run();
     }
 

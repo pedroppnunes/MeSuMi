@@ -398,6 +398,7 @@ public class Robbery extends JavaPlugin implements Listener {
 
                 if (Bukkit.getEntity(droppedUUID) != null) {
                     Items item = new Items(itemData);
+                    item.setPickable(true);
                     items.add(item);
                     continue;
                 }
@@ -423,6 +424,7 @@ public class Robbery extends JavaPlugin implements Listener {
                                 String id = stand.getPersistentDataContainer().get(new NamespacedKey(this, "item_uuid"), PersistentDataType.STRING);
                                 if (id != null && id.equals(key)) {
                                     Items item = new Items(itemData);
+                                    item.setPickable(true);
                                     items.add(item);
                                     found = true;
                                     break;
@@ -433,10 +435,12 @@ public class Robbery extends JavaPlugin implements Listener {
 
                     if (!found) {
                         Items item = new Items(itemData);
+                        item.setPickable(true);
                         items.add(item);
                     }
                 } else {
                     Items item = new Items(itemData);
+                    item.setPickable(true);
                     items.add(item);
                 }
             }
