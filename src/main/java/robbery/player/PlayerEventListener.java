@@ -63,11 +63,22 @@ public class PlayerEventListener implements Listener {
             }
         }
         SuperiorPlayer superiorPlayer = SuperiorSkyblockAPI.getPlayer(player);
-        Island island = superiorPlayer.getIsland();
-        UUID currentOutpostOwner = plugin.getOutpostManager().getCurrentIsland();
 
-        if (island != null && currentOutpostOwner != null && island.isMember(superiorPlayer)) {
-            plugin.getOutpostManager().applyPerksToIsland(currentOutpostOwner);
+        Island playerIsland = superiorPlayer.getIsland();
+        Island outpostIsland = plugin.getOutpostManager().getCurrentIsland();
+
+        if (playerIsland != null && playerIsland.equals(outpostIsland)) {
+            memory.setOutpostBoost(plugin.getOutpostManager().getPerk1());
+            String perk2 = plugin.getOutpostManager().getPerk2();
+            int value = Integer.parseInt(perk2.split("%")[0]);
+
+            if (perk2.contains("Skillpoint")) {
+                memory.setSkillpointChance(value);
+            } else if (perk2.contains("Booster")) {
+                memory.setBoosterChance(value);
+            } else if (perk2.contains("Speed")) {
+                memory.setSpeedBonus(value);
+            }
         } else {
             memory.setOutpostBoost(0);
             memory.setSkillpointChance(0);

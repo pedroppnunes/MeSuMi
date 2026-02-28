@@ -13,9 +13,13 @@ import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
+/**
+ * Manages an outpost capture event using Island objects (SuperiorSkyblock2 API).
+ * Replaces previous UUID-based island tracking with direct Island references.
+ */
 public class OutpostManager {
     private final Robbery plugin;
     private final OutpostRegion region;
@@ -24,13 +28,13 @@ public class OutpostManager {
     private static final int CAPTURE_TIME_SECONDS = 60; // time to capture (100%)
     private static final int MESSAGE_THRESHOLD = 15; // percent at which we announce
 
-    // Outpost state
-    private UUID currentIsland; // island currently attempting to capture/neutralize
+    // Outpost state (now using Island)
+    private Island currentIsland; // island currently attempting to capture/neutralize
     private double progress; // 0..100 percent
-    private UUID ownerIsland = null; // current owner
+    private Island ownerIsland = null; // current owner
 
     // Boost management
-    private UUID lastBoosterIsland;
+    private Island lastBoosterIsland;
     private BukkitTask boostExpireTask;
     private long ownershipExpiryMillis = 0L;
 
@@ -38,7 +42,7 @@ public class OutpostManager {
     private boolean captureAnnounced = false;
     private boolean neutralizeAnnounced = false;
     private long lastMessageTime = 0L;
-    private static final long MESSAGE_COOLDOWN_MS = 5000; // 10 seconds between messages
+    private static final long MESSAGE_COOLDOWN_MS = 5000; // milliseconds between messages
 
     // Perks
     private double moneyMultiplier = 0.0;
@@ -88,7 +92,7 @@ public class OutpostManager {
             return;
         }
 
-        Map<UUID, Integer> islandPlayerCounts = getIslandPlayerCounts();
+        Map<Island, Integer> islandPlayerCounts = getIslandPlayerCounts();
 
         if (islandPlayerCounts.isEmpty()) {
             handleNoPlayers();
@@ -103,7 +107,7 @@ public class OutpostManager {
         }
 
         // Exactly one island present
-        UUID capturingIsland = islandPlayerCounts.keySet().iterator().next();
+        Island capturingIsland = islandPlayerCounts.keySet().iterator().next();
         int playerCount = islandPlayerCounts.get(capturingIsland);
 
         // If owner is present (defenders) and the capturing island is the same as owner, show owner time left
@@ -163,8 +167,12 @@ public class OutpostManager {
         updateProgressDisplay();
     }
 
-    private Map<UUID, Integer> getIslandPlayerCounts() {
-        Map<UUID, Integer> islandCounts = new HashMap<>();
+    /**
+     * Count players inside the outpost region grouped by Island object.
+     * Uses Island objects as map keys (not UUIDs).
+     */
+    private Map<Island, Integer> getIslandPlayerCounts() {
+        Map<Island, Integer> islandCounts = new HashMap<>();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!region.isInside(player.getLocation())) continue;
@@ -177,8 +185,7 @@ public class OutpostManager {
                 continue;
             }
 
-            UUID islandOwner = island.getOwner().getUniqueId();
-            islandCounts.put(islandOwner, islandCounts.getOrDefault(islandOwner, 0) + 1);
+            islandCounts.put(island, islandCounts.getOrDefault(island, 0) + 1);
         }
 
         return islandCounts;
@@ -205,45 +212,40 @@ public class OutpostManager {
         // No progress changes while contested
     }
 
-    private void checkAnnouncements(double oldProgress, UUID capturingIsland) {
+    private void checkAnnouncements(double oldProgress, Island capturingIsland) {
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastMessageTime < MESSAGE_COOLDOWN_MS) {
             return;
         }
 
-        SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(capturingIsland);
-        Island capturingIsle = sp != null ? sp.getIsland() : null;
-        if (capturingIsle == null) return;
+        if (capturingIsland == null) return;
 
         if (oldProgress < MESSAGE_THRESHOLD && progress >= MESSAGE_THRESHOLD) {
             if (ownerIsland == null && !captureAnnounced) {
                 broadcastMessage("events.outpost.capturing_broadcast",
-                        Map.of("island_name", capturingIsle.getName()));
+                        Map.of("island_name", capturingIsland.getName()));
                 captureAnnounced = true;
                 lastMessageTime = currentTime;
             } else if (ownerIsland != null && !neutralizeAnnounced) {
                 broadcastMessage("events.outpost.neutralizing_broadcast",
-                        Map.of("island_name", capturingIsle.getName()));
+                        Map.of("island_name", capturingIsland.getName()));
                 neutralizeAnnounced = true;
                 lastMessageTime = currentTime;
             }
         }
     }
 
-    private void completeCapture(UUID capturingIsland) {
+    private void completeCapture(Island capturingIsland) {
         // Only complete capture if outpost is currently unclaimed
         if (ownerIsland != null) return;
 
-        SuperiorPlayer superiorPlayer = SuperiorSkyblockAPI.getPlayer(capturingIsland);
-        Island island = superiorPlayer != null ? superiorPlayer.getIsland() : null;
-
-        if (island == null) {
-            Bukkit.getLogger().warning("Could not find island for UUID: " + capturingIsland);
+        if (capturingIsland == null) {
+            Bukkit.getLogger().warning("completeCapture called with null island.");
             return;
         }
 
         broadcastMessage("events.outpost.capture_broadcast",
-                Map.of("island_name", island.getName()));
+                Map.of("island_name", capturingIsland.getName()));
 
         applyPerksToIsland(capturingIsland);
         lastBoosterIsland = capturingIsland;
@@ -269,13 +271,11 @@ public class OutpostManager {
         }.runTaskLater(plugin, ticks);
     }
 
-    private void neutralizeOutpost(UUID neutralizingIsland) {
+    private void neutralizeOutpost(Island neutralizingIsland) {
         // neutralize means removing current owner's perks and making outpost unclaimed.
         if (ownerIsland == null) return; // nothing to neutralize
 
-        SuperiorPlayer spNeutralizer = SuperiorSkyblockAPI.getPlayer(neutralizingIsland);
-        Island neutralizerIsland = spNeutralizer != null ? spNeutralizer.getIsland() : null;
-        String neutralizerName = neutralizerIsland != null ? neutralizerIsland.getName() : "Unknown";
+        String neutralizerName = neutralizingIsland != null ? neutralizingIsland.getName() : "Unknown";
 
         // remove perks and announce neutralization
         removePerksFromIsland();
@@ -299,12 +299,14 @@ public class OutpostManager {
     }
 
     private void showTimeLeftToOwner() {
+        if (ownerIsland == null) return;
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!region.isInside(player.getLocation())) continue;
 
             SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(player);
             Island playerIsland = sp != null ? sp.getIsland() : null;
-            if (playerIsland != null && playerIsland.getOwner().getUniqueId().equals(ownerIsland)) {
+            if (playerIsland != null && playerIsland.equals(ownerIsland)) {
                 long timeLeft = ownershipExpiryMillis - System.currentTimeMillis();
                 String formattedTime = formatMillis(Math.max(0, timeLeft));
                 Messages.sendActionBarFormatted(player, "events.outpost.owned_time_left",
@@ -410,15 +412,17 @@ public class OutpostManager {
         applyPerksToIsland(ownerIsland);
     }
 
+    /**
+     * Apply perks to all **online** island members. Offline members must be handled separately
+     * (persist state or apply on join) if you need offline application.
+     */
+    public void applyPerksToIsland(Island island) {
+        if (island == null) return;
 
-    public void applyPerksToIsland(UUID islandUUID) {
-        if (islandUUID == null) return;
+        List<SuperiorPlayer> members = island.getIslandMembers(true);
+        if (members == null) return;
 
-        SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(islandUUID);
-        if (sp == null) return;
-        Island currentIsle = sp.getIsland();
-        if (currentIsle == null) return;
-        for (SuperiorPlayer coop : currentIsle.getIslandMembers(true)) {
+        for (SuperiorPlayer coop : members) {
             Player player = coop.asPlayer();
             if (player != null) {
                 PlayerData pd = PlayerDataManager.getPlayerData(player);
@@ -438,12 +442,13 @@ public class OutpostManager {
         }
     }
 
+    /**
+     * Remove perks from the last booster island's online members.
+     */
     public void removePerksFromIsland() {
         if (lastBoosterIsland == null) return;
 
-        SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(lastBoosterIsland);
-        if (sp == null) return;
-        Island lastIsle = sp.getIsland();
+        Island lastIsle = lastBoosterIsland;
         if (lastIsle != null) {
             for (SuperiorPlayer coop : lastIsle.getIslandMembers(true)) {
                 Player player = coop.asPlayer();
@@ -459,7 +464,7 @@ public class OutpostManager {
     }
 
     // Getters
-    public UUID getCurrentIsland() {
+    public Island getCurrentIsland() {
         return ownerIsland;
     }
 
@@ -467,9 +472,7 @@ public class OutpostManager {
         if (ownerIsland == null)
             return Messages.get("events.outpost.status-title-unclaimed");
 
-        SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(ownerIsland);
-        Island island = sp != null ? sp.getIsland() : null;
-        String islandName = island != null ? island.getName() : Messages.get("events.outpost.holder-island-name-none");
+        String islandName = ownerIsland != null ? ownerIsland.getName() : Messages.get("events.outpost.holder-island-name-none");
 
         String titleTemplate = Messages.get("events.outpost.status-title-controlled");
         return titleTemplate.replace("%island%", islandName);
@@ -491,25 +494,26 @@ public class OutpostManager {
         if (ownerIsland == null)
             return Messages.get("events.outpost.holder-island-name-none");
 
-        SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(ownerIsland);
-        Island island = sp != null ? sp.getIsland() : null;
-        return island != null ? island.getName() : Messages.get("events.outpost.holder-island-name-none");
+        return ownerIsland != null ? ownerIsland.getName() : Messages.get("events.outpost.holder-island-name-none");
     }
 
     public String getHolderLeaderName() {
         if (ownerIsland == null)
             return Messages.get("events.outpost.holder-leader-name-none");
 
-        SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(ownerIsland);
-        return sp != null ? sp.getName() : Messages.get("events.outpost.holder-leader-name-none");
+        // If you need the leader's SuperiorPlayer name, you can get leader via ownerIsland.getIslandLeader() if available
+        SuperiorPlayer leader = ownerIsland.getOwner();
+        return leader != null ? leader.getName() : Messages.get("events.outpost.holder-leader-name-none");
     }
 
     public String getOutpostMaterial(Player player) {
         if (ownerIsland == null)
             return Messages.get("events.outpost.outpost-material-unclaimed");
 
-        Island island = SuperiorSkyblockAPI.getPlayer(player).getIsland();
-        if (island == null || !island.getOwner().getUniqueId().equals(ownerIsland)) {
+        SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(player);
+        if (sp == null) return Messages.get("events.outpost.outpost-material-not-owner");
+        Island island = sp.getIsland();
+        if (island == null || !island.equals(ownerIsland)) {
             return Messages.get("events.outpost.outpost-material-not-owner");
         }
 

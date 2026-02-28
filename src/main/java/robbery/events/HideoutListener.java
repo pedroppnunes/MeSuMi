@@ -37,6 +37,10 @@ public class HideoutListener implements Listener {
         PlayerData pData = PlayerDataManager.getPlayerData(player);
         Backpacks backpack = pData.getBackpack();
         if(player.hasPermission("robbery.bypass")) return;
+
+        //Let people type ho top with backpack items
+        if(message.equalsIgnoreCase("/ho top")) return;
+
         // Block hideout entry or teleport commands if player has items
         if ((message.startsWith("/ho") || message.startsWith("/hideout") || message.contains("/ho") || message.contains("/hideout")) ||
                 (message.startsWith("/spawn") || message.startsWith("/lobby") || message.contains("/spawn") || message.contains("/lobby") ||
@@ -78,16 +82,4 @@ public class HideoutListener implements Listener {
         return back.getSize() != 0;
     }
 
-    /**
-     * Prevents copper blocks from oxidizing.
-     *
-     * @param event the BlockFadeEvent triggered by copper oxidation
-     */
-    @EventHandler
-    public void onCopperOxidation(BlockFadeEvent event) {
-        Material type = event.getBlock().getType();
-        if (type == Material.COPPER_BLOCK || type == Material.EXPOSED_COPPER || type == Material.WEATHERED_COPPER) {
-            event.setCancelled(true);
-        }
-    }
 }

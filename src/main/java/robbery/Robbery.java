@@ -167,7 +167,7 @@ public class Robbery extends JavaPlugin implements Listener {
 
         saveDefaultConfig();
 
-        String webhookUrl = "https://discord.com/api/webhooks/1418305594716192830/LqLGQ8B-f6JRkBJw0fyQVndskVuWx8GnLpaD33lHmQwwlZw5IN_CrkBoV-YdpzLHFmqS";
+        String webhookUrl = "https://discord.com/api/webhooks/1474804880240545873/qALvKipUQzhdvuT81pbnNx3kGeOcJAJQObzTEHciBPQSftGSDDaBWEfKGGX-CH9Far_2";
         weeklyLeaderboardTask = new WeeklyLeaderboardTask(this, webhookUrl);
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, this::saveItems, 20L * 60, 20L * 60 * 5);
