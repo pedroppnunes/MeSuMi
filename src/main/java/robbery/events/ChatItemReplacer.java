@@ -1,5 +1,8 @@
 package robbery.events;
 
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.events.IslandChatEvent;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -57,7 +60,7 @@ public class ChatItemReplacer implements Listener {
      *
      * @param event the AsyncPlayerChatEvent
      */
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         String message = event.getMessage();
@@ -154,5 +157,57 @@ public class ChatItemReplacer implements Listener {
         Component display = LEGACY.deserialize(rawName);
 
         return display.hoverEvent(HoverEvent.showItem(item.asHoverEvent().value()));
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onIslandChat(IslandChatEvent event) {
+        SuperiorPlayer sp = event.getPlayer();
+        Player player = sp.asPlayer();
+        if (player == null) return;
+
+        String message = event.getMessage();
+
+        // OPTIONAL: mute check
+        if (muteManager.isMuted(player.getUniqueId()) && !player.hasPermission("robbery.bypass")) {
+            event.setCancelled(true);
+            Messages.send(player, "chat.muted");
+            return;
+        }
+
+        // Remove color codes
+        message = message.replaceAll("(?i)&[0-9A-FK-OR]", "");
+
+        // Handle [item]
+        Component finalMessage = buildIslandChatMessage(player, message);
+
+        // Cancel default island chat formatting
+        event.setCancelled(true);
+
+        // Send ONLY to island members
+        event.getIsland().getIslandMembers(true).forEach(member -> {
+            Player target = member.asPlayer();
+            if (target != null) {
+                target.sendMessage(finalMessage);
+            }
+        });
+    }
+
+    private Component buildIslandChatMessage(Player player, String message) {
+        String[] parts = message.split("\\[item\\]", 2);
+        String before = parts[0];
+        String after  = parts.length > 1 ? parts[1] : "";
+
+        Component beforeComp = LEGACY.deserialize(before);
+        Component afterComp  = LEGACY.deserialize(after);
+
+        Component itemComp = message.contains("[item]")
+                ? buildItemComponent(player)
+                : Component.empty();
+
+        return Component.text("[ISLAND] ", NamedTextColor.GREEN)
+                .append(Component.text(player.getName() + ": ", NamedTextColor.WHITE))
+                .append(beforeComp)
+                .append(itemComp)
+                .append(afterComp);
     }
 }

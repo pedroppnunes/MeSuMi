@@ -33,6 +33,10 @@ public class OutpostManager {
     private double progress; // 0..100 percent
     private Island ownerIsland = null; // current owner
 
+    // Immunity for owner after capture (20 minutes)
+    private static final long OWNER_IMMUNITY_MILLIS = 20 * 60 * 1000L;
+    private long ownerImmunityExpiryMillis = 0L;
+
     // Boost management
     private Island lastBoosterIsland;
     private BukkitTask boostExpireTask;
@@ -109,6 +113,21 @@ public class OutpostManager {
         // Exactly one island present
         Island capturingIsland = islandPlayerCounts.keySet().iterator().next();
         int playerCount = islandPlayerCounts.get(capturingIsland);
+
+        // If owner exists and owner immunity is active, block other islands from progressing
+        if (ownerIsland != null && !ownerIsland.equals(capturingIsland) && ownerIsImmune()) {
+            long timeLeft = ownerImmunityExpiryMillis - System.currentTimeMillis();
+            String formatted = formatMillis(Math.max(0, timeLeft));
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!region.isInside(player.getLocation())) continue;
+                // Give the attacker(s) a short actionbar telling them owner has immunity and remaining time
+                Messages.sendActionBarFormatted(player, "events.outpost.owner_immunity", Map.of(
+                        "owner", ownerIsland.getName(),
+                        "time", formatted
+                ));
+            }
+            return; // Block progress while immunity active
+        }
 
         // If owner is present (defenders) and the capturing island is the same as owner, show owner time left
         if (ownerIsland != null && ownerIsland.equals(capturingIsland)) {
@@ -254,6 +273,11 @@ public class OutpostManager {
         long delayMillis = 4L * 60 * 60 * 1000; // 4 hours
         ownershipExpiryMillis = System.currentTimeMillis() + delayMillis;
 
+        // give owner 20 minutes of immunity
+        ownerImmunityExpiryMillis = System.currentTimeMillis() + OWNER_IMMUNITY_MILLIS;
+        Bukkit.broadcastMessage(Messages.getFormatted("events.outpost.immunity_started",
+                Map.of("island_name", capturingIsland.getName(), "time", "20m")));
+
         // reset state so new captures start fresh
         currentIsland = null;
         progress = 0.0;
@@ -287,6 +311,7 @@ public class OutpostManager {
         ownerIsland = null;
         lastBoosterIsland = null;
         ownershipExpiryMillis = 0L;
+        ownerImmunityExpiryMillis = 0L;
         if (boostExpireTask != null) {
             boostExpireTask.cancel();
             boostExpireTask = null;
@@ -371,6 +396,7 @@ public class OutpostManager {
         ownerIsland = null;
         ownershipExpiryMillis = 0L;
         boostExpireTask = null;
+        ownerImmunityExpiryMillis = 0L;
         resetMessageFlags();
     }
 
@@ -406,7 +432,7 @@ public class OutpostManager {
                         "perk", perk2Type,
                         "value", String.valueOf(perk2Value)
                 )));
-        Bukkit.broadcastMessage(Messages.get("events.outpost.perk_announcement_border") + "\u200B");
+        Bukkit.broadcastMessage(Messages.get("events.outpost.perk_announcement_border"));
         Bukkit.broadcastMessage("");
 
         applyPerksToIsland(ownerIsland);
@@ -463,6 +489,10 @@ public class OutpostManager {
         }
     }
 
+    private boolean ownerIsImmune() {
+        return ownerIsland != null && System.currentTimeMillis() < ownerImmunityExpiryMillis;
+    }
+
     // Getters
     public Island getCurrentIsland() {
         return ownerIsland;
@@ -483,9 +513,14 @@ public class OutpostManager {
             return Messages.get("events.outpost.status-lore-time-left")
                     .replace("%time%", Messages.get("events.outpost.holder-island-name-none"));
 
+        if (ownerIsImmune()) {
+            long timeLeft = ownerImmunityExpiryMillis - System.currentTimeMillis();
+            String formattedTime = formatMillis(Math.max(0, timeLeft));
+            return Messages.get("events.outpost.status-lore-immunity").replace("%time%", formattedTime);
+        }
+
         long timeLeft = ownershipExpiryMillis - System.currentTimeMillis();
         String formattedTime = formatMillis(Math.max(0, timeLeft));
-
         String loreTemplate = Messages.get("events.outpost.status-lore-time-left");
         return loreTemplate.replace("%time%", formattedTime);
     }

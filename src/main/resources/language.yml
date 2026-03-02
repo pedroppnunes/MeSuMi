@@ -3,6 +3,7 @@ global:
   player-only: "&5&lRobbery &8> &cOnly players can run this command."
   no-permission: "&5&lRobbery &8> &cYou do not have permission to use this command."
   no-money: "&5&lRobbery &8> &cYou don't have enough money. You need $%price%."
+  not-here: "&5&lRobbery &8> &cYou can't use that here."
 
 command:
   additem:
@@ -205,6 +206,9 @@ events:
     neutralizing_broadcast: "&6&lOutpost &8> &eOutpost being neutralized by &b%island_name%&e!"
     neutralized_broadcast: "&6&lOutpost &8> &eOutpost neutralized by &b%island_name%&e!"
     capturing_broadcast: "&6&lOutpost &8> &cOutpost being captured by &b%island_name%&c!"
+    owner_immunity: "§cOwner §6%owner% §chas immunity for §e%time%§c — you cannot capture now."
+    immunity_started: "&b%island_name% &chas a 20m immunity after capturing the Outpost!"
+    status-lore-immunity: "&cOwner immunity: &b%time%"
 
 reload:
   player-kick: "&cServer is reloading."
@@ -237,6 +241,7 @@ itemclear:
 voteparty:
   reached: "&a&lVoteParty &8> &6Vote Party reached! Rewarding everyone!"
   reset: "&a&lVoteParty &8> &cVote Party count has been reset for the new day!"
+  reminder: "&a&lVoteParty &8> &6Don't forget to Vote, reach the milestone for a free vote key &a%current%/%required%"
 help:
   main_title: "&6&l--- Help Categories ---"
   category_display: "&e• &a%category%"

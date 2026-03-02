@@ -29,6 +29,7 @@ public class CombatManager implements Listener {
 
     private final Map<UUID, Long> taggedPlayers = new HashMap<>();
     private final Robbery main;
+    private final String[] allowedCommands = {"/r", "/ho top", "/msg", "/tell","/reply","message"};
 
     /**
      * Constructs a new CombatManager instance and starts the combat timer task.
@@ -99,15 +100,34 @@ public class CombatManager implements Listener {
      */
     @EventHandler
     public void onHit(EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof Player attacker) || !(event.getEntity() instanceof Player victim)) return;
+        if (!(event.getEntity() instanceof Player victim)) return;
+
+        Player attacker = null;
+
+        // Direct hit
+        if (event.getDamager() instanceof Player player) {
+            attacker = player;
+        }
+        // Projectile hit (arrow, trident, etc.)
+        else if (event.getDamager() instanceof org.bukkit.entity.Projectile projectile) {
+            if (projectile.getShooter() instanceof Player shooter) {
+                attacker = shooter;
+            }
+        }
+
+        if (attacker == null) return;
 
         if (!attacker.getWorld().getName().equalsIgnoreCase("outpost")) return;
+
+        if (hasBypass(attacker) || hasBypass(victim)) return;
 
         SuperiorPlayer superiorPlayer = SuperiorSkyblockAPI.getPlayer(attacker);
         Island atkIsland = superiorPlayer.getIsland();
         SuperiorPlayer superiorPlayer2 = SuperiorSkyblockAPI.getPlayer(victim);
         Island vicIsland = superiorPlayer2.getIsland();
-        if (atkIsland != null && vicIsland != null && atkIsland.getOwner().getUniqueId().equals(vicIsland.getOwner().getUniqueId())) {
+
+        if (atkIsland != null && vicIsland != null &&
+                atkIsland.getOwner().getUniqueId().equals(vicIsland.getOwner().getUniqueId())) {
             event.setCancelled(true);
             return;
         }
@@ -124,12 +144,21 @@ public class CombatManager implements Listener {
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
+
         if (!player.getWorld().getName().equalsIgnoreCase("outpost")) return;
 
-        if (isTagged(player)) {
-            Messages.send(player, "events.combat.command_blocked");
-            event.setCancelled(true);
+        if (!isTagged(player) || hasBypass(player)) return;
+
+        String message = event.getMessage().toLowerCase();
+
+        for (String cmd : allowedCommands) {
+            if (message.equals(cmd)) {
+                return;
+            }
         }
+
+        Messages.send(player, "events.combat.command_blocked");
+        event.setCancelled(true);
     }
 
 
@@ -175,5 +204,9 @@ public class CombatManager implements Listener {
                 return true;
             });
         }, 0L, 20L);
+    }
+
+    private boolean hasBypass(Player player) {
+        return player.hasPermission("robbery.op") || player.hasPermission("robbery.bypass");
     }
 }

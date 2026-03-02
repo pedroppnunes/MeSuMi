@@ -15,6 +15,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -29,8 +30,6 @@ import robbery.mutes.MuteManager;
 import robbery.outpost.CombatManager;
 import robbery.outpost.OutpostManager;
 import robbery.outpost.OutpostRegion;
-import robbery.player.PlayerData;
-import robbery.player.PlayerDataManager;
 import robbery.player.PlayerEventListener;
 import robbery.prestige.PrestigeCountManager;
 import robbery.ranks.RankPaperListener;
@@ -45,8 +44,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 public class Robbery extends JavaPlugin implements Listener {
 
@@ -65,6 +62,7 @@ public class Robbery extends JavaPlugin implements Listener {
     private VotePartyManager votePartyManager;
     private ChatStyleManager chatStyleManager;
     private WeeklyLeaderboardTask weeklyLeaderboardTask;
+    private HourlyLeaderboard hourlyLeaderboard;
     private PlayerEventListener playerEventListener;
 
     @Override
@@ -82,6 +80,14 @@ public class Robbery extends JavaPlugin implements Listener {
         } else {
             getLogger().warning("Could not find PlaceholderAPI! This plugin is required.");
             Bukkit.getPluginManager().disablePlugin(this);
+        }
+        Plugin voting = Bukkit.getPluginManager().getPlugin("VotingPlugin");
+
+        if (voting != null && voting.isEnabled()) {
+            tips = voting.getConfig().getStringList("tips");
+            getLogger().info("Hooked into VotingPlugin tips.");
+        } else {
+            getLogger().warning("VotingPlugin not found. Tips feature disabled.");
         }
         this.hidePlayers = new HidePlayers(main);
         this.rcrate = new Rcrate();
@@ -139,9 +145,13 @@ public class Robbery extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("muteinfo")).setExecutor(new MuteInfoCommand(muteManager));
         Objects.requireNonNull(getCommand("baltop")).setExecutor(new Baltop());
         Objects.requireNonNull(getCommand("help")).setExecutor(new HelpCommand(main));
-        Objects.requireNonNull(getCommand("spawn")).setExecutor(new SpawnCommand());
+        SpawnCommand s = new SpawnCommand();
+        Objects.requireNonNull(getCommand("spawn")).setExecutor(s);
+        Objects.requireNonNull(getCommand("s")).setExecutor(s);
         Objects.requireNonNull(getCommand("ct")).setExecutor(new ChatColorCommand(main));
-        Objects.requireNonNull(getCommand("lobby")).setExecutor(new Lobby(main));
+        Lobby l = new Lobby(main);
+        Objects.requireNonNull(getCommand("lobby")).setExecutor(l);
+        Objects.requireNonNull(getCommand("l")).setExecutor(l);
         Objects.requireNonNull(getCommand("weeklyleaderboard")).setExecutor(new WeeklyLeaderboardCommand(main));
         Objects.requireNonNull(getCommand("loadbackup")).setExecutor(new LoadBackup(main));
         Objects.requireNonNull(getCommand("migrate")).setExecutor(new MigrateBackup(main));
@@ -155,7 +165,6 @@ public class Robbery extends JavaPlugin implements Listener {
         PrestigeCountManager.load();
         OutpostRegion region = new OutpostRegion(outpostWorld, -3, 1, -3, 4, 1, 4);
         outpostManager = new OutpostManager(main, region);
-        startItemClearTask();
         blockCraft.removeRecipes();
         addItemstoMap();
 
@@ -167,8 +176,30 @@ public class Robbery extends JavaPlugin implements Listener {
 
         saveDefaultConfig();
 
-        String webhookUrl = "https://discord.com/api/webhooks/1474804880240545873/qALvKipUQzhdvuT81pbnNx3kGeOcJAJQObzTEHciBPQSftGSDDaBWEfKGGX-CH9Far_2";
-        weeklyLeaderboardTask = new WeeklyLeaderboardTask(this, webhookUrl);
+        if (getConfig().getBoolean("leaderboards.weekly.enabled")) {
+            String webhookUrl = getConfig().getString("leaderboards.weekly.webhook");
+            if (webhookUrl != null && !webhookUrl.isEmpty()) {
+                weeklyLeaderboardTask = new WeeklyLeaderboardTask(this, webhookUrl);
+                getLogger().info("Weekly leaderboard enabled.");
+            } else {
+                getLogger().warning("Weekly leaderboard enabled but webhook is missing.");
+            }
+        }
+
+        if (getConfig().getBoolean("leaderboards.hourly.enabled")) {
+            String webhookUrl = getConfig().getString("leaderboards.hourly.webhook");
+            if (webhookUrl != null && !webhookUrl.isEmpty()) {
+                hourlyLeaderboard = new HourlyLeaderboard(this, webhookUrl);
+                getLogger().info("Hourly leaderboard enabled.");
+            } else {
+                getLogger().warning("Hourly leaderboard enabled but webhook is missing.");
+            }
+        }
+
+
+        startItemClearTask();
+        startVoteReminderTask();
+        startTipsTask();
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, this::saveItems, 20L * 60, 20L * 60 * 5);
     }
@@ -622,6 +653,49 @@ public class Robbery extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskTimer(this, 20L, 20L);
+    }
+
+    private void startVoteReminderTask() {
+        long interval = 20L * 1800; // 30 minutes
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                int current = votePartyManager.getDisplayCurrentVotes();
+                int required = votePartyManager.getDisplayRequiredVotes();
+
+                Map<String, String> placeholders = Map.of(
+                        "current", String.valueOf(current),
+                        "required", String.valueOf(required)
+                );
+
+                Bukkit.broadcastMessage(Messages.getFormatted("voteparty.reminder", placeholders));
+            }
+        }.runTaskTimer(this, 0L, interval);
+    }
+
+    private int tipIndex = 0;
+    private List<String> tips = new ArrayList<>();
+
+    private void startTipsTask() {
+        long interval = 20L * 1200; // 20 minutes
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (tips.isEmpty()) return;
+
+                String tip = tips.get(tipIndex);
+
+                Bukkit.broadcastMessage(tip);
+
+                tipIndex++;
+
+                if (tipIndex >= tips.size()) {
+                    tipIndex = 0;
+                }
+            }
+        }.runTaskTimer(this, 0L, interval);
     }
 
     public boolean getIsBackup(){

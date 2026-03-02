@@ -3,7 +3,7 @@ version: '1.0'
 main: robbery.Robbery
 api-version: '1.21'
 
-softdepend: [PlaceholderAPI]
+softdepend: [PlaceholderAPI,VotingPlugin]
 depend: [Vault]
 
 commands:
@@ -47,6 +47,9 @@ commands:
   loadbackup:
     usage: /loadbackup
     permission: robbery.op
+  l:
+    description: Teleports you to lobby
+    usage: /l
   lobby:
     usage: /lobby
   mall:
@@ -90,6 +93,9 @@ commands:
     description: Main command for Robbery
     usage: /robbery <reload>
     permission: robbery.op
+  s:
+    description: Teleports you to spawn
+    usage: /s
   sellrob:
     usage: /sellrob [player]
     permission: robbery.op

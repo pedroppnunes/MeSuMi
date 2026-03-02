@@ -210,8 +210,8 @@ public class PlayerData {
     }
 
     //General stuff
-    public void setBoostersPaused(String paused){
-        this.boostersPaused = Boolean.parseBoolean(paused);
+    public void setBoostersPaused(boolean paused){
+        this.boostersPaused = paused;
     }
 
     public void addItemToBackpack(Items item) {
@@ -430,6 +430,11 @@ public class PlayerData {
                 b.setSeconds(seconds);
                 activeBoosters.addLast(b);
             } catch (NumberFormatException ignored) {}
+        }
+
+        if (boostersPaused) {
+            boostx = 0.0;
+            return;
         }
 
         if (!activeBoosters.isEmpty()) {

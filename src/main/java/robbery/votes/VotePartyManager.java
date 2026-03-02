@@ -25,6 +25,7 @@ public class VotePartyManager {
     private final Robbery plugin;
     private int currentVotes = 0;
     private final int requiredVotes = 50;
+    private int totalVotes = 0;
 
     /**
      * Constructs a new VotePartyManager and loads the saved vote count from configuration.
@@ -43,10 +44,14 @@ public class VotePartyManager {
      */
     public void handleVote() {
         currentVotes++;
-        saveVotes();
-        if (currentVotes % requiredVotes == 0) {
+        totalVotes++;
+
+        if (currentVotes >= requiredVotes) {
             triggerVoteParty();
+            currentVotes = 0;
         }
+
+        saveVotes();
     }
 
     /**
@@ -54,11 +59,18 @@ public class VotePartyManager {
      * Executed via console command to ensure proper permission handling.
      */
     private void triggerVoteParty() {
-        Bukkit.broadcastMessage(Messages.get("voteparty.reached"));
+        Bukkit.getScheduler().runTask(plugin, () -> {
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "crate key give " + player.getName() + " vote 1");
-        }
+            Bukkit.broadcastMessage(Messages.get("voteparty.reached"));
+
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                Bukkit.dispatchCommand(
+                        Bukkit.getConsoleSender(),
+                        "crate key give " + player.getName() + " vote 1"
+                );
+            }
+
+        });
     }
 
     /**
@@ -67,6 +79,7 @@ public class VotePartyManager {
      */
     private void saveVotes() {
         plugin.getConfig().set("voteparty.votes", currentVotes);
+        plugin.getConfig().set("voteparty.totalVotes", totalVotes);
         plugin.saveConfig();
     }
 
@@ -76,6 +89,7 @@ public class VotePartyManager {
      */
     private void loadVotes() {
         currentVotes = plugin.getConfig().getInt("voteparty.votes", 0);
+        totalVotes = plugin.getConfig().getInt("voteparty.totalVotes", 0);
     }
 
     /**
@@ -87,7 +101,17 @@ public class VotePartyManager {
      */
     public void resetVotes() {
         currentVotes = currentVotes % requiredVotes;
+        totalVotes = currentVotes;
         saveVotes();
         Bukkit.broadcastMessage(Messages.get("voteparty.reset"));
+    }
+
+    public int getDisplayCurrentVotes() {
+        return totalVotes;
+    }
+
+    public int getDisplayRequiredVotes() {
+        int nextMilestone = ((totalVotes / requiredVotes) + 1) * requiredVotes;
+        return nextMilestone;
     }
 }

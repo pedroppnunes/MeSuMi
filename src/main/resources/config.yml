@@ -1,3 +1,7 @@
 voteparty:
   votes: 0
   required: 50
+  totalVotes: 0
+
+tips:
+  - ""

@@ -96,7 +96,7 @@ public class PlayerEventListener implements Listener {
             memory.setPrestige(Integer.parseInt(cfg.getString("stats.prestige")));
             memory.setActiveBooster(cfg.getString("stats.booster"));
             memory.setBoostersFromString(cfg.getString("stats.hasbooster"));
-            memory.setBoostersPaused(cfg.getString("stats.boosterpaused"));
+            memory.setBoostersPaused(cfg.getBoolean("stats.boosterpaused"));
             memory.setSP(cfg.getString("stats.skillpoints"));
             memory.setSPShopString(cfg.getString("stats.spshop"));
             memory.setBackpack(BackpackManager.toBackpack(cfg.getString("stats.backpack"),cfg.getString("stats.material"),cfg.getString("stats.itemsbackpack"),cfg.getString("stats.colorbackpack")));

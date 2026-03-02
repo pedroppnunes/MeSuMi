@@ -16,6 +16,7 @@ public class PrestigeCountManager {
     private static FileConfiguration config;
 
     public static void load() {
+        prestigeCounts.clear();
         file = new File(Robbery.getInstance().getDataFolder(), "prestige_counts.yml");
         if (!file.exists()) {
             try {
@@ -36,6 +37,8 @@ public class PrestigeCountManager {
     }
 
     public static void save() {
+        config.set("PrestigeCounts", null);
+
         for (Map.Entry<Integer, Integer> entry : prestigeCounts.entrySet()) {
             config.set("PrestigeCounts." + entry.getKey(), entry.getValue());
         }

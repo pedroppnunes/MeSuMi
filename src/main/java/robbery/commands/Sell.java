@@ -14,6 +14,7 @@ import robbery.number.NumberFormatter;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -82,33 +83,44 @@ public class Sell implements CommandExecutor {
         if(amountToAdd == 0)
             return true;
         Economy econ = Robbery.getEconomy();
-        if(chance != 0) {
-            int roll = random.nextInt((int) (1/chance)) + 1;
-            if(roll == 1){
-                long newAmount = Long.parseLong(NumberFormatter.formatDouble((long) (amountToAdd*(1+chance))));
-                econ.depositPlayer(player, newAmount);
-
-                String title = "&aYou sold your items for &2" + NumberFormatter.formatDoubleNumber(newAmount) + "$";
-                String subtitle = "&6You got Lucky! &e+" + (int)(chance * 100) + "% Bonus!";
-
-                player.sendTitle(
-                        ChatColor.translateAlternateColorCodes('&', title),
-                        ChatColor.translateAlternateColorCodes('&', subtitle),
-                        10, 60, 10
-                );
-
-                return true;
-            }
-        }
-        econ.depositPlayer(player, amountToAdd);
         String title = "&aYou sold your items for &2" + NumberFormatter.formatDoubleNumber(amountToAdd) + "$";
         String subtitle = "";
 
-        player.sendTitle(
-                ChatColor.translateAlternateColorCodes('&', title),
+        boolean lucky = false;
+
+        if (chance != 0) {
+            int roll = random.nextInt((int) (1 / chance)) + 1;
+            if (roll == 1) {
+                lucky = true;
+                long newAmount = (long) (amountToAdd * (1 + chance));
+                econ.depositPlayer(player, newAmount);
+
+                title = "&aYou sold your items for &2" + NumberFormatter.formatDoubleNumber(newAmount) + "$";
+                subtitle = "&6You got Lucky! &e+" + (int)(chance * 100) + "% Bonus!";
+            }
+        }
+
+        if (!lucky) {
+            econ.depositPlayer(player, amountToAdd);
+        }
+
+        player.sendTitle(ChatColor.translateAlternateColorCodes('&', title),
                 ChatColor.translateAlternateColorCodes('&', subtitle),
-                10, 60, 10
+                10, 60, 10);
+
+        Map<String, String> placeholders = Map.of(
+                "amount", NumberFormatter.formatDoubleNumber(lucky ? (long)(amountToAdd * (1 + chance)) : amountToAdd)
         );
+
+        Messages.sendFormatted(player, "command.sell.sold", placeholders);
+
+        if (lucky) {
+            Map<String, String> luckyPlaceholders = Map.of(
+                    "bonus", String.valueOf((int) (chance * 100))
+            );
+
+            Messages.sendFormatted(player, "command.sell.lucky", luckyPlaceholders);
+        }
 
         return true;
     }

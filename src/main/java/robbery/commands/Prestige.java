@@ -83,21 +83,26 @@ public class Prestige implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         Player player = null;
 
-        if (args.length > 0) {
+        if(args.length == 0 && sender instanceof Player p){
+            if(!hasPrestigePermission(p) && !p.hasPermission("robbery.op")) {
+                Messages.send(sender,"global.no-permission");
+                return true;
+            }
+            player = p;
+        } else if (args.length > 0) {
             player = Bukkit.getPlayer(args[0]);
-            if (player == null || !player.isOnline() || !player.getWorld().getName().equals("world")) {
-                Messages.send(sender, "global.player-not-found");
+            if(player != null && !player.hasPermission("robbery.op")){
+                Messages.send(sender,"global.no-permission");
                 return true;
             }
         }
 
-        if (player == null) {
-            if (sender instanceof Player) {
-                player = (Player) sender;
-            } else {
-                Messages.send(sender, "command.prestige.console-no-player");
-                return true;
-            }
+        if (player == null || !player.isOnline()) {
+            Messages.send(sender, "global.player-not-found");
+            return true;
+        } else if(!player.getWorld().getName().equals("world")){
+            Messages.send(sender,"global.not-here");
+            return true;
         }
 
         PlayerData p = PlayerDataManager.getPlayerData(player);
@@ -130,7 +135,7 @@ public class Prestige implements CommandExecutor {
             Bukkit.broadcastMessage(border);
             Bukkit.broadcastMessage(msg);
             Bukkit.broadcastMessage(msg2);
-            Bukkit.broadcastMessage(border+"\u200B");
+            Bukkit.broadcastMessage(border);
 
             // Teleport player to prestige start
             player.teleport(new Location(player.getWorld(), 20025, 100, 20015));
@@ -205,6 +210,15 @@ public class Prestige implements CommandExecutor {
             case 3 -> "rd";
             default -> "th";
         };
+    }
+
+    private boolean hasPrestigePermission(Player player) {
+        for (int i = 1; i <= 7; i++) {
+            if (player.hasPermission("robbery.rank" + i)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
