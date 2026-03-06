@@ -2,7 +2,7 @@ package robbery.prestige;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import robbery.Robbery;
+import robbery.core.Robbery;
 
 import java.io.File;
 import java.io.IOException;

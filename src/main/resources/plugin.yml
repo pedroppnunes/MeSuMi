@@ -1,6 +1,6 @@
 name: Robbery
 version: '1.0'
-main: robbery.Robbery
+main: robbery.core.Robbery
 api-version: '1.21'
 
 softdepend: [PlaceholderAPI,VotingPlugin]
@@ -11,6 +11,10 @@ commands:
     description: Spawns item
     usage: /additem <item_name>
     permission: robbery.op
+  adminxp:
+    description: Modify a player's Robbery XP or Level
+    usage: /adminxp <give|set|reset|setlevel> <player> <amount>
+    permission: robbery.adminxp
   baltop:
     description: Shows the top balances
     usage: /baltop [page]
@@ -70,8 +74,7 @@ commands:
   outpostinfo:
     usage: /outpostinfo
   prestige:
-    usage: /prestige [player]
-    permission: robbery.op
+    usage: /prestige
   pv:
     description: Open your private chest
     usage: /pv [slot]

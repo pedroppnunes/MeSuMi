@@ -10,6 +10,17 @@ command:
     usage: "&5&lRobbery &8> &cUsage: /additem <item_name>"
     invalid-item: "&5&lRobbery &8> &cInvalid item! Available items: %items%"
     spawn-success: "&5&lRobbery &8> &aSpawned a floating %item%!"
+  adminxp:
+    greater_than_zero: "&5&lRobbery &8> §cAmount must be greater than 0."
+    no_negative: "&5&lRobbery &8> §cAmount cannot be negative."
+    min_level: "&5&lRobbery &8> §cLevel must be at least 1."
+    invalid_number: "&5&lRobbery &8> §cInvalid number format provided."
+    give: "&5&lRobbery &8> §aGiven %amount% Robbery XP to %player%."
+    set_xp: "§&5&lRobbery &8> aSet %player%'s Robbery XP to %amount%."
+    set_level: "&5&lRobbery &8> §aSet %player%'s Robbery Level to %level%."
+    reset: "&5&lRobbery &8> §aSuccessfully reset %player%'s Robbery XP and level to default."
+    help_header: "§8=== §aAdmin XP Options §8==="
+    help_commands: "§2/adminxp give <player> <amount> §a- Adds absolute XP","§2/adminxp set <player> <amount> §a- Sets player's exact total XP","§2/adminxp setlevel <player> <level> §a- Snaps player to exact level (adjusts XP)","§2/adminxp reset <player> §a- Resets player back to Level 1 and 0 XP"
   baltop:
     header: "&6&lTop Balances"
     entry: "&e#%rank% &f%player% &7- &a$%balance%"
@@ -113,6 +124,11 @@ command:
   reload:
     usage: "&5&lRobbery &8> &cUsage: /robbery reload"
     success: "&5&lRobbery &8> &aadditems.yml/language.yml reloaded."
+    updated-items: "&5&lRobbery &8> &aReloaded successfully %count% items."
+  sell:
+    sold: "&5&lRobbery &8> &aYou sold your items for &2%amount%$"
+    lucky: "&5&lRobbery &8> &6You got Lucky! &e+%bonus% Bonus!"
+    xp-earned: "&7(You earned %xp% Robbery xp)"
   skillpointbuy:
     usage: "&5&lRobbery &8> &cUsage: /skillpointbuy <operation> <player>"
     unknown-upgrade: "&5&lRobbery &8> &cUnknown upgrade type."
@@ -183,6 +199,9 @@ events:
     command_blocked: "&6&lOutpost &8> &cYou cannot use commands while in PvP!"
     tag_timer: "&cCombat Tag: &e%time%s"
     death-message: "&6&lOutpost &8> &c%killed% &fwas killed by &c%killer%"
+  events:
+    robberyxp:
+      level-up: "&5&lRobbery &8> &bYou have leveled up to &6Level %level%&b!"
   outpost:
     need_island: "&cYou need an hideout to capture the outpost!"
     contested: "&cOutpost is being contested!"
@@ -219,6 +238,7 @@ boosters:
   queued: "&5&lRobbery &8> &eQueued &e%boost_name% booster. It will activate automatically later."
   paused: "&5&lRobbery &8> &cYou have stopped your booster."
   resumed: "&5&lRobbery &8> &eYou have resumed your booster."
+  expired: "&5&lRobbery &8> &cYour booster has expired."
 rank:
   already_have: "&5&lRobbery &8> &cYou already have this rank or a better one."
   upgraded: "&5&lRobbery &8> &aYour rank has been upgraded to %rank_name%!"

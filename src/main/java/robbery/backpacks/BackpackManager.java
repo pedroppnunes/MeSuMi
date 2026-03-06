@@ -2,7 +2,7 @@ package robbery.backpacks;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import robbery.Robbery;
+import robbery.core.Robbery;
 import robbery.items.Items;
 
 import java.util.ArrayList;
@@ -34,11 +34,11 @@ public class BackpackManager {
     public final static Backpacks BACK13 = new Backpacks("Spider Stash Pack",39,null,Material.IRON_CHESTPLATE,20_000_000,"§x§F§F§0§0§0§0§lS§x§F§F§0§0§0§F§lp§x§F§F§0§0§1§E§li§x§F§F§0§0§2§D§ld§x§F§F§0§0§3§C§le§x§F§F§0§0§4§A§lr §x§F§F§0§0§6§8§lS§x§F§F§0§0§7§7§lt§x§F§F§0§0§8§6§la§x§F§F§0§0§9§5§ls§x§F§F§0§0§A§4§lh §x§F§F§0§0§C§1§lP§x§F§F§0§0§D§0§la§x§F§F§0§0§D§F§lc§x§F§F§0§0§E§E§lk");
     public final static Backpacks BACK14 = new Backpacks("Ghost Protocol Pack",43,null,Material.IRON_CHESTPLATE,57_500_000,"§x§F§F§F§F§F§F§lG§x§F§6§F§F§F§1§lh§x§E§D§F§F§E§3§lo§x§E§3§F§F§D§5§ls§x§D§A§F§F§C§6§lt §x§C§7§F§F§A§A§lP§x§B§E§F§F§9§C§lr§x§B§4§F§F§8§E§lo§x§A§B§F§F§8§0§lt§x§A§1§F§F§7§1§lo§x§9§8§F§F§6§3§lc§x§8§E§F§F§5§5§lo§x§8§5§F§F§4§7§ll §x§7§2§F§F§2§B§lP§x§6§9§F§F§1§C§la§x§5§F§F§F§0§E§lc§x§5§6§F§F§0§0§lk");
     public final static Backpacks BACK15 = new Backpacks("Jackal Pack",47,null,Material.IRON_CHESTPLATE,150_000_000L,"§x§F§F§A§5§0§0J§x§F§F§9§5§0§0a§x§F§F§8§4§0§0c§x§F§F§7§4§0§0k§x§F§F§6§3§0§0a§x§F§F§5§3§0§0l §x§F§F§3§2§0§0P§x§F§F§2§1§0§0a§x§F§F§1§1§0§0c§x§F§F§0§0§0§0k");
-    public final static Backpacks BACK16 = new Backpacks("Green FN Pack",52,null,Material.IRON_CHESTPLATE,500_000_000L,"§x§0§0§F§F§1§C§lG§x§0§0§E§3§1§8§lr§x§0§0§C§7§1§3§le§x§0§0§C§7§1§3§le§x§0§0§C§7§1§3§ln §x§0§0§C§7§1§3§lF§x§0§0§C§7§1§3§lN §x§0§0§C§7§1§3§lP§x§0§0§C§7§1§3§la§x§0§0§C§7§1§3§lc§x§0§0§C§7§1§3§lk");
-    public final static Backpacks BACK17 = new Backpacks("Hunter’s Cloak Pack",57,null,Material.DIAMOND_CHESTPLATE,1_000_000_000L,"§x§E§7§F§F§0§0§lH§x§E§7§E§E§0§2§lu§x§E§7§D§E§0§4§ln§x§E§7§C§D§0§6§lt§x§E§7§B§C§0§7§le§x§E§7§A§B§0§9§lr§x§E§7§9§B§0§B§l’§x§E§7§8§A§0§D§ls §x§E§6§6§9§1§1§lC§x§E§6§5§8§1§3§ll§x§E§6§4§7§1§4§lo§x§E§6§3§6§1§6§la§x§E§6§2§6§1§8§lk §x§0§0§D§6§F§F§lP§x§0§0§D§6§F§F§la§x§0§0§D§6§F§F§lc§x§0§0§D§6§F§F§lk");
-    public final static Backpacks BACK18 = new Backpacks("Wraith Pack",62,null,Material.DIAMOND_CHESTPLATE,1_750_000_000L,"§x§E§7§0§0§F§F§lW§x§D§F§0§0§F§3§lr§x§D§7§0§0§E§7§la§x§C§F§0§0§D§B§li§x§C§7§0§0§C§F§lt§x§B§F§0§0§C§2§lh §x§A§F§0§0§A§A§lP§x§A§7§0§0§9§E§la§x§D§3§0§0§7§E§lc§x§F§F§0§0§5§D§lk");
-    public final static Backpacks BACK19 = new Backpacks("Kratos Pack",67,null,Material.DIAMOND_CHESTPLATE,6_000_000_000L,"§x§F§F§0§0§0§0§lK§x§F§F§1§A§1§A§lr§x§F§F§3§3§3§3§la§x§F§F§4§D§4§D§lt§x§F§F§6§6§6§6§lo§x§F§F§8§0§8§0§ls §x§F§F§B§3§B§3§lP§x§F§F§C§C§C§C§la§x§F§F§E§6§E§6§lc§x§F§F§F§F§F§F§lk");
-    public final static Backpacks BACK20 = new Backpacks("Matrix Upload Pack",72,null,Material.DIAMOND_CHESTPLATE,10_000_000_000L,"§x§0§0§F§F§1§C§lM§x§0§0§E§3§1§9§la§x§0§0§C§6§1§6§lt§x§0§0§A§A§1§3§lr§x§0§0§8§E§1§0§li§x§0§0§7§1§0§C§lx §x§0§0§3§9§0§6§lU§x§0§0§1§C§0§3§lp§x§0§0§0§0§0§0§ll§x§0§0§1§2§0§0§lo§x§0§0§3§4§0§0§la§x§0§1§5§6§0§0§ld §x§0§2§9§9§0§0§lP§x§0§2§B§B§0§0§la§x§0§3§D§D§0§0§lc§x§0§3§F§F§0§0§lk");
+    public final static Backpacks BACK16 = new Backpacks("Green FN Pack",52,null,Material.IRON_CHESTPLATE,300_000_000L,"§x§0§0§F§F§1§C§lG§x§0§0§E§3§1§8§lr§x§0§0§C§7§1§3§le§x§0§0§C§7§1§3§le§x§0§0§C§7§1§3§ln §x§0§0§C§7§1§3§lF§x§0§0§C§7§1§3§lN §x§0§0§C§7§1§3§lP§x§0§0§C§7§1§3§la§x§0§0§C§7§1§3§lc§x§0§0§C§7§1§3§lk");
+    public final static Backpacks BACK17 = new Backpacks("Hunter’s Cloak Pack",57,null,Material.DIAMOND_CHESTPLATE,600_000_000L,"§x§E§7§F§F§0§0§lH§x§E§7§E§E§0§2§lu§x§E§7§D§E§0§4§ln§x§E§7§C§D§0§6§lt§x§E§7§B§C§0§7§le§x§E§7§A§B§0§9§lr§x§E§7§9§B§0§B§l’§x§E§7§8§A§0§D§ls §x§E§6§6§9§1§1§lC§x§E§6§5§8§1§3§ll§x§E§6§4§7§1§4§lo§x§E§6§3§6§1§6§la§x§E§6§2§6§1§8§lk §x§0§0§D§6§F§F§lP§x§0§0§D§6§F§F§la§x§0§0§D§6§F§F§lc§x§0§0§D§6§F§F§lk");
+    public final static Backpacks BACK18 = new Backpacks("Wraith Pack",62,null,Material.DIAMOND_CHESTPLATE,800_000_000L,"§x§E§7§0§0§F§F§lW§x§D§F§0§0§F§3§lr§x§D§7§0§0§E§7§la§x§C§F§0§0§D§B§li§x§C§7§0§0§C§F§lt§x§B§F§0§0§C§2§lh §x§A§F§0§0§A§A§lP§x§A§7§0§0§9§E§la§x§D§3§0§0§7§E§lc§x§F§F§0§0§5§D§lk");
+    public final static Backpacks BACK19 = new Backpacks("Kratos Pack",67,null,Material.DIAMOND_CHESTPLATE,1_250_000_000L,"§x§F§F§0§0§0§0§lK§x§F§F§1§A§1§A§lr§x§F§F§3§3§3§3§la§x§F§F§4§D§4§D§lt§x§F§F§6§6§6§6§lo§x§F§F§8§0§8§0§ls §x§F§F§B§3§B§3§lP§x§F§F§C§C§C§C§la§x§F§F§E§6§E§6§lc§x§F§F§F§F§F§F§lk");
+    public final static Backpacks BACK20 = new Backpacks("Matrix Upload Pack",72,null,Material.DIAMOND_CHESTPLATE,3_000_000_000L,"§x§0§0§F§F§1§C§lM§x§0§0§E§3§1§9§la§x§0§0§C§6§1§6§lt§x§0§0§A§A§1§3§lr§x§0§0§8§E§1§0§li§x§0§0§7§1§0§C§lx §x§0§0§3§9§0§6§lU§x§0§0§1§C§0§3§lp§x§0§0§0§0§0§0§ll§x§0§0§1§2§0§0§lo§x§0§0§3§4§0§0§la§x§0§1§5§6§0§0§ld §x§0§2§9§9§0§0§lP§x§0§2§B§B§0§0§la§x§0§3§D§D§0§0§lc§x§0§3§F§F§0§0§lk");
     /**
      * Converts serialized backpack data into a {@link Backpacks} object.
      *

@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import robbery.Robbery;
+import robbery.core.Robbery;
 import robbery.messages.Messages;
 import robbery.mutes.MuteManager;
 

@@ -1,7 +1,7 @@
 package robbery.mutes;
 
 import org.bukkit.configuration.file.YamlConfiguration;
-import robbery.Robbery;
+import robbery.core.Robbery;
 
 import javax.annotation.Nullable;
 import java.io.File;

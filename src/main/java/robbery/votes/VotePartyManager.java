@@ -2,7 +2,7 @@ package robbery.votes;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import robbery.Robbery;
+import robbery.core.Robbery;
 import robbery.messages.Messages;
 
 /**
@@ -114,4 +114,5 @@ public class VotePartyManager {
         int nextMilestone = ((totalVotes / requiredVotes) + 1) * requiredVotes;
         return nextMilestone;
     }
+
 }

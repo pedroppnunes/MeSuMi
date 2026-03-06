@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import robbery.Robbery;
+import robbery.core.Robbery;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -263,6 +263,7 @@ public class Items {
     public String getId(){
         return id;
     }
+    public String getPlayername(){return playername;}
 
     public void forceRespawnNow() {
         if (droppedItem == null && respawning) {

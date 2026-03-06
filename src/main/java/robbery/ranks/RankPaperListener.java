@@ -7,7 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import robbery.commands.RankUpdate;
+import robbery.ranks.RankUpdate;
 import robbery.messages.Messages;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;

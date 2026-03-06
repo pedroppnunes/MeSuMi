@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import robbery.Robbery;
+import robbery.core.Robbery;
 import robbery.messages.Messages;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;

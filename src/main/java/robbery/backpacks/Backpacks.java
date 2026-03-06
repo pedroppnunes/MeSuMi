@@ -150,7 +150,6 @@ public class Backpacks {
      * Adds an item to the backpack if there is available capacity.
      *
      * @param i     the item to add
-     * @param boost
      */
     public void addBackpackItem(Items i, double boost) {
         if (backpack.size() < capacity)

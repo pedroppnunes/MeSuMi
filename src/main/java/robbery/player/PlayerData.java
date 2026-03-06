@@ -8,13 +8,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import robbery.Robbery;
+import robbery.core.Robbery;
 import robbery.backpacks.BackpackManager;
 import robbery.backpacks.Backpacks;
 import robbery.booster.Booster;
 import robbery.booster.BoosterItem;
 import robbery.booster.BoosterManager;
-import robbery.events.InventoryManager;
+import robbery.mechanics.InventoryManager;
 import robbery.items.Items;
 import robbery.keys.KeyManager;
 import robbery.keys.Keys;
@@ -38,6 +38,8 @@ public class PlayerData {
     private Backpacks backpack;
     private Tools tool;
     private Keys key;
+    private long xp = 0L;
+    private int level = 1;
     private final Deque<Booster> activeBoosters = new ArrayDeque<>();
     private boolean boostersPaused = false;
     private BukkitTask boosterTask;
@@ -70,6 +72,8 @@ public class PlayerData {
         this.skillpoints = 0;
         this.sp = new SkillPoint(0,0,0,0,0,0,0);
         this.rank = NONE;
+        this.xp = 0L;
+        this.level = 1;
     }
 
     //Backpacks
@@ -228,12 +232,11 @@ public class PlayerData {
 
 
     public double getBoost() {
-        return 1 + prestige * 0.15 + rank.boost() + sp.extraMoney() + outboost + boostx;
+        return 1 + prestige * 0.10 + rank.boost() + sp.extraMoney() + outboost + boostx;
     }
     public double getPrestigeBoost(){
-        return (1 + prestige*0.15);
+        return (1 + prestige*0.10);
     }
-    public double getNextPrestigeBoost(){return (1 + (prestige+1)*0.15);}
 
     public String getRank(){
         return rank.rank();
@@ -339,6 +342,8 @@ public class PlayerData {
 
                 active.setSeconds(active.getSeconds() - 1);
                 if (active.getSeconds() <= 0) {
+
+                    Messages.send(player,"boosters.expired");
                     activeBoosters.pollFirst();
                     this.cancel();
                     startNextBooster(player);
@@ -402,7 +407,7 @@ public class PlayerData {
 
         StringBuilder builder = new StringBuilder();
         for (Booster b : activeBoosters) {
-            if (builder.length() > 0) builder.append("|");
+            if (!builder.isEmpty()) builder.append("|");
             builder.append(b.getTag()).append("_").append(b.getSeconds());
         }
         return builder.toString();
@@ -418,27 +423,43 @@ public class PlayerData {
         }
 
         String[] parts = string.split("\\|");
+
         for (String part : parts) {
             String[] data = part.split("_");
             if (data.length != 2) continue;
 
-            Booster b = BoosterManager.getBooster(data[0]);
-            if (b == null) continue;
+            Booster template = BoosterManager.getBooster(data[0]);
+            if (template == null) continue;
 
             try {
                 int seconds = Integer.parseInt(data[1]);
-                b.setSeconds(seconds);
-                activeBoosters.addLast(b);
-            } catch (NumberFormatException ignored) {}
+                if (seconds <= 0) continue;
+
+                Booster booster = new Booster(
+                        template.getName(),
+                        template.getMultiplier(),
+                        seconds,
+                        template.getPriority(),
+                        template.getTag()
+                );
+
+                activeBoosters.addLast(booster);
+
+            } catch (NumberFormatException ignored) {
+            }
         }
 
+        // If boosters are paused, don't start timer
         if (boostersPaused) {
             boostx = 0.0;
             return;
         }
 
+        // Start ticking if any exist
         if (!activeBoosters.isEmpty()) {
             startNextBooster(player);
+        } else {
+            boostx = 0.0;
         }
     }
 
@@ -447,7 +468,7 @@ public class PlayerData {
         return boosters.getOrDefault(name,0);
     }
 
-//Skillpoints
+//Skillpoints & XP
     public int getSP(){ return skillpoints;}
     public void addSkillpoint(){
         this.skillpoints++;
@@ -461,6 +482,30 @@ public class PlayerData {
     public void addSkillpoint(int sp){
         this.skillpoints += sp;
     }
+    public long getXp() {
+        return xp;
+    }
+    public void setXp(long xp) {
+        this.xp = Math.max(0L, xp);
+    }
+    public int getLevel() {
+        return level;
+    }
+    public void setLevel(int level) {
+        this.level = Math.max(1, level);
+    }
+    public void addSkillPoints(int n) {
+        this.skillpoints += Math.max(0, n);
+    }
+    public int getSkillPoints() {
+        return skillpoints;
+    }
+    public void setSkillPoints(int pts) {
+        this.skillpoints = Math.max(0, pts);
+    }
+
+
+//SkillPointShop
     public SkillPoint getSPShop(){ return sp;}
     public void setSPShop(SkillPoint spShop) {
         if (sp.extraSlots() != spShop.extraSlots()) {
@@ -472,6 +517,7 @@ public class PlayerData {
         }
         sp = spShop;
     }
+
 
     public String getSPShopString(){
         return sp.doubleItemChance() + "_" + sp.extraDamage() + "_" + sp.extraMoney() + "_" + sp.extraSlots() + "_" + sp.skillpointChance() + "_" + sp.moneypouchChance() + "_" + sp.instastealChance();
@@ -498,7 +544,6 @@ public class PlayerData {
         }
         this.sp = new SkillPoint(itemChance,extraDamage,extraMoney,extraSlots,spChance,moneyChance,instachance);
     }
-
 
     public void setSkillpointChance(int perk2Value) {
         this.outspchance = (double) perk2Value /100;

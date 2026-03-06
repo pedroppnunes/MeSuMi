@@ -6,7 +6,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import robbery.Robbery;
+import robbery.core.Robbery;
 import robbery.messages.Messages;
 
 import java.io.File;
