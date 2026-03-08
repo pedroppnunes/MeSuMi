@@ -28,6 +28,13 @@ import robbery.backpacks.BuyBackpack;
 import robbery.backpacks.PvCommand;
 import robbery.keys.BuyKey;
 import robbery.keys.Rcrate;
+import robbery.player.PlayerDataManager;
+import robbery.skilltree.SkillCommand;
+import robbery.skilltree.SkillService;
+import robbery.skilltree.SkillTreeConfig;
+import robbery.skilltree.SkillTreeGUI;
+import robbery.storeMastery.RewardManager;
+import robbery.storeMastery.StoreMasteryManager;
 import robbery.tool.BuyTool;
 import robbery.chat.ChatColorCommand;
 import robbery.claim.Claim;
@@ -114,6 +121,8 @@ public class Robbery extends JavaPlugin implements Listener {
     private HourlyLeaderboard hourlyLeaderboard;
     private PlayerEventListener playerEventListener;
     private XPManager xpManager;
+    private RewardManager rewardManager;
+    private StoreMasteryManager storeMasteryManager;
 
     private FileConfiguration itemConfig;
     private File itemConfigFile;
@@ -149,6 +158,8 @@ public class Robbery extends JavaPlugin implements Listener {
         this.chatStyleManager = new ChatStyleManager(getDataFolder());
         this.playerEventListener = new PlayerEventListener(main);
         this.xpManager = new XPManager(main);
+        this.rewardManager = new RewardManager(main);
+        this.storeMasteryManager = new StoreMasteryManager(main);
         getServer().getPluginManager().registerEvents(new VoteListener(main), main);
         BlockCraftListener blockCraft = new BlockCraftListener();
         Messages.init(main);
@@ -210,6 +221,10 @@ public class Robbery extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("migrate")).setExecutor(new MigrateBackup(main));
         Objects.requireNonNull(getCommand("stopbooster")).setExecutor(new StopBoosterCommand());
         Objects.requireNonNull(getCommand("adminxp")).setExecutor(new AdminXPCommand(main));
+        SkillTreeConfig cfg = new SkillTreeConfig(main);
+        SkillService svc = new SkillService(main,cfg);
+        SkillTreeGUI gui = new SkillTreeGUI(main,cfg,svc);
+        Objects.requireNonNull(getCommand("skilltree")).setExecutor(new SkillCommand(svc,gui,cfg));
         getServer().getMessenger().registerOutgoingPluginChannel(main, "BungeeCord");
         World outpostWorld = Bukkit.getWorld("outpost");
         if (outpostWorld == null) {
@@ -287,7 +302,7 @@ public class Robbery extends JavaPlugin implements Listener {
         this.isBackingUp = true;
         PrestigeCountManager.save();
         for (Player player : Bukkit.getOnlinePlayers()) {
-            playerEventListener.saveOnDisable(player);
+            playerEventListener.savePlayerData(player, PlayerDataManager.getPlayerData(player));
             player.kick(Component.text(Messages.get("reload.player-kick")));
         }
         Bukkit.getScheduler().cancelTasks(this);
@@ -696,6 +711,9 @@ public class Robbery extends JavaPlugin implements Listener {
         return this.itemConfig;
     }
 
+    public RewardManager getRewardManager(){return this.rewardManager;}
+    public StoreMasteryManager getMasteryManager() {return this.storeMasteryManager;}
+
     private void startItemClearTask() {
         final int clearIntervalSec = 900;
         final List<String> worlds = List.of("SuperiorWorld", "outpost");
@@ -789,5 +807,6 @@ public class Robbery extends JavaPlugin implements Listener {
     public boolean getIsBackup() {
         return isBackingUp;
     }
+
 
 }

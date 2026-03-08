@@ -9,10 +9,13 @@ import robbery.core.Robbery;
 import robbery.booster.Booster;
 import robbery.booster.BoosterManager;
 import robbery.items.Items;
+import robbery.keys.KeyManager;
+import robbery.keys.Keys;
 import robbery.messages.Messages;
 import robbery.number.NumberFormatter;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
+import robbery.storeMastery.StoreMasteryManager;
 import robbery.tool.Tools;
 
 import java.util.Map;
@@ -74,6 +77,9 @@ public class PickingTask extends BukkitRunnable {
                 }
             }
             int itemStoreNum = extractStoreNumber(item.getId());
+            String storeId = getStoreId(itemStoreNum);
+            main.getMasteryManager().incrementMastery(player, storeId);
+            p.addItemsStolen(1);
             Booster booster = BoosterManager.getRandomBoosterWithChance(itemStoreNum,p);
             if(booster != null) {
                 Messages.sendFormatted(player, "events.picking.booster_reward", Map.of(
@@ -142,10 +148,6 @@ public class PickingTask extends BukkitRunnable {
 
     }
 
-    public Items getItem() {
-        return item;
-    }
-
     public void resetAndCancel() {
         this.cancel();
         item.setHp(item.getInitialhp());
@@ -159,6 +161,13 @@ public class PickingTask extends BukkitRunnable {
             return Integer.parseInt(matcher.group());
         }
         return 0;
+    }
+
+    private String getStoreId(int storeOrder){
+        Keys k = KeyManager.getKeyByOrder(storeOrder);
+        if(k != null)
+            return k.getId();
+        return "store1";
     }
 
 }

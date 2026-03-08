@@ -1,6 +1,5 @@
 package robbery.player;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -48,6 +47,10 @@ public class PlayerData {
     private final Set<String> backpackunlucked = new HashSet<>();
     private final Set<String> toolsunlocked = new HashSet<>();
     private int skillpoints;
+    private int itemsStolen;
+    private final Map<String, Integer> storeItems = new java.util.HashMap<>();
+    private final Map<String, Integer> storeMilestones = new java.util.HashMap<>();
+    private final Map<String, Integer> skillTreeLevels = new HashMap<>();
 
     private SkillPoint sp;
     private Rank rank;
@@ -74,6 +77,7 @@ public class PlayerData {
         this.rank = NONE;
         this.xp = 0L;
         this.level = 1;
+        this.itemsStolen = 0;
     }
 
     //Backpacks
@@ -284,6 +288,10 @@ public class PlayerData {
         InventoryManager.giveItem(player, SkillPointItem.createSkillPointItem(plugin),2);
     }
 
+    //Items Stolen
+    public int getItemsStolen() {
+        return itemsStolen;
+    }
 
     //Boosters
     public void setBoosters(String name, Player player) {
@@ -495,7 +503,7 @@ public class PlayerData {
         this.level = Math.max(1, level);
     }
     public void addSkillPoints(int n) {
-        this.skillpoints += Math.max(0, n);
+        this.skillpoints += n;
     }
     public int getSkillPoints() {
         return skillpoints;
@@ -504,7 +512,68 @@ public class PlayerData {
         this.skillpoints = Math.max(0, pts);
     }
 
+//Store Milestones
+public int getStoreItems(String storeId) {
+    return storeItems.getOrDefault(storeId, 0);
+}
 
+    public void addStoreItems(String storeId, int amount) {
+        int current = getStoreItems(storeId);
+        storeItems.put(storeId, current + amount);
+    }
+
+    public Map<String, Integer> getStoreItemsMap() {
+        return storeItems;
+    }
+
+    public void setStoreItemsMap(Map<String, Integer> map) {
+        storeItems.clear();
+        if (map != null) storeItems.putAll(map);
+    }
+
+    public int getStoreMilestone(String storeId) {
+        return storeMilestones.getOrDefault(storeId, 0);
+    }
+
+    public void setStoreMilestone(String storeId, int milestoneLevel) {
+        storeMilestones.put(storeId, milestoneLevel);
+    }
+
+    public void addStoreMilestone(String storeId, int amount) {
+        int current = getStoreMilestone(storeId);
+        storeMilestones.put(storeId, current + amount);
+    }
+
+    public Map<String, Integer> getStoreMilestoneMap() {
+        return storeMilestones;
+    }
+
+    public void setStoreMilestoneMap(Map<String, Integer> map) {
+        storeMilestones.clear();
+        if (map != null) storeMilestones.putAll(map);
+    }
+
+    public void addItemsStolen(int amount) {
+        this.itemsStolen += amount;
+    }
+
+    public void setItemsStolen(int amount) {
+        this.itemsStolen = amount;
+    }
+
+    public int getStoreMastery(String storeId) {
+        return getStoreItems(storeId);
+    }
+
+//SkillTree
+    public int getSkillTreeLevel(String tierId) {
+        return skillTreeLevels.getOrDefault(tierId, 0);
+    }
+    public void setSkillTreeLevel(String tierId, int level) {
+        if (level <= 0) skillTreeLevels.remove(tierId);
+        else skillTreeLevels.put(tierId, level);
+    }
+    public Map<String,Integer> getAllSkillTreeLevels() { return Collections.unmodifiableMap(skillTreeLevels); }
 //SkillPointShop
     public SkillPoint getSPShop(){ return sp;}
     public void setSPShop(SkillPoint spShop) {
@@ -564,5 +633,6 @@ public class PlayerData {
     public double getOutSpChance() {
         return outspchance;
     }
+
 }
 

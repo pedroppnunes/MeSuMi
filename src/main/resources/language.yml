@@ -20,7 +20,12 @@ command:
     set_level: "&5&lRobbery &8> §aSet %player%'s Robbery Level to %level%."
     reset: "&5&lRobbery &8> §aSuccessfully reset %player%'s Robbery XP and level to default."
     help_header: "§8=== §aAdmin XP Options §8==="
-    help_commands: "§2/adminxp give <player> <amount> §a- Adds absolute XP","§2/adminxp set <player> <amount> §a- Sets player's exact total XP","§2/adminxp setlevel <player> <level> §a- Snaps player to exact level (adjusts XP)","§2/adminxp reset <player> §a- Resets player back to Level 1 and 0 XP"
+    help_commands:
+      - "§2/adminxp give <player> <amount> §a- Adds absolute XP"
+      - "§2/adminxp set <player> <amount> §a- Sets player's exact total XP"
+      - "§2/adminxp setlevel <player> <level> §a- Snaps player to exact level (adjusts XP)"
+      - "§2/adminxp reset <player> §a- Resets player back to Level 1 and 0 XP"
+      - "§2/adminxp calculate <itemID> §a- Test XP values from config"
   baltop:
     header: "&6&lTop Balances"
     entry: "&e#%rank% &f%player% &7- &a$%balance%"
@@ -108,7 +113,11 @@ command:
     invalid-rank: "&5&lRobbery &8> &cInvalid rank name. Available ranks: rank1 to rank7."
     success: "&5&lRobbery &8> &aSuccessfully updated &e%player%'s &arank to &e%rank%&a."
   rcrate:
-    usage: "&5&lRobbery &8> &cUsage: /rcrate <material> <qty> <player>\n&5&lRobbery &8> &cUsage: /rcrate rank<id> <player>\n&5&lRobbery &8> &cUsage: /rcrate sp <amount> <player>\n&5&lRobbery &8> &cUsage: /rcrate boost<id> <player>"
+    usage:
+      "&5&lRobbery &8> &cUsage: /rcrate <material> <qty> <player>
+      &5&lRobbery &8> &cUsage: /rcrate rank<id> <player>
+      &5&lRobbery &8> &cUsage: /rcrate sp <amount> <player>
+      &5&lRobbery &8> &cUsage: /rcrate boost<id> <player>"
     invalid-rank: "&5&lRobbery &8> &cInvalid rank: &e%rank%"
     rank-given: "&5&lRobbery &8> &aGiven &e%rank% &avoucher to &e%player%&a."
     sp-invalid-amount: "&5&lRobbery &8> &cSkillpoint amount must be a number."
@@ -128,7 +137,7 @@ command:
   sell:
     sold: "&5&lRobbery &8> &aYou sold your items for &2%amount%$"
     lucky: "&5&lRobbery &8> &6You got Lucky! &e+%bonus% Bonus!"
-    xp-earned: "&7(You earned %xp% Robbery xp)"
+    xp-earned: "&5&lRobbery &8> &bYou earned &3+%xp% Robbery XP"
   skillpointbuy:
     usage: "&5&lRobbery &8> &cUsage: /skillpointbuy <operation> <player>"
     unknown-upgrade: "&5&lRobbery &8> &cUnknown upgrade type."
@@ -167,7 +176,6 @@ command:
     entry_issuer: "&c▪ &7Issued by: &f%issuer%"
     entry_expires: "&c▪ &7Expires: &f%expire%"
 
-
 events:
   already-being-picked: "&eSomeone is already picking this item!"
   backpack-full: "&cYour backpack is full!"
@@ -185,6 +193,11 @@ events:
   hideout:
     has_items: "&5&lRobbery &8> &cYou cannot use this command while your backpack has items!"
     chest_blocked: "&5&lRobbery &8> &cYou can't use that command here."
+  mastery:
+    level-up: "&c&lStore Mastery &8> &aYou've reached &6Milestone %level%&r&a in &r%store%"
+    store11-tier1: "&c&lStore Mastery &8> &aYou can now access the second floor of the store!"
+    tier2: "&c&lStore Mastery &8> &aYou can now access the higher part of the store!"
+    max: "&c&lStore Mastery &8> &6&lMAX MASTERY&r &aYou have mastered the &r%store%&a!"
   picking:
     item_stolen: "&aYou've stolen &e%item%&a for &n&2%value%&r"
     item_stolen_with_boost: "&aYou've stolen &e%item%&a for &n&2%value%&r &a+ &n&2%bonus%&r"
@@ -199,9 +212,9 @@ events:
     command_blocked: "&6&lOutpost &8> &cYou cannot use commands while in PvP!"
     tag_timer: "&cCombat Tag: &e%time%s"
     death-message: "&6&lOutpost &8> &c%killed% &fwas killed by &c%killer%"
-  events:
-    robberyxp:
-      level-up: "&5&lRobbery &8> &bYou have leveled up to &6Level %level%&b!"
+  robberyxp:
+    # merged level-up entries (both files included similar entry)
+    level-up: "&5&lRobbery &8> &bYou have leveled up to &6Level %level%&b!"
   outpost:
     need_island: "&cYou need an hideout to capture the outpost!"
     contested: "&cOutpost is being contested!"
@@ -225,8 +238,11 @@ events:
     neutralizing_broadcast: "&6&lOutpost &8> &eOutpost being neutralized by &b%island_name%&e!"
     neutralized_broadcast: "&6&lOutpost &8> &eOutpost neutralized by &b%island_name%&e!"
     capturing_broadcast: "&6&lOutpost &8> &cOutpost being captured by &b%island_name%&c!"
-    owner_immunity: "§cOwner §6%owner% §chas immunity for §e%time%§c — you cannot capture now."
-    immunity_started: "&b%island_name% &chas a 20m immunity after capturing the Outpost!"
+    owner_immunity:
+      - "§cOwner §6%owner% §chas immunity for §e%time%§c — you cannot capture now."
+    immunity_started:
+      - "&6&lOutpost &8> &b%island_name% &has a 20m immunity after capturing the Outpost!"
+      - "&b%island_name% &chas a 20m immunity after capturing the Outpost!"
     status-lore-immunity: "&cOwner immunity: &b%time%"
 
 reload:
@@ -239,29 +255,35 @@ boosters:
   paused: "&5&lRobbery &8> &cYou have stopped your booster."
   resumed: "&5&lRobbery &8> &eYou have resumed your booster."
   expired: "&5&lRobbery &8> &cYour booster has expired."
+
 rank:
   already_have: "&5&lRobbery &8> &cYou already have this rank or a better one."
   upgraded: "&5&lRobbery &8> &aYour rank has been upgraded to %rank_name%!"
+
 chat:
   muted: "&5&lRobbery &8> &cYou are muted."
   spam:
     warning: "&5&lRobbery &8> &c[Spam] Please don't spam, warning: %count%/3."
     final_warning: "&5&lRobbery &8> &c[Spam] Please don't spam, warning: 3/3. Next infraction will result in a mute."
     muted: "&5&lRobbery &8> &cYou have been muted for 12 hours for spamming."
+
 warning:
   bar: "&4&m-------------------------------------------"
   title: "&c&lYou Have Received a Warning"
   reason_format: "&7( &c%reason% &7)"
   given_by: "&7Given by: &c%issuer%  &7Expires in: &c%duration%"
+
 itemclear:
   warning_5min: "&5&lRobbery &8> &6Clearing dropped items in &c5 &6minutes!"
   warning_seconds: "&5&lRobbery &8> &6Clearing dropped items in &c%seconds% &6seconds!"
   cleared_items: "&5&lRobbery &8> &c%amount%&6 items have been cleared from the ground!"
   cleared_none: "&5&lRobbery &8> &6No dropped items to clear."
+
 voteparty:
   reached: "&a&lVoteParty &8> &6Vote Party reached! Rewarding everyone!"
   reset: "&a&lVoteParty &8> &cVote Party count has been reset for the new day!"
   reminder: "&a&lVoteParty &8> &6Don't forget to Vote, reach the milestone for a free vote key &a%current%/%required%"
+
 help:
   main_title: "&6&l--- Help Categories ---"
   category_display: "&e• &a%category%"
@@ -272,13 +294,6 @@ help:
   command_description: " &7- %description%"
   nav_prev: " &a« Previous Page "
   nav_next: " &a Next Page »"
+
 join-message: "%prefix%%player% joined the server!"
 quit-message: "%prefix%%player% left the server!"
-
-
-
-
-
-
-
-

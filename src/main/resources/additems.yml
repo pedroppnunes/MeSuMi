@@ -1,32 +1,2312 @@
 items:
-  melon:
-    hp: 2.0
+  s1_water:
+    hp: 4.0
     value: 2
-    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGU0MTgxMTM1ODdhM2NhZGQ2YmM4NGE3MWUxZDU3ZDI1MWZmZjgwOTVmYTQ2YjY5ODE3NDk4NjVlMjAwM2UwYyJ9fX0="
-    time: 4
-  pumpkin:
+    name: "Water"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTI4ZTUzNzM1OGQ3MmZhZTk3MzNjYjQ1MjVjMWViMjMwN2M1Mjc2M2VhMjhmOWNjZjljN2Q5OThlNWIxZmQ1OCJ9fX0="
+    time: 6
+  s1_toiletpaper:
+    hp: 4.0
+    value: 2
+    name: "Toilet Paper"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmM4YzIyOTg1YjAzMzZmODE3ZmMzMDdjYmE2YzE1ZGE0ODRiZjIzNjFjNjBmNWEzM2U2YTk1NTdlZTJkIn19fQ=="
+    time: 5
+  s1_milk:
     hp: 5.0
-    value: 5
-    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzAyZTZiMDljNzE0YzliOTNhMGY2Y2JiZDZjMTM0YTJlYTc1OTYyM2ZkMTgyNjY4MzEzMjUxYTkyNjM3YWFlZSJ9fX0="
-    time: 4
-  milk:
-    hp: 7.0
-    value: 7
+    value: 3
+    name: "Milk"
     playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjUxYzAzYjVlNjU5Mjc1ZWQ4NWNhMmM4YWQ5ODhjNzU1Y2NmYmE0NWFmZjNmNmQ4ZDZmMjczOGIwOTY3Y2NjZCJ9fX0="
-    time: 5
-  juice:
-    hp: 9.0
-    value: 12
-    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzk1NDQ5YzM3OWQwOWJlNmQ2ZjMwMzVhNzBkODhjMTMxZjYxZmE0OTI0NWY5Njk4Yjc5NGI0MWM2YTMzNDdkMiJ9fX0"
-    time: 5
-  apple:
-    hp: 11.0
-    value: 20
+    time: 6
+  s1_apple:
+    hp: 6.0
+    value: 4
+    name: "Apple"
     playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzVlMmUwOTU5NzEyZGNkMzM1N2NjM2NlYTg1Zjk5YjNmZDgwOTc4NTVjNzU0YjliMTcxZjk2MzUxNDIyNWQifX19"
-    time: 7
-  hamburger:
-    hp: 15.0
-    value: 30
+    time: 6
+  s1_hamburger:
+    hp: 6.5
+    value: 5
+    name: "Hamburger"
     playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTQxMWNiNTRhYWExZTNkYjU1NWM3ODVmNmI3NWJlMWJmOGU2OGIyOGU1Y2ZjNTljOWE4NzY4OTRmNjFjZGMxNyJ9fX0"
+    time: 6
+  s1_banana:
+    hp: 6.5
+    value: 4
+    name: "Banana"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmE5YTM2NjVjZGM3NGZhYzE0ZDlkYWFjZTU0YmU5YjA4YjMxMDI5MTNiZWYyYmFhYzZiZTEyYzEyYWExMjIwYyJ9fX0="
+    time: 6
+  s1_rice:
+    hp: 7.0
+    value: 6
+    name: "Rice"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2I3MGYyZmI1ZWJmNDlmNzlmZjNlODczNjE2ODYzYWU1ZDM2MmZiYmZjMzFhZWYyZGZiOTNkNmUxN2RiZjIifX19"
+    time: 7
+  s1_melon:
+    hp: 8.5
+    value: 10
+    name: "Melon"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGU0MTgxMTM1ODdhM2NhZGQ2YmM4NGE3MWUxZDU3ZDI1MWZmZjgwOTVmYTQ2YjY5ODE3NDk4NjVlMjAwM2UwYyJ9fX0="
+    time: 7
+  s1_pumpkin:
+    hp: 10.0
+    value: 11
+    name: "Pumpkin"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzAyZTZiMDljNzE0YzliOTNhMGY2Y2JiZDZjMTM0YTJlYTc1OTYyM2ZkMTgyNjY4MzEzMjUxYTkyNjM3YWFlZSJ9fX0="
+    time: 8
+  s1_juice:
+    hp: 11.0
+    value: 12
+    name: "Juice"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzk1NDQ5YzM3OWQwOWJlNmQ2ZjMwMzVhNzBkODhjMTMxZjYxZmE0OTI0NWY5Njk4Yjc5NGI0MWM2YTMzNDdkMiJ9fX0"
+    time: 8
+  s1_coffee:
+    hp: 13.0
+    value: 14
+    name: "Coffee"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2I4ZTM2NGFjMWIxODQxYzMzYzMxMTFlZTlkNjk3ODViZWRjNmNhNjdjYzlhNzVlZDIzM2Y2MDlmYjgxMzIyZiJ9fX0="
+    time: 9
+  s1_soap:
+    hp: 14.0
+    value: 16
+    name: "Soap"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDI4ZTZkZWZhYjcyMTVlYTc0NTdjYzFhOWNmZDFlOTkxNDZlNTQzN2MzZjEzNTRlNGFlNTg2MmE1ODQ2YjQ0YyJ9fX0="
     time: 10
+  s1_soda:
+    hp: 15.0
+    value: 18
+    name: "Soda"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTRkNTdmNjNjMmM5NDgyZGE1MjhmYzUzOWNjOGUzZTA2MzViNjMxMzBhN2FhZTg4YjlhYzBhMGNlMjA5ZDFlMyJ9fX0="
+    time: 11
+  s1_cake:
+    hp: 15.0
+    value: 19
+    name: "Cake"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmUwNGM0N2E1MTE1ZDUxNDlkZWY3YjBlZjE5NGUyNGFkYmI5NjRkY2I1NWM5NTRkMWVkMTAwOTYxNWQ0NGJmNSJ9fX0="
+    time: 12
+  s2_shoe:
+    hp: 8.0
+    value: 7
+    name: "Shoe"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzhkYzVlNDY3ZTQyMmEyZGQyOGYwMWI2MTIwN2VhNzk2MGE1YTQ4ZGJjMzYxMDg5ZjZkYTM5ZjJjMWIxMGU3NCJ9fX0="
+    time: 5
+  s2_TVControl:
+    hp: 8.0
+    value: 9
+    name: "TV Controller"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2JlNzE3YjgwNzRjZTczZTNlOTg1MTFkOTZhMWJkNWNlYmI0YWE4ZmFiZWRhODIzODJhM2VlNDA0YjE3MTA4MCJ9fX0="
+    time: 6
+  s2_vase:
+    hp: 10.0
+    value: 15
+    name: "Vase"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWY0NTA1NWZhNjQ4Y2RiYjJjNjIwYmE1NjUwYjI5ZWMwM2MwMzAyNmJhNGZhODhhZmYwNTUyOTc0NzM3YjJiNyJ9fX0="
+    time: 6
+  s2_bread:
+    hp: 12.0
+    value: 17
+    name: "Bread"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjIxZmUxY2Y2NDU4ODVlYzE5NTMyYWI2OWFiYjAyODJlNWExMGNjZTIxMmNjOWVhYjkyMzZhZDgyMDgyNjFkMCJ9fX0="
+    time: 7
+  s2_microwave:
+    hp: 14.0
+    value: 20
+    name: "Microwave"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTM5MzM0NzM5YTQwODMxZTIzNzQzM2VhMzdlMjk3MzQ2ZDgxODZlMTZmNzEyNWI4YzFlNDkxOWQ5ZWJiNjNkIn19fQ=="
+    time: 7
+  s2_snacks:
+    hp: 16.0
+    value: 24
+    name: "Snacks"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzUzOWZmMzVmYjBiYmJhMGUxMDdmMjBmMzRkMWQ1N2I1ZjdiYmRiOGIwNGE1MWEzYTI1OTA0M2UzMWFlYjk5MCJ9fX0="
+    time: 7
+  s2_tire:
+    hp: 18.0
+    value: 26
+    name: "Tire"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTBjZDIyNDlmYWU5YTRkNjhmZjE0ODkxMzFlMWVkMTUzZDZlODI5NjZlZjMzNDQ4NWEwZGRhZTE0MmYifX19"
+    time: 8
+  s2_fuel:
+    hp: 19.0
+    value: 26
+    name: "Fuel"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGI4OWRlNDhhOWI4N2NmZDA3YzcwNGYyYmU1ZTVhOGNjNDVlODA3OWQzOGZhYWVkZjEzYjE1ZDE1YTEwYTcwYyJ9fX0="
+    time: 8
+  s2_plate:
+    hp: 21.0
+    value: 28
+    name: "Plate"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzY5ZmRlNjY4OGM5MWNhYzg5MGMzNjA1OWYyYmY5Y2NhMTAyY2ViYTE4ZmFiM2RhNWZkNzk0NDk5MmRlZmJhYSJ9fX0="
+    time: 7
+  s2_pianokeys:
+    hp: 23.0
+    value: 30
+    name: "Piano Keys"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTY0YzZlOWE0NWFjZDA1MjZhYzMyNWE1YzUwN2YzNzcxMTkwM2Q0MWY0MjcyYTVkNGQ3MzcwNjEwZDIyNmUyMSJ9fX0="
+    time: 8
+  s2_clothes:
+    hp: 25.0
+    value: 35
+    name: "Clothes"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTE2Y2UxMDRlYWVmOWZhYThjZmNlNmViMDYxNmI5MTVlODgwNGIyNjI5Y2VjMTQyODE2M2ZhOTUxNGY3NzA4MyJ9fX0="
+    time: 8
+  s2_socks:
+    hp: 28.0
+    value: 39
+    name: "Socks"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzQ1MTkxYTNmZjgwY2YzY2U1NzI1YzJhOGYyZTNjOGRiOTZkMTA4ZWRjODNkYzkyNzljNmIyMjg4MmI4OTNlYyJ9fX0="
+    time: 9
+  s2_toiletpaper:
+    hp: 30.0
+    value: 42
+    name: "Toilet Paper"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmM4YzIyOTg1YjAzMzZmODE3ZmMzMDdjYmE2YzE1ZGE0ODRiZjIzNjFjNjBmNWEzM2U2YTk1NTdlZTJkIn19fQ=="
+    time: 9
+  s2_soap:
+    hp: 32.0
+    value: 43
+    name: "Soap"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDIwNmE5Njg5YzgzM2Y2MGMxYjVjZTZiN2M5NmY2YjM5M2QzY2RiNDY5MDUyZjY3ZDY3Yzg1ZTdkYTk1N2NiMCJ9fX0="
+    time: 9
+  s2_toilet:
+    hp: 34.0
+    value: 47
+    name: "Toilet"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjU2ZTIzZTI3NTkwM2RlYWRlMWRkMzAxMGE4ZjJiZDZmNTY1NDEzMWM0NzI4NzRiMGI2Mjk5MDYyYzIwYjg1ZCJ9fX0="
+    time: 10
+  s2_books:
+    hp: 35.0
+    value: 50
+    name: "Books"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzAxZDgyOWEwM2Q0NDYwMjJmZDhjNDkyMDVhZDBiYzM3ODk0NjYyMTY4Yjk3YTQ5NTM5MTM5MTIwMDg5Yjk1OSJ9fX0="
+    time: 9
+  s2_lamp:
+    hp: 38.0
+    value: 55
+    name: "Lamp"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjcxNGE4OGNhMjFhYjcwZTZiN2ZlMzAxZjM4MzQ4Yzg2ZDgwZGFmNWE3YjIwMWEzYjk3Njc0NmQ4MmMxOGY5NCJ9fX0="
+    time: 10
+  s2_pillow:
+    hp: 40.0
+    value: 60
+    name: "Pillow"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDgyZDMxMDMwOTY2MjJkZjA1YzA0NDZkN2RmMGJhMzg4NDFkMDZlMmIzYWRjZDcwNWQ3NWQyNjViM2RhMmY2NCJ9fX0="
+    time: 10
+  s2_megHat:
+    hp: 45.0
+    value: 76
+    name: "Meg's Hat"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzk5ZjZmZTE3MDkyMTg2MjljZjkyOThmNGRhZjQ2ZjljMDgwYzE5OWVjN2QwNjUzZWY1NzljNDMwZDU4M2U4NCJ9fX0="
+    time: 12
+  s2_stewieraygun:
+    hp: 46.0
+    value: 78
+    name: "Stewie's Raygun"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzQzNjkyOTk3MmRlMDJjZTc1MDQ4M2YzYzk0YTgwZDBiNWQxODRhY2U1ZjhmM2FlYWQ2YzhmNWUyZGJlOTllMiJ9fX0="
+    time: 12
+  s2_chriscomputer:
+    hp: 48.0
+    value: 80
+    name: "Chri's Computer"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTlmOGM4NDdiZTZmMGViNjM1ZGIzZGY1NjYyNzRhMjE4N2EyM2M4NDY3NTE1ZGZlMDk5MjZhYTYyZWRmOTA4YiJ9fX0="
+    time: 12
+  s2_rupert:
+    hp: 55.0
+    value: 120
+    name: "Rupert"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2QwY2M0NzZlYzlmMjk3ZWViMWE1ZTcyN2ZhOTFlZWViNGQ5YTBmZTVlMTNkYTQxN2FiZjk4NjBmZTMzMzRlYSJ9fX0="
+    time: 15
+  s3_water:
+    hp: 14.0
+    value: 54
+    name: "Water Bottle"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjU0M2JiZDkwNTcxYjFlMzVhYTAzOWE1ZWJhZDY1ZjQxNDI3YzhiODg3MWRkZjc2NzU4MGYzYTViMTAyMmZiZiJ9fX0="
+    time: 8
+  s3_shoe:
+    hp: 16.0
+    value: 63
+    name: "Running Shoes"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGM3ZGM0OTYxMGMwMzQxNmM1YzUzZTMzNGQ2NGViOTc1YTgyMGRlMmJmMzdmMDU1MzNmNTVjY2NlZjFmYjg2NCJ9fX0="
+    time: 8
+  s3_earbuds:
+    hp: 20.0
+    value: 75
+    name: "Earbuds"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTM5ZTYwN2ZjMDVmMmEwZTgxZDUwMDBlZTczZTJiNWQ2M2JkZGQ5MWU0ZDNjOTkxMTE1MjdjN2ZmYWQ5MzE5YSJ9fX0="
+    time: 8
+  s3_towel:
+    hp: 23.0
+    value: 83
+    name: "Towel"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGQxY2I5ZTBhMDRhODRkZGE0ZTcxODhkYzE5MTVlY2JmNmZhYjlhNDAxZTUyNTFjNjYyMDI4N2MxZGZmYTc4NCJ9fX0="
+    time: 9
+  s3_boxing:
+    hp: 26.0
+    value: 93
+    name: "Boxing gloves"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTI2NTU4NWE3OGQwNTYxYWJhNGM5OTQ0NjA5OTdjZDZiYmM4MmM1ODkxOWYzNDEyZGRlZTI0ZDhiZDVkYzdlMCJ9fX0="
+    time: 9
+  s3_headgear:
+    hp: 28.0
+    value: 108
+    name: "Headgear"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODgxMTk2MGM0MTgwYTExMTI4MjExNzc1MTQ1ZGYxYzY0YWIzYzUxYzFmNzY0MTA4OWY4OWExYjI1ZjA4MmViNCJ9fX0="
+    time: 10
+  s3_gymdown:
+    hp: 30.0
+    value: 126
+    name: "Gym Membership"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2Y2YWI3NDM2MDNiZDZkYjVlODczNmVlNDgxZGY2NTI5YTgwZDcxYjQ5MmM2YTY0NThiZjI1Zjk0MzJhMTEzIn19fQ=="
+    time: 10
+  s3_headphones:
+    hp: 32.0
+    value: 143
+    name: "Headphones"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDk1MmQ5ZDU3OWE5NzVlOWQxNzAyZGVhMWVjNWUwNGI5ODNlOGZlMjU1NjdmMWI4OTgxMWRlODBhYmI1YTk3YSJ9fX0="
+    time: 11
+  s3_treaddown:
+    hp: 35.0
+    value: 158
+    name: "Treadmill"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmYxMDRhYTA0OTk5NGMyN2JhODA0NzA4YzFlZjM3NTJiNzQyYWI4ZDYwZThjY2JhNDMzMWQzNDljYmY0MDkwNSJ9fX0="
+    time: 11
+  s3_dumbdown:
+    hp: 38.0
+    value: 173
+    name: "Dumbbells"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjY2MGQ2NWYwOTdlYTE0MjNiNDgwMmE3Y2U5Y2VlZjgxODEzMGFhYzNiNmZkODc4YWVmNzE2ZTQwMjkxYmFjYiJ9fX0="
+    time: 12
+  s3_10weight:
+    hp: 40.0
+    value: 188
+    name: "10kg Weights"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmYyY2ZhYWQ2ZjhiNjJjOTkyYzNiNTVjZTMxNjlmZmE0MDA1YWFlZTJkYjM1YTYzZjRiMzc5MGU0YTU5NmMzNSJ9fX0="
+    time: 13
+  s3_gymup:
+    hp: 45.0
+    value: 225
+    name: "Gym Membership"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2Y2YWI3NDM2MDNiZDZkYjVlODczNmVlNDgxZGY2NTI5YTgwZDcxYjQ5MmM2YTY0NThiZjI1Zjk0MzJhMTEzIn19fQ"
+    time: 14
+  s3_lifting:
+    hp: 48.0
+    value: 240
+    name: "Lifting bar"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2E4Yjg3ZTQ2Y2ZlOGEyZGMzNTI1YzFjNjdkOGE2OWEyNWZkMGE3ZjcyNGE2ZmE5MTFhZDc0YWRiNmQ4MmMyIn19fQ=="
+    time: 14
+  s3_20weight:
+    hp: 50.0
+    value: 263
+    name: "20kg Weights"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmYyY2ZhYWQ2ZjhiNjJjOTkyYzNiNTVjZTMxNjlmZmE0MDA1YWFlZTJkYjM1YTYzZjRiMzc5MGU0YTU5NmMzNSJ9fX0"
+    time: 15
+  s3_treadup:
+    hp: 52.0
+    value: 265
+    name: "Treadmill"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmYxMDRhYTA0OTk5NGMyN2JhODA0NzA4YzFlZjM3NTJiNzQyYWI4ZDYwZThjY2JhNDMzMWQzNDljYmY0MDkwNSJ9fX0"
+    time: 18
+  s3_protein:
+    hp: 54.0
+    value: 270
+    name: "Protein Shake"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMThjMjhjMzg5MzViYzZmYmFiZTgyMjc4ZDE1ZWQ5MzU5Mjg4MmZjODBmYjVkNWMwY2JiYzYyZjViNDJkOTcwMSJ9fX0="
+    time: 15
+  s3_shower:
+    hp: 55.0
+    value: 293
+    name: "Shower Head"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWM2ODRjZjFiYjk0NTNkOWUyZjNlZDJiMmNiYzdkMzQzZDhjMzI3M2QxMWRmZWRjZTM2NzllOWU1MzRhNGJlIn19fQ=="
+    time: 16
+  s3_shampoo:
+    hp: 60.0
+    value: 308
+    name: "Shampoo"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDViMzIzMzk5NmZmODI1ZjVkMWIyMjVhZDQ3NjAxNzVmMWUyMTE3NThmOWYxOWI1NmIxODQ5ODFiZWEzOTMxMyJ9fX0="
+    time: 16
+  s3_tren:
+    hp: 62.0
+    value: 323
+    name: "Tren"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGVjNTNhODk5ZDRhZDEyMTVhYTIzOGFjZTEzNmE3MGQzZmZjMjcwYTVmMjlhMzNlZmFmZjljMTM2MTg0YjNmMCJ9fX0="
+    time: 17
+  s3_dumbup:
+    hp: 65.0
+    value: 353
+    name: "Dumbbells"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjY2MGQ2NWYwOTdlYTE0MjNiNDgwMmE3Y2U5Y2VlZjgxODEzMGFhYzNiNmZkODc4YWVmNzE2ZTQwMjkxYmFjYiJ9fX0"
+    time: 17
+  s3_straps:
+    hp: 75.0
+    value: 405
+    name: "Straps"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzIxOTc2MmY5M2I3NzJlMzU4ZGE5OTJkYTIyYmM1YTUxYmU1YWJjN2JiOGFmZTEzNDI0MjhiMjQ5NTM2YzgifX19"
+    time: 20
+  s4_popcorn:
+    hp: 45.0
+    value: 210
+    name: "Popcorn"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmNjYTNiYzhiZTAxMTU1ZDNmMGZiZjUxNjlmZDRhMThlMzYzNzUzMjBmNTlmZDY5OGMyNWY5NDAyNjVlYTFmZCJ9fX0="
+    time: 10
+  s4_coins:
+    hp: 50.0
+    value: 250
+    name: "Coins"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDE3N2E5NGUyYmQwOGJiZDgzOTQ0NjU4YjM0MjAyYjY5YWMzNmMyOGE4NmQyOThjZmNjMDQ0ZWYyOGIzMDlkYiJ9fX0="
+    time: 10
+  s4_ball:
+    hp: 54.0
+    value: 290
+    name: "Arcade Balls"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2U2MjMyMTFiZGE1ZGQ1YWI5ZTc2MDMwZjg2YjFjNDczMGI5ODg3MjZlZWY2YTNhYjI4YWExYzFmN2Q4NTAifX19"
+    time: 10
+  s4_hat:
+    hp: 58.0
+    value: 320
+    name: "Hat"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGUyNTAzZTFkMDdlNzYxZDQxYWQ1NmQ4ZmU0ZjZkMzM4ZTVlNTc1ZjYzODA0YzYzOTI3NzcxOWIxYzYyYjFiZSJ9fX0="
+    time: 11
+  s4_pixel:
+    hp: 62.0
+    value: 350
+    name: "Pixels"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWQ1ZDQ2YmFmYjIxNzI3Mjc2ZDIwMmNjZDEzMGY1OThhNjk1NmM3OWE0Y2YwN2ExNDNmNzRjOTdiMWJlOTE4YyJ9fX0="
+    time: 11
+  s4_creeper:
+    hp: 64.0
+    value: 370
+    name: "Creeper Head"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTVlN2UwNzJlYWU4ZTc5OWQ5NzNjNDA4ODNhNzliZTRkZDJkNmY1ZDdkZGRiM2FjMTk1MTRlODVjZGViYTc2YSJ9fX0="
+    time: 12
+  s4_machine:
+    hp: 66.0
+    value: 400
+    name: "Gumball Machine"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmRiZGFiNjFiMTFhYjQ4MjljMjI4YjdhNjNiMjJiOGZhYzIxYjRhM2U2NzFlYTllNTNiNjNiYzgyZGMwYTcyOCJ9fX0="
+    time: 12
+  s4_car:
+    hp: 70.0
+    value: 440
+    name: "Toy Car"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2YwZWVlYzQ5ODA5YzllNjUwZTdlYjZmNjQ5MGZmNWUyNTQ1YTBiMWM1YmEyYzY2OTY4MDAxZTQ1ZDU0MjJiIn19fQ=="
+    time: 13
+  s4_drink:
+    hp: 75.0
+    value: 480
+    name: "Juice"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWYyMTBlMTJjMTgwMmE1Mjk5MjYyYmVkNTU2YTY4NGMwY2VkN2FkZDg1OWRkOWJmODZhNGZmYTQ5ODVjMjI3MCJ9fX0="
+    time: 13
+  s4_laser:
+    hp: 80.0
+    value: 535
+    name: "Laser Gun"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTA3NjM5OWIwYWQxNTFmMDBlOTNmNDliOTE2YjVmMDQ2YWFhYWE3ZTUxODVmNmFjZDBjMjU2ZWE5ZDk4NDI5OSJ9fX0="
+    time: 14
+  s4_cupcake:
+    hp: 85.0
+    value: 580
+    name: "Cupcake"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RmZTA5OThhM2JhMDI3NzAxZWQ1YzYyNzY2YTExMjEzZmM3YjViYTQ4OTRjOGMyNjZlZWU1MDAyNTM5ZGY5MyJ9fX0="
+    time: 14
+  s4_rgb:
+    hp: 130.0
+    value: 750
+    name: "RGB Lights"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTNlMmY3NzkxNDdiYzAyNTQ4N2IyN2EzN2I3ZmM1MTZkNzQ4OWM1ODlkZjk3MDE2ZWI4ZGMwZjU0ZDNiZjI5ZSJ9fX0="
+    time: 16
+  s4_controller:
+    hp: 133.0
+    value: 850
+    name: "Game Controller"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzgyMWY0OGIzZjYwNDQwZmQ4ZmY4OTNjYjMwYTk4NjNiNmRmN2IwMDI5MTM3YTU0NTU5ZGE2MzA2Njk5NGM5ZiJ9fX0="
+    time: 16
+  s4_clouds:
+    hp: 135.0
+    value: 950
+    name: "Clouds"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOThhNGY0MWQwNGViODYwNGM1YjY2YmRlZTAxYmM3YzFiMGVjNDg2Y2U3NTg1NjI3ODQwNGZmYTkwYTg4MDM2In19fQ=="
+    time: 17
+  s4_rubik:
+    hp: 138.0
+    value: 1100
+    name: "Rubik's Cube"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTMyZDdlMDk3YjFhODk4OGYyOWI3M2M4MDk0MjIzMzM4MjcyYWY3N2NkZDk4YTZiZjE1ODhiYmQ0NThiMGI0MiJ9fX0="
+    time: 18
+  s4_star:
+    hp: 140.0
+    value: 1250
+    name: "Star"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWY1Yzk1YzE3NWZhMDA1OTA1ZTQ1MzUxY2RmYjA5YmY2ZDdmODdkZDg0NjE1YWQ3MjhiNTZmOTZkZGFlY2UwMyJ9fX0="
+    time: 20
+  s4_vr:
+    hp: 144.0
+    value: 1500
+    name: "Oculus VR"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWFhOTliY2RkZTg1YTIxZDllM2NlYjA4ZGM3YjZhZDViMTBjZDA2YzE3YjdiOTQyNTdkZGJkNDkwNTY0YmUyYSJ9fX0="
+    time: 21
+  s4_freddy:
+    hp: 148.0
+    value: 1850
+    name: "Freddy Plushie"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODhiY2E0NzUwNTQxMTYxYWM1MDM3NzIwZTQ2N2ZlNjg5YzNlOWVmNDVjZjRkOGM2MDdhZWE2ZTA2MGM3Y2QxYSJ9fX0="
+    time: 23
+  s4_tetris:
+    hp: 150.0
+    value: 2300
+    name: "Tetris"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGU1ODVhYTRhZDg4Nzc1ZDMzN2VjZmM4YTUzZTIxMGFiMzE2YzMzYmQ3ODM2YjI2NDIyMDUxNDY1ZjJhYzA2ZSJ9fX0="
+    time: 25
+  s5_pendown:
+    hp: 90.0
+    value: 800
+    name: "Pencils"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTliYzU2NmFlMzcwYjE1YzI3MmZjNTA0ODhhMjZjMTViZmU3ZTQzNDBlZGQyMWIzOTMxMWE4NDZjZjljNzA1MiJ9fX0="
+    time: 12
+  s5_bookdown:
+    hp: 95.0
+    value: 950
+    name: "Book"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTViZTIyYjVkNGE4NzVkNzdkZjNmNzcxMGZmNDU3OGVmMjc5MzlhOTY4NGNiZGIzZDMxZDk3M2YxNjY4NDkifX19"
+    time: 12
+  s5_note:
+    hp: 100.0
+    value: 1100
+    name: "Notebook"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWQ4OGE4NjQ0NWQ0MTE0YjE1MTcxYmI5ZWY4Mzc0NjA2MGNhZmZmMmNiMmFhNzUxMTU5NzQwY2ZmNDhkZjg5ZSJ9fX0="
+    time: 13
+  s5_dict:
+    hp: 105.0
+    value: 1250
+    name: "Dictionary"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjI5YTQ5NWM5ZjZhZmNhZDQ1M2U0NTc5ODc0MTAzZjEyMmMzNmJjZGFjZGJlYzc2MmUyNDUzZTYwMTE4NjEifX19"
+    time: 13
+  s5_eraser:
+    hp: 110.0
+    value: 1400
+    name: "Eraser"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGQyNzhkZjc0YjZmOGU5YWZlNTU1NGY2Nzg5ZTY1YjE3OWYzNGNhMmE1NDY1OTZiMjZhNGZjZDBmZDNkOGYzMSJ9fX0="
+    time: 14
+  s5_toiletdown:
+    hp: 115.0
+    value: 1650
+    name: "Toilet Paper"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTY1MWIzM2E3NzM0NDdkZTBmM2VlMTA3ZDdkNzg0ZjE4MzNjZTUxNGUzYjdhMDhjMmIzMWI3MWNhYzYwY2EifX19"
+    time: 14
+  s5_glasses:
+    hp: 120.0
+    value: 1800
+    name: "Glasses"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGFjZmY3NGU2N2YxNDhlMmVmOGM1MmZiM2E3N2UwYWQ3MGNmNmMyYmUzZmNlODU3MWYzZWNjNmY3MTAwOTg2NSJ9fX0="
+    time: 15
+  s5_shoe:
+    hp: 126.0
+    value: 2000
+    name: "Sport Shoes"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjJmMDA4YjA2ZjgyMTM2ZGI2NjAzYTg3NzFjZjk4MDJiN2I0MWU2ODUxMzVkNzFmMTMzNGZmMDFhN2Y0MTc1MiJ9fX0="
+    time: 15
+  s5_basket:
+    hp: 132.0
+    value: 2250
+    name: "Basketball"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWRmODQ3MTVhNjRkYzQ1NTg2ZjdhNjA3OWY4ZTQ5YTk0NzdjMGZlOTY1ODliNGNmZDcxY2JhMzIyNTRhYzgifX19"
+    time: 16
+  s5_bread:
+    hp: 138.0
+    value: 2500
+    name: "Bread"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTE5OTdkYTY0MDQzYjI4NDgyMjExNTY0M2E2NTRmZGM0ZThhNzIyNjY2NGI0OGE0ZTFkYmI1NTdiNWMwZmUxNCJ9fX0="
+    time: 16
+  s5_pasta:
+    hp: 144.0
+    value: 2750
+    name: "Pasta"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmRjNTVmNDNlM2Q4NDIwOTc1MTg5YTcwZmVhNGRmNzc5MWU0ZTEwMGI0MTYzZDYxNWI5YzBkMjBiMWRmYjJiZSJ9fX0="
+    time: 17
+  s5_microphone:
+    hp: 150.0
+    value: 3000
+    name: "Microphone"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzc3OGI3NjA3MTIxZThiNmYxYTc1NDM4MGYyOWIxNzVmMjdhZGZlMjdjZDhlZjIzZTEzNmYzY2VhMGQ4NTIzMiJ9fX0="
+    time: 17
+  s5_penup:
+    hp: 180.0
+    value: 5000
+    name: "Pencils"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTliYzU2NmFlMzcwYjE1YzI3MmZjNTA0ODhhMjZjMTViZmU3ZTQzNDBlZGQyMWIzOTMxMWE4NDZjZjljNzA1MiJ9fX0="
+    time: 20
+  s5_bookup:
+    hp: 184.0
+    value: 5500
+    name: "Book"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTViZTIyYjVkNGE4NzVkNzdkZjNmNzcxMGZmNDU3OGVmMjc5MzlhOTY4NGNiZGIzZDMxZDk3M2YxNjY4NDkifX19"
+    time: 21
+  s5_toiletup:
+    hp: 188.0
+    value: 6000
+    name: "Toilet Paper"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTY1MWIzM2E3NzM0NDdkZTBmM2VlMTA3ZDdkNzg0ZjE4MzNjZTUxNGUzYjdhMDhjMmIzMWI3MWNhYzYwY2EifX19"
+    time: 22
+  s5_projector:
+    hp: 192.0
+    value: 6750
+    name: "Projector"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTJjNDE1NjNjNmIyNjMyOWYyYTVkMGU3ZWU5ZDc5Nzk3NDY3N2U0MGZmMTQzOTQ1ZjgwYmRiZmUzMWVlIn19fQ=="
+    time: 23
+  s5_cheat:
+    hp: 196.0
+    value: 7500
+    name: "Cheat Notes"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjI4ZDk4Y2U0N2ZiNzdmOGI2MDRhNzY2ZGRkMjU0OTIzMjU2NGY5NTYyMjVjNTlmM2UzYjdiODczYTU4YzQifX19"
+    time: 24
+  s5_speaker:
+    hp: 200.0
+    value: 9000
+    name: "Speakers"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGFkNjVlMzM4ZTM1OTM5NzhlZmEwZTA3MTgyNTVhYmM3MTgyYWNlZWRiMWEzMGNlNzQ4NTIzZWI0YjkzZGEifX19"
+    time: 25
+  s5_bandage:
+    hp: 206.0
+    value: 10500
+    name: "Bandages"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTY0ZTRiODc0Y2RmN2IyNWFhMmIyODdlMmE3MDYzZDA4MmU2NGY5ZmYxNTEwYzEyMjY5MDUzNDhlMDA1YzNlIn19fQ=="
+    time: 26
+  s5_ibuprofen:
+    hp: 212.0
+    value: 13000
+    name: "Ibuprofen"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTg3MDE4MDFkOTgyMDBkODE0NzY3NTMyMzY2YzI1ZTU1NzY5NTM4MjBmODJjOTMxNTY1NjM0YWUzOWIxMDNhOCJ9fX0="
+    time: 27
+  s6_penny:
+    hp: 150.0
+    value: 3500
+    name: "Pennies"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWRiOTZmYTMwNjNiNzkwNWFiYzA5YjRjOTAzODllYWRmYTFiZTFiZGVhMDZiMGVjNGFlOGQwZDA1ZTliZmRiMSJ9fX0="
+    time: 15
+  s6_register:
+    hp: 154.0
+    value: 4000
+    name: "Cash Register"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzEyMzBiNzAxYjkxZWVmN2ExNDU1ZTM2OTZkNzYyYTE5ZWRmMWI2ZTYxMDJjODYzNDQzMDNlNjYzZDUxMDFlYyJ9fX0="
+    time: 15
+  s6_water:
+    hp: 158.0
+    value: 5500
+    name: "Water"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmYzZWFhOTFlNDVlNjBhZmE0ZTE1NDJhNjAxMjUyODFkMzMxMDI1MGUxZjhjOWU4NmFlNWY2MjhjZDYxMTRiZiJ9fX0="
+    time: 16
+  s6_cocktail:
+    hp: 162.0
+    value: 6000
+    name: "Cocktail"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWRkZjZmZTAyZTVjYjM2YjE1OGFlNGMxZjQ0M2E0M2YzYTE2YmUxNzlhYTIwOGI1NjExNzM3ZjM1N2JlZTg3In19fQ=="
+    time: 17
+  s6_chipgray:
+    hp: 166.0
+    value: 7000
+    name: "Gray Chips"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTdmNTMxYWNmYjgyNzliNjk1NTY3YTk1YjAyYTJlMjNjOTNkM2ZiYTZiYzZmOTNkZjZhN2Y4ZWI2MWYzMTdmYyJ9fX0="
+    time: 19
+  s6_chipgreen:
+    hp: 170.0
+    value: 7500
+    name: "Green chips"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTgxYmM0ZjQzZDMyZmM5YmI0ZGRjNmUwZTE1MGU0NGVhNmRiN2EzZjg4N2FiNmU1ZGQzYmVkNzRjMDkxNmJiMiJ9fX0="
+    time: 19
+  s6_cardsclose:
+    hp: 172.0
+    value: 8500
+    name: "Cards"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTVjMjUyMjhiZWJjZWFhYmU5YjhlZTliMzVkY2RkNTljMmQ5ODc4ODA1YTRmNjNmZTI1NDczNmQ5YzNkOWFiIn19fQ=="
+    time: 19
+  s6_coinsclose:
+    hp: 174.0
+    value: 9000
+    name: "Coins"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2QyNGRjNTgwNjljMTIxMmI1MjlhNGFlNWQ0ZTczYmUwOTkwZDQ2ZmU5MzcxYjFmNzllODE2NGI0Mjg1OWFjOCJ9fX0="
+    time: 20
+  s6_moneyclose:
+    hp: 178.0
+    value: 10000
+    name: "Money"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQwMDVlYmJmOTgxN2Q2OTI4ZGU4YmM1ZjdkMWMzODkyNzYwMjBhYzg3NjQ3ZDI4YWI4Zjk5ZWIzOWZmZGU3NiJ9fX0="
+    time: 21
+  s6_drums:
+    hp: 182.0
+    value: 12000
+    name: "Drums"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWNhYWFjODAwNjIzZGY0ZWFmMTk0MzBhZDk0NGRhNzI3YjdhNDRhOTI4ZWU1OGE4NDk4YmFlYmM4MmViZDc3YSJ9fX0="
+    time: 22
+  s6_speaker:
+    hp: 186.0
+    value: 12500
+    name: "Speakers"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDk0NTI0NzExZjY2MWQ0NTJkYWFkNmU1MzhmN2Q2NmQ5ZDFkZmFkOTRlYzMzYzA4NjI2MzM0YzA0MzM3OGYxIn19fQ=="
+    time: 22
+  s6_microphone:
+    hp: 190.0
+    value: 14000
+    name: "Microphone"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2NmMGEyN2QyNDYzNTVlNGRjYmJkN2IzNjlkMzI2Y2ZlZDdhZWQxYmEwNGU1ZGQ5YmE2OGNkZWNjNDEzM2QzMyJ9fX0="
+    time: 23
+  s6_chipblue:
+    hp: 196.0
+    value: 17000
+    name: "Blue Chips"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzIzMjMyM2MzZGEwMGY0M2U3MDU4MTdmZGJjMTA2ZDJhODhlNTBlOWJkNTM4NGNlODE2MjJlMzBkNWU4MzliZCJ9fX0="
+    time: 24
+  s6_coinsaway:
+    hp: 202.0
+    value: 18000
+    name: "Coins"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2QyNGRjNTgwNjljMTIxMmI1MjlhNGFlNWQ0ZTczYmUwOTkwZDQ2ZmU5MzcxYjFmNzllODE2NGI0Mjg1OWFjOCJ9fX0="
+    time: 25
+  s6_moneyaway:
+    hp: 210.0
+    value: 18500
+    name: "Money"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQwMDVlYmJmOTgxN2Q2OTI4ZGU4YmM1ZjdkMWMzODkyNzYwMjBhYzg3NjQ3ZDI4YWI4Zjk5ZWIzOWZmZGU3NiJ9fX0="
+    time: 25
+  s6_slots:
+    hp: 218.0
+    value: 21000
+    name: "Slots"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGUxYzJhNWM0ZDRjMzVmYzM3NTQyOTVmMzljMzMzZWY2NzhiZDJlZGFkOWM4OGYyZDE2ODBmMTQ5NjgyIn19fQ=="
+    time: 27
+  s6_chippurple:
+    hp: 226.0
+    value: 25000
+    name: "Purple Chips"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjdhN2YyOWMyYjU4ODFmMDUwMzY2YjhiY2QyODBiYzJmYWQ3ZTQ0N2JjNWIyMDIwYjQ3NjM5ZGIwY2MyNDAzYyJ9fX0="
+    time: 30
+  s6_chiporange:
+    hp: 235.0
+    value: 25500
+    name: "Orange Chips"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDc1YmU4ODBiMzRiMWU4ZGYyNWJiNDUyYzRlMzM2NmJiZTNlMTA3ZGUxOGI4YjI1MTRiYWZjMTA5MDE1NTZkNyJ9fX0="
+    time: 31
+  s6_chipred:
+    hp: 250.0
+    value: 26000
+    name: "Red Chips"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWQ4NzQyMjg4OGYyMjU1MzRiM2ZmZmZjYzkxZWY0ZmQ1ZDA3MmFjNTAzZDQ2MjI4NTUwNTBlNmU0NDllNmIwNiJ9fX0="
+    time: 31
+  s6_ball:
+    hp: 260.0
+    value: 29000
+    name: "Roulette Ball"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjcyYmNkZjZhNTQ4OTc0YmY3YjExNWFjZWU2M2NiMjg0MzY3YTBmNzQ1YmMwZmYzNTdjMTQyMzE1MjQzZDhkOSJ9fX0="
+    time: 32
+  s6_emerald:
+    hp: 279.0
+    value: 33000
+    name: "Emerald"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTk4NWU5NjEyMjgzOTNhNGNkNTdmYWFlMTdiZmIwN2JkMGZkYTA4NTMxNmZkOGJlNTg0NTk4NzRkZWNjM2JjOCJ9fX0="
+    time: 33
+  s6_gold:
+    hp: 280.0
+    value: 35000
+    name: "Gold"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDFiNWZkZWZmZmZmYTcwODM4MWU3MGYzNTAzYTI3NTc3MmI0NTI5NmNmOWYxNjI1YTg3ZWRjNmI2MjU0OWVmNiJ9fX0="
+    time: 33
+  s6_cardsaway:
+    hp: 290.0
+    value: 37500
+    name: "Cards"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTVjMjUyMjhiZWJjZWFhYmU5YjhlZTliMzVkY2RkNTljMmQ5ODc4ODA1YTRmNjNmZTI1NDczNmQ5YzNkOWFiIn19fQ=="
+    time: 35
+  s7_flower:
+    hp: 200.0
+    value: 20000
+    name: "Flower"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTEyZjhhYmE1NWIxNmE1MjZjY2ZlOWVmZmM2NTkwMDExOGJhMzFiZDUwMWM4MmRmM2Y4MGI0N2YxNDgwNjkzYSJ9fX0="
+    time: 20
+  s7_toilet:
+    hp: 205.0
+    value: 22500
+    name: "Toilet Paper"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODhkOTNhNWJhYTVhOTY0ZDkxZDJiMmZlY2NkNzkwMWYxNDY0ODFhN2UzMjdmOGE3ZWQ3OGQxNTNjOTRmNzNlIn19fQ=="
+    time: 21
+  s7_pufftank:
+    hp: 210.0
+    value: 27500
+    name: "Pufferfish Tank"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmVkYmRlYzZmMTI1Y2I1ZmIyOGNjNzE3ZmQzNzI2MGY3Mzk1YzBhYzYwMTUyZDE3NThhYWI5NjZjMzUzOTgyNSJ9fX0="
+    time: 22
+  s7_penguin:
+    hp: 215.0
+    value: 32500
+    name: "Penguin"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTM0Nzk0ZGYxMjRlZjVlODE1NzYxZGQ3MDY4NjkxMzU5ODE0Y2ZiZGUyZDRlZDU5ZmI3N2VmY2VmOWNlNGZmYyJ9fX0="
+    time: 23
+  s7_chum:
+    hp: 220.0
+    value: 35000
+    name: "Chum Bucket"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjNiNjgzYWFjNjc1Y2U3MDNiM2VhN2JkNzg0MDQzYjFjYWY3YjY2OTU3ZDc1Yjg4ZmIyNjMyMTY5NWI3NDA5NyJ9fX0="
+    time: 24
+  s7_secret:
+    hp: 225.0
+    value: 40000
+    name: "Secret Fish"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODFkMGM2YjIyYWQ3NjZiOWQ3NDg5MWM5NGIyZjUwM2M3ODI1MWQ4MTJhN2FjOTI0MjBhZTI3MWYwOWI2ZjhlZiJ9fX0="
+    time: 25
+  s7_nemo:
+    hp: 230.0
+    value: 42500
+    name: "Nemo"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmIwZWQ4ZmRhODBiY2RmZThkMWY5N2IxMzg5MGQ2MWFkODVlZDRkOTI1OGFjOTY4N2Q4NTg1MjAyY2M0ZDBhMSJ9fX0="
+    time: 25
+  s7_pufferfish:
+    hp: 235.0
+    value: 45000
+    name: "Pufferfish"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGU1YmJiOWYxYjVkZmU5MmY0NTViZWE0ODE4MWI2ZjIzZjU2ZGQyYTdkZTAyMmM3ODBjNTVhYTUxYjYxNjM4YyJ9fX0="
+    time: 26
+  s7_eel:
+    hp: 240.0
+    value: 50000
+    name: "Eel"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzYzNzA0YTdmYzdkNDM3ZjdiOTIzZTIzZTlhMDhhZTNiYmUyODkzN2RmNGRhZmE5ZTNlODcyNWIyY2U0YWZhNSJ9fX0="
+    time: 27
+  s7_wallet:
+    hp: 245.0
+    value: 52500
+    name: "Wallet"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmU3ZTNlOGFiMDYwZTY0ZDAyNTZiMzY4OGU2MmQ0MzNlYWIzNDFhMTU3ZjJhNzMzZWQ0MzQ1MGZlZTRlNzI2NCJ9fX0="
+    time: 28
+  s7_fishbowl:
+    hp: 250.0
+    value: 55000
+    name: "Fish Bowl"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjg3YjM1ZDE5ZTcxMjNhMzMzMzg0YmNmMmY2NGZhMTM2ZTY0ZDE2OGIwNGE5YmRkZmZlZThmM2IzNTQ5NzJiMSJ9fX0="
+    time: 29
+  s7_fishtank:
+    hp: 260.0
+    value: 70000
+    name: "Fish Tank"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWRkZTU3YWYwZjQ4MTUyMDI0ZDhjY2FjZTZiMDY5N2ZiN2M0ODA1MDM4YzcxYzA4NzMxMTM3ZDgyZWVkMDQ5NCJ9fX0="
+    time: 30
+  s7_shark:
+    hp: 265.0
+    value: 75000
+    name: "Shark"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjZlN2FhMTcyMDUyNGFjZGFiNzRiNGZjOGU5YmMwNjZjN2ZlOGYzYzkwMmFjNThhNjkyZGUxMmUxZWIxODQzIn19fQ=="
+    time: 31
+  s7_flowerpot:
+    hp: 270.0
+    value: 80000
+    name: "Flower Pot"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2YxYTA0MjA4MTUzZWYzZTc3ODAyODUwNTdmM2ZiMjQ1MDdmMWRiNTNkYzdmZWZkNDhjOTY3MjU5OWFkZDdmNyJ9fX0="
+    time: 32
+  s7_tomatofish:
+    hp: 275.0
+    value: 85000
+    name: "Tomato Fish"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzA1NmU2NTI3YWRkOTUzYTk5MWIzYWQ1MGFjMzI1N2ExN2M5MGJhMmYyYjNhZmIzZmZlZDc3MmNjMzAxMzFhOSJ9fX0="
+    time: 33
+  s7_crazyfish:
+    hp: 280.0
+    value: 87500
+    name: "Crazy Fish"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTZiZTY3ZDI1ODA5OWJmY2YyNjE0NzcyZTVmY2NmZDcxYjJlNTJjYmY2ZGY4MGYyOTQ3MmFjZDUyYzllMjQ5In19fQ=="
+    time: 34
+  s7_seaweed:
+    hp: 285.0
+    value: 90000
+    name: "Seaweed"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWY3NzM0NmY1ODk0Y2YwZjVlZmYyYTRjMDZjYjliNmVhYjBiZjM5ZDc4OTE5MWI3MGNmN2MwOGQzNmZkYTI0OCJ9fX0="
+    time: 35
+  s7_juice:
+    hp: 290.0
+    value: 95000
+    name: "Juice"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmYwZmFmY2I5OWI5ZDFkNzQzMTdjYjI5MTc4OGQxZjlhOTA1ODVjODZkZjg4NDllNDJjM2IyNzRkNjRkN2M2YiJ9fX0="
+    time: 36
+  s7_coffee:
+    hp: 295.0
+    value: 97500
+    name: "Coffee"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDA0Y2I5MWNiMzc1OTljN2ZiYWY1ZjUwMWIyZGI4MWEyZjg5NmIyYTAxN2ZiMTQxYjc4ODgzZjVhZGVlMmI4MSJ9fX0="
+    time: 38
+  s7_tulip:
+    hp: 300.0
+    value: 100000
+    name: "Tulip"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTRjNGE0YWUzYjc5NmYxMjNiNDlmN2IyYTI5YmZjM2FmZjI2NDBiNWZmOWRhOWRkODQzMDZhNDI5ODAxYjk5NiJ9fX0="
+    time: 38
+  s7_yellowcoral:
+    hp: 305.0
+    value: 115000
+    name: "Yellow Coral"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQ5MWI2ZTZhZTk0NTFjNDdlMDliZjFmZjIzZDUwZmZmODdiYTU5MjdhNTFmNDZmZmVkZjkyNmM1Y2JkZTc3ZiJ9fX0="
+    time: 40
+  s7_purplecoral:
+    hp: 310.0
+    value: 120000
+    name: "Purple Coral"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTNmMTgwNWVkY2QzMmI5N2FiMmYxOWEwM2JhYWIxZjhkNGRjNGRiOGVjN2EwMDRiMTRlYjY2NmQwOWZiODdmMiJ9fX0="
+    time: 40
+  s7_bluecoral:
+    hp: 315.0
+    value: 135000
+    name: "Blue Coral"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDhmOWQ5MDcyZDdmZDFiNTE3NWU3ODhhMjdlMGZmMDUwZWNiZTQyNWY3ZTc5ZDVmMjgyMjZjMmZkYjdkYzE2NyJ9fX0="
+    time: 40
+  s7_turtle:
+    hp: 320.0
+    value: 140000
+    name: "Turtle"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGZhNTUyMTM5OTY2YzVmYWMxYjk4MDYxY2UyM2ZjMGRkZWYwNThjMTYzMTQyZGQ2ZDFjNzY4Y2QyZGEyMDdjMiJ9fX0="
+    time: 40
+  s8_plate:
+    hp: 220.0
+    value: 50000
+    name: "Plate"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmU4NzJmMTdlZjc2NmY1NTIzNGQ1ZjczZWY2ZWUzNTZlYzQ0YjRhYzAxZTY5NTZlYzRjYTA1YTBhZjgwYzA1ZSJ9fX0="
+    time: 25
+  s8_ribeye:
+    hp: 225.0
+    value: 55000
+    name: "Ribeye Steak"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjExNjJjZTEzMWMzZWExNmVkZDllNTg3M2Y5Y2ZjNDkyMzk1MjUzOGE3YzU2OTlhNDgwYWNmNjdkMGY3OTgwMyJ9fX0="
+    time: 26
+  s8_filet:
+    hp: 230.0
+    value: 60000
+    name: "Filet Mignon"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2IwMWZjNTJjMGVhYTgwYzhhNTg0NmJhNGIwM2RlYjc2Y2NkYTUyOGMwOWI3ZjM0ZmFmZjAwOGNkNTQ0Nzc2OCJ9fX0="
+    time: 27
+  s8_roast:
+    hp: 235.0
+    value: 65000
+    name: "Roast Chickens"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDNlMjBhMjZjYmI1NzQwYTE1OGRhOTkxZWY5NGRjZDMyZDQ0N2U5YWMwM2FhMGU4ZjgyOWE0OTgzMDYxOWExMCJ9fX0="
+    time: 28
+  s8_coffee:
+    hp: 240.0
+    value: 70000
+    name: "Coffee"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjM1ZTNkZGZlOGY5YjUxNjNjZTdjYmE3MTU0ODQ0MTE0NTM3YTQzMTAyZTBmOGE3ODIxZTU5YzY1OWVmMjU3MyJ9fX0="
+    time: 29
+  s8_cheesecake:
+    hp: 245.0
+    value: 75000
+    name: "Cheesecake"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzFlZjc4OWUzMmQyMjhiMzVkNTE3NDQzMmU0MzdjYjUwMWY2MjlkNTQ3ODMzMmE2ZDFhZTRhMTZmZWEyNzQ3MiJ9fX0="
+    time: 30
+  s8_tiramisu:
+    hp: 250.0
+    value: 80000
+    name: "Tiramisu"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTZiNTg1NDBmZThkZjIyZDJkZTlmZTI2MmM0MTA3YmQ5ZTdjN2UzNzUyZmY4YTZlNzhmNjM4ZGE0MGEyZTQifX19"
+    time: 31
+  s8_brownies:
+    hp: 255.0
+    value: 85000
+    name: "Brownies"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjUwYzQxYmUwODdlYWNiODJhZjkxNTQ2ZWYzMDRmZjYxYzU1ZWZkNzJhZDU5ODE1YjM4MjM3ZDI5MmYzMDdhMCJ9fX0="
+    time: 32
+  s8_register:
+    hp: 260.0
+    value: 90000
+    name: "Cash Register"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzEyMzBiNzAxYjkxZWVmN2ExNDU1ZTM2OTZkNzYyYTE5ZWRmMWI2ZTYxMDJjODYzNDQzMDNlNjYzZDUxMDFlYyJ9fX0="
+    time: 33
+  s8_oven:
+    hp: 265.0
+    value: 95000
+    name: "Oven"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmY1Y2ZmY2M1NTVjMjFlMTdhNjhmNDExYWQ1YzE5ZjA4OWQzNmY0MmM5ZTA0Y2Q1YzVlZTZjZDc3NDM5OTcwZSJ9fX0="
+    time: 34
+  s8_stove:
+    hp: 270.0
+    value: 100000
+    name: "Stove"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGY5ZGE0NmQ5NzQ2MWExYmUxMDYwMGNjNTQ2YTlkNDYxM2UxNmNmYjU3MTllZWIzOTA0MmU1MDE4MzYwMDhjYSJ9fX0="
+    time: 35
+  s8_stew:
+    hp: 275.0
+    value: 110000
+    name: "Stew"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGJiOGMzNTk3MmNmNTBiMmExZDgxMDhlZDdhYTg4MzFkNDcyNzc4MDhiY2FhODRlNTI3ZjgxYzkyODRiOTEyOCJ9fX0="
+    time: 36
+  s8_dish:
+    hp: 280.0
+    value: 120000
+    name: "Dishes"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTQ3YTg5MmI3Mjc2MTU4OGQyMjdmMmNiYWY3NzdlNTg4ZjU4NmNkOTk1NWIyNDVlZjQzMzdiN2FmNGMxZjAzMSJ9fX0="
+    time: 37
+  s8_cake:
+    hp: 285.0
+    value: 130000
+    name: "Cake"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmUwNGM0N2E1MTE1ZDUxNDlkZWY3YjBlZjE5NGUyNGFkYmI5NjRkY2I1NWM5NTRkMWVkMTAwOTYxNWQ0NGJmNSJ9fX0="
+    time: 38
+  s8_eggs:
+    hp: 290.0
+    value: 140000
+    name: "Eggs"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmNiYjUxYzEwOWE2MWZkZGIzODNlNDQ3YWYxMGZkNjY5ZTk0MmQ2NDhkNGVmZjFjODBlM2FlMzczYjY2YTJhZiJ9fX0="
+    time: 39
+  s8_meat:
+    hp: 295.0
+    value: 150000
+    name: "Meat"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTEzZmRjZjdhNmUyNTU4MGQxYTA0NGI1N2U4NDNlMzE3NGEwY2E1YTlmYmRlMzYxMDU4YzhkMGY0ZmRmNjQ3NCJ9fX0="
+    time: 40
+  s8_fish:
+    hp: 300.0
+    value: 160000
+    name: "Fish"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDIyYjBlNWZhYTk3Y2ExMDljZDQ1ZjFmYmEyZDg0Y2EyYjliNjAxZGU1MGI0N2Y0YWRkMmQ4MzVhYTM2MGY3OCJ9fX0="
+    time: 40
+  s8_petit:
+    hp: 305.0
+    value: 175000
+    name: "Petit Gateau"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGNmZmJjYzlkZWY5NDIwZTBkMTgzMWIwN2U0OTU2OGRhZGQzMjNhNDcwMjJkYjA4MGFkNGUyYTI0MWI5MmI4In19fQ=="
+    time: 41
+  s8_caramel:
+    hp: 310.0
+    value: 185000
+    name: "Caramel Shortbread"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzI3MzY0OTg0ZDE0M2M1MzE3MDhhZjU2MWVjZmExMGQ5ZDg4OGU2NWMxZWMwYzE0NDY1Y2E0YjJkOThiODRkZCJ9fX0="
+    time: 41
+  s8_ribs:
+    hp: 315.0
+    value: 195000
+    name: "Short Ribs"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzhjZmQwNTg4YThhOTNiOGNkMjFiZGQyY2UxNjU0ODljYjM5Mzk0ODcxNGZkZDg1ZmIxMGU0NGQ0ODg2ZjYifX19"
+    time: 42
+  s8_pork:
+    hp: 320.0
+    value: 210000
+    name: "Pork Chops"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2JiZGFjOTk1MjgzODUzZmM5ZWMyYTE1MmIzY2RjNTBkZTBjMDUyMmIzM2FhOTA4Zjk2MTY3NDg5MDc2YjdjNSJ9fX0="
+    time: 42
+  s8_mic:
+    hp: 325.0
+    value: 230000
+    name: "Microphone"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2NmMGEyN2QyNDYzNTVlNGRjYmJkN2IzNjlkMzI2Y2ZlZDdhZWQxYmEwNGU1ZGQ5YmE2OGNkZWNjNDEzM2QzMyJ9fX0="
+    time: 43
+  s8_drums:
+    hp: 330.0
+    value: 250000
+    name: "Drums"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDBkNDRhY2IyNjMyN2ViYWQ1NjhmNmNjYjRlY2M1NTEyN2FiNDgyNDYzOTJlOTVlMjlkYzI0YzFhNTkxNzI3MyJ9fX0="
+    time: 43
+  s8_flowers:
+    hp: 335.0
+    value: 275000
+    name: "Flowers"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjhmYjg2Mjg2M2E1MGE4YmI1YjE3NTVmMDZmNjcwOTNkMDhhMzAwNjM0OTExNmFjMTM0YTM3ZWE4MzNiY2MxNyJ9fX0="
+    time: 44
+  s8_dvds:
+    hp: 340.0
+    value: 300000
+    name: "DvDs"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWI2NjljZDUxMjRkYzY1YjBmZmEyZWVkMDc4OWI1MDA5MDE2MmM0OWY0ZGVhMWVhZDY3ZTc1NWQzZjQzNTliOCJ9fX0="
+    time: 44
+  s8_beef:
+    hp: 345.0
+    value: 325000
+    name: "Beef Wellington"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTFjZmM3YzUzYjdiNzBiNTI2ZmIxNWZkYjJiYjM1NzljZDk3YTg5NTRlNzEyODIwYmFiNmJkM2JjYmJhOWM0In19fQ=="
+    time: 45
+  s8_ham:
+    hp: 350.0
+    value: 350000
+    name: "Glazed Ham"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzdjN2IyYzFmMjhkMWE0YzRlOGU0MjZjOTE3ZjQ4NGIxM2NmODAyMzdiZGFhMDc3YWJiNDFkNGM0MTBhYjU4NCJ9fX0="
+    time: 45
+  s8_tbone:
+    hp: 355.0
+    value: 375000
+    name: "T-Bone Steak"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWI0ZGEyMjQ5OWRlMmI2NjZkYzI0NjhiOTZiNTNkZTg2MjlkMWU0NjlmY2M1N2Y3Y2U5Nzc5OTY3NmI2YzBmMSJ9fX0="
+    time: 45
+  s8_wagyu:
+    hp: 360.0
+    value: 400000
+    name: "Wagyu"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjEzMGExYTViOTRiYWRlYmQ3NTYxNDllZWI4NTVmMDYzNjFlNTBlM2RiNjE4YTE1YzFkMTFhMzQ3NzFlMWIzIn19fQ=="
+    time: 45
+  s9_garmor:
+    hp: 240.0
+    value: 75000
+    name: "Gold Armor"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWQ3NzZhNDMyNWYzYmVmZDNhODcyNGYzY2VlODc1OWU2YTU2MDI4MGJmMTkwMzQ4YTg4ZGY1MmVkM2I4MjU1MyJ9fX0="
+    time: 30
+  s9_darmor:
+    hp: 245.0
+    value: 90000
+    name: "Diamond Armor"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2VhODcyM2U4Yjg2M2Q1MDNmZTk4ZDdmZjM2Mzg2OWRjZGIyMmIzYWFiNDIzOTgzZjY3YTRkY2QxY2JjZDI5MiJ9fX0="
+    time: 31
+  s9_book:
+    hp: 250.0
+    value: 105000
+    name: "Books"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmUwNDcwMjM2ZjE4YWRkNGZkNmY2NTI5NWQ5NDU4MzBmMjFmNDUzYjdmOWJhMGNhODFmZmYyMThhOWVjNzJhOSJ9fX0="
+    time: 32
+  s9_register:
+    hp: 255.0
+    value: 120000
+    name: "Cash Register"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzEyMzBiNzAxYjkxZWVmN2ExNDU1ZTM2OTZkNzYyYTE5ZWRmMWI2ZTYxMDJjODYzNDQzMDNlNjYzZDUxMDFlYyJ9fX0="
+    time: 33
+  s9_ringdown:
+    hp: 260.0
+    value: 135000
+    name: "Ring"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThlNTBkMDI3ZGE5MGRiZWE4YTY2MDg4YWJhNmY5NzhlYWM4YTdiZWI2NTYxMDIwZjAyODlmY2Q0M2Q4OWM2OCJ9fX0="
+    time: 34
+  s9_goldnugget:
+    hp: 265.0
+    value: 150000
+    name: "Gold Nugget"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDAxYmU4NTQyZjgzMzU3YzUxMWE3OTEzYjc2YmE5YTM4N2JlNzg4NWRmMzNiYmVhMDA4NzBiZDQxYzFiMDBjMyJ9fX0="
+    time: 35
+  s9_statue:
+    hp: 270.0
+    value: 165000
+    name: "Statue Piece"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTRhMzhjZDVmNDc4NjBmMDgxYTIzOGE1NDQzN2Q5M2VkZjA4NjA1YjI1MWU5YjVhYTZjNDVlZTUyZmUwNDNmNSJ9fX0="
+    time: 36
+  s9_colar:
+    hp: 275.0
+    value: 180000
+    name: "Colar"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODRlMjRiZDAwZWYzYzEwYjU0NWVkN2JmZTc5YmM5ZTM5NDBiNDlkZjJhOTkwNjA3MjExZWE0MjAzMTIxOWMwYyJ9fX0="
+    time: 37
+  s9_coffee:
+    hp: 280.0
+    value: 195000
+    name: "Coffee"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDA0Y2I5MWNiMzc1OTljN2ZiYWY1ZjUwMWIyZGI4MWEyZjg5NmIyYTAxN2ZiMTQxYjc4ODgzZjVhZGVlMmI4MSJ9fX0="
+    time: 38
+  s9_water:
+    hp: 285.0
+    value: 210000
+    name: "Water"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjU0M2JiZDkwNTcxYjFlMzVhYTAzOWE1ZWJhZDY1ZjQxNDI3YzhiODg3MWRkZjc2NzU4MGYzYTViMTAyMmZiZiJ9fX0="
+    time: 39
+  s9_camera:
+    hp: 290.0
+    value: 225000
+    name: "Camera"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWI0MWQwZmZjOTg4MjVkYWM2MzZhZmJjZjYxMzU3MmRmZTBkMTg0MGYyZDA2OGZlNDNhMjViMGQzYjYwOTA4YSJ9fX0="
+    time: 40
+  s9_painting:
+    hp: 295.0
+    value: 240000
+    name: "Painting"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTc0NGQyZDk0ZmMwMGI4ODc0N2Q1NmQ3N2M0NzA3ZjUxNjU5ZDRiZTE0Y2MwYjNkZTNjNWNjMTljZmQzOTE1ZSJ9fX0="
+    time: 40
+  s9_keys:
+    hp: 300.0
+    value: 250000
+    name: "Keys"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGViNDYxMzU0NDBjMmUwNDJhZWY4NzUyNGMzMTkyMDRhZjcwMWQzNWFiY2U3NDc4YWY2NGU4ZWY4ZTU5MGQzNSJ9fX0="
+    time: 40
+  s9_neck:
+    hp: 305.0
+    value: 275000
+    name: "Necklace"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzE1Njc3ZjgyNGJjNGY0YzEwNTRmOWM2ZDE4MTZjYjJmZmU2ZjljMDg0NTg4MTg2NGY5ZDhjZWI2NjUxZWM3MiJ9fX0="
+    time: 41
+  s9_bracelet:
+    hp: 310.0
+    value: 300000
+    name: "Bracelet"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWU5N2Y5OWU5ZWRiODllZDdiMTMwOTBiOTE4Mzk3ZGFjNDdmYTdhNmVhMTA4MGU0MzljZDMzODBhMTYwMzFjOCJ9fX0="
+    time: 41
+  s9_yellowgem:
+    hp: 315.0
+    value: 325000
+    name: "Yellow Gemstone"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2RhNmVjZGNiYzNmZTM1NWNhMDYxMTE5MmEzZmJkMzVkZDU2MzVkNWZjZGYzZmJjNzllZDJiYzFmNGEwMTdmZSJ9fX0="
+    time: 42
+  s9_purse:
+    hp: 320.0
+    value: 350000
+    name: "Purse"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZThkMTA1NjI3MDZmMTYxYWYxNTYzODZmYTc1NzUwYjUyZGIwMWMzZTc3YzcwZmM0OTFlMjVhYzU2ODI3N2Q3OCJ9fX0="
+    time: 42
+  s9_pc:
+    hp: 325.0
+    value: 375000
+    name: "PC"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWZiNzFlNzllZDVlOWRiYzUwNWY0N2RlMzQ0ZWFkZDk1ODg5NzNhZGU5Y2FiNzc2M2M0YTU5ZjgyMTMwZDMifX19"
+    time: 43
+  s9_emeraldp:
+    hp: 330.0
+    value: 400000
+    name: "Emerald Piece"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWJjN2ZkYmJlYThkMjAxYWZlOWZhOWQ0MmYwOTFiNDAzODg2YzQ0YzVhZjNkMGU4ZTQ3YmViODhmMmVkZWM4MSJ9fX0="
+    time: 43
+  s9_diamondp:
+    hp: 335.0
+    value: 425000
+    name: "Diamond Piece"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTQ4OTY5YzU2MmI3MTFlZGQxOTJmMTU3NjIxOTk5MDk1ZDM3MmNjNzhkOTEwZTY5MjA3ZjY2ODQ5OWNjNmRmYyJ9fX0="
+    time: 44
+  s9_ear:
+    hp: 340.0
+    value: 450000
+    name: "Earrings"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmMzZjdkMjVjNTEwYjA5MjUwZDE4ZGQ5YTU4NTI3MzA2YmZjMjA3NDMzNjJkYTg2OGEyNGQ5ZDBiNGZkMjg3YyJ9fX0="
+    time: 45
+  s9_bluegem:
+    hp: 345.0
+    value: 475000
+    name: "Blue Gemstone"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGU5M2ViYWNiNjBiNzE3OTMzNTVmZGUwZDRiYmE0M2E5YzVlYzA5YzNmMzg4OTdjNDhjMWY4NTc1MjNhMGEyOSJ9fX0="
+    time: 46
+  s9_redgem:
+    hp: 350.0
+    value: 500000
+    name: "Red Gemstone"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzliNmUwNDdkM2IyYmNhODVlOGNjNDllNTQ4MGY5Nzc0ZDhhMGVhZmU2ZGZhOTU1OTUzMDU5MDI4MzcxNTE0MiJ9fX0="
+    time: 47
+  s9_eternity:
+    hp: 355.0
+    value: 525000
+    name: "Eternity Rings"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjczODE5NjA4YTk5MGEyODBiODdjMzA5ZWY1ZThkOWY2ZmJhMTczMjk0ZDYyMzQ2YTM2NDJkODI0MmFjY2JiYyJ9fX0="
+    time: 48
+  s9_secretbook:
+    hp: 360.0
+    value: 550000
+    name: "Secret Book"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGJiNmJmOTMwN2UwY2MwMjM1ZWQ5ZGZlZjIwMzRiZjcxNTliMDNhYTdiYjlkOWE5MWNhZWVkNjA1ZTgyOTYwNyJ9fX0="
+    time: 49
+  s9_secretnote:
+    hp: 365.0
+    value: 575000
+    name: "Secret Notes"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzAyODlkNWQxMzAxYjRlMTk2N2FmZWYzMWNjZjkyNmQ4MTk1MWE2YTY1OGU5YTYyYzU0Yzk5MmYxYjlhOTg5NCJ9fX0="
+    time: 50
+  s9_emeraldblock:
+    hp: 370.0
+    value: 600000
+    name: "Emerald Block"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmMwZTZkOWUyNDI3MzU0ODE5MThjNWZkMTQ0OThiZDc2MGJiOWY0ZmY2NDMwYWQ0Njk2YjM4ZThhODgzZGE5NyJ9fX0="
+    time: 50
+  s9_diamondblock:
+    hp: 375.0
+    value: 625000
+    name: "Diamond Block"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2I1ZmFmNGNkODcxMzhjODcxY2M2YTg2NzU4MTdhODk5ODVhM2NiODk3MjFhNGM3NjJmZTY2NmZmNjE4MWMyNCJ9fX0="
+    time: 50
+  s9_ringup:
+    hp: 380.0
+    value: 650000
+    name: "Wedding Ring"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTQ2YzgzNTcyYjYzNDMwNTFkMDdkMDY4NGFjMTA5ZTVhMGY5MzFhY2FmNDhkYzM3YWU3MGNiMzA4MmQ0NGNlMSJ9fX0="
+    time: 50
+  s10_hat:
+    hp: 260.0
+    value: 125000
+    name: "Hat"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTUzZGEwYThjNWY3ZGFmNDRjNTQ3NjM3M2Y0NmMwNTJlYTYyMTJmNzI2NzUxNmU0ZTkyOTk3ZGM3ZmYzN2Q4NyJ9fX0="
+    time: 32
+  s10_clothes:
+    hp: 260.0
+    value: 140000
+    name: "Clothes"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzgwN2VkNjY5NTBjZGEzMWQwOTZhNGNjM2ZmZjFmOTYxM2ExZGQyMzQwNWViOTM3NzZhNzQxOTdlOTRiZDk2NSJ9fX0="
+    time: 33
+  s10_socks:
+    hp: 265.0
+    value: 155000
+    name: "Socks"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzQ1MTkxYTNmZjgwY2YzY2U1NzI1YzJhOGYyZTNjOGRiOTZkMTA4ZWRjODNkYzkyNzljNmIyMjg4MmI4OTNlYyJ9fX0="
+    time: 34
+  s10_thrift:
+    hp: 265.0
+    value: 160000
+    name: "Thrift Shirts"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTU1MDdkNjUxN2VmZjk1MmRkMzhmYThiYzU1MWRkNmQ2YTdhNWU0ZWExMzQ1MTliNDQ2NTBhYzFmZmE1OWMzIn19fQ=="
+    time: 34
+  s10_jeans:
+    hp: 270.0
+    value: 175000
+    name: "Jeans"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGZjYzcwYjhhMGMxZjZjZWEyZTQ0MmFiYmYxNzcyMGY5MTdiMTVmNzQ5YjYwNDk3ODVlNzAzNzI0YTVjOTk5In19fQ=="
+    time: 35
+  s10_lhat:
+    hp: 270.0
+    value: 200000
+    name: "Leather Hat"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjBiZjFkNjQzOWM5OGI0MDY2MTdhOWIxZjdjODM0NGVjZGJiODJhYjkyMTNkMzEzZWRiMjgyMTY2OTQ2MmJkZiJ9fX0="
+    time: 36
+  s10_lboots:
+    hp: 275.0
+    value: 225000
+    name: "Leather Boots"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmEwNTQ1MDljMTg2Mjk4YWJiNzMxYTI0Yjg2NTE5OTNhMThmNjE0YzQwNWMzZjFlZTBlNWM4OWE2OGM2YWNlYyJ9fX0="
+    time: 37
+  s10_lbelt:
+    hp: 275.0
+    value: 250000
+    name: "Leather Belt"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDNhMjE0N2M3ZWY3NzJmOWNjNDBiMzAxNTEyY2JkNGZiMzdiNWE2ODg1ZGQ1ZmUyNDU0OTM2MjU4NGRkYTQ2NyJ9fX0="
+    time: 37
+  s10_redp:
+    hp: 280.0
+    value: 275000
+    name: "Red Pants"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTFmMzZjNThjZjU3ZTYxNDUyYmM5NjU5MmZjZjQ2ZjJkZGY1N2QzN2U1ZDZlZmNmYzEzYmUyM2RkZDVlZTlkYiJ9fX0="
+    time: 38
+  s10_chains:
+    hp: 280.0
+    value: 300000
+    name: "Chains"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGM3MzQyOTZmOWQ3YzczNDEzY2FjZjFmN2M5NjJlNWZmNTY0ZjBlYzNhOGViYzNkNjU0NmNjZTA4ZGRlODk4ZiJ9fX0="
+    time: 38
+  s10_cap:
+    hp: 285.0
+    value: 325000
+    name: "Cap"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWZhM2Q4YmVjN2UzOTJhYWFhZWQ4MTJmZDc4NGRlZjM2NWE3MzZmMmZjN2RmYjA0MDQzMjUzZTA4ODM1MWEzNSJ9fX0="
+    time: 39
+  s10_ironbelt:
+    hp: 285.0
+    value: 350000
+    name: "Iron Belt"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzBiZjZkNzZmMmEwM2YzMTlmZmZlNzI1ZjgyYjgwYjkyNTI5MWVmZGEzNmQ0ZGIyNWJhY2Q3ZWE4NmE2NTdjIn19fQ=="
+    time: 39
+  s10_clothesaway:
+    hp: 290.0
+    value: 375000
+    name: "Clothes"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmUyMDNmYmY5ZTU3ODRjZmZlYzkzYTJlYmNjNTU4YmI4ZTU1NmVjM2VjNTI1ZDZiY2Q4ZTRiMjIxMDZlNzk5In19fQ=="
+    time: 39
+  s10_shoes:
+    hp: 290.0
+    value: 400000
+    name: "Shoes"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmUzYWRlODY5MzViNTdhNzczZTRkMTQ5MDZmYTZjN2NjYTdkZjY4YjBkZjUzOTA4YzUwYmM3OGFiOWI5ODEwZiJ9fX0="
+    time: 39
+  s10_iset:
+    hp: 295.0
+    value: 425000
+    name: "Iron Set"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjBmZWZjODU1ZjljN2JmMzBmZjM0MmI2OTkxZmMxYTljY2U0ZWNkZWRlZDg0NzhmMDM1ZWIxMDE4YzIwMmQxZiJ9fX0="
+    time: 40
+  s10_cset:
+    hp: 295.0
+    value: 450000
+    name: "Chain Set"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzE4N2RlMjMxNmM4YjY1YmVlZGRlNzA0Y2VmMDU0OWRjODIyYTcxMTFmOTljMTJlMDBjNDgxNDY0ZTQ4N2RhMiJ9fX0="
+    time: 40
+  s10_gset:
+    hp: 300.0
+    value: 475000
+    name: "Gold Set"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWQ3NzZhNDMyNWYzYmVmZDNhODcyNGYzY2VlODc1OWU2YTU2MDI4MGJmMTkwMzQ4YTg4ZGY1MmVkM2I4MjU1MyJ9fX0="
+    time: 41
+  s10_dset:
+    hp: 300.0
+    value: 500000
+    name: "Diamond Set"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2VhODcyM2U4Yjg2M2Q1MDNmZTk4ZDdmZjM2Mzg2OWRjZGIyMmIzYWFiNDIzOTgzZjY3YTRkY2QxY2JjZDI5MiJ9fX0"
+    time: 41
+  s10_hanger:
+    hp: 305.0
+    value: 525000
+    name: "Hanger"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQxODZlODJiZDdkMDcwZjY0NjIwOTVkMzg5Y2ExYTRjODRlZjJlMTVhMWQzNDhlN2RmYzFjOTY3OGJhNWFmZSJ9fX0="
+    time: 42
+  s10_register:
+    hp: 305.0
+    value: 550000
+    name: "Cash Register"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2I2NDhiOWE0NGUyODBiY2RmMjVmNGE2NmE5N2JkNWMzMzU0MmU1ZTgyNDE1ZTE1YjQ3NWM2Yjk5OWI4ZDYzNSJ9fX0="
+    time: 42
+  s10_tophat:
+    hp: 310.0
+    value: 575000
+    name: "Top Hat"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmEwYWEwMzk1NmY4YjIwNGRmYjY3Y2IwMTM2Mjk4MGQwMjFhYmU1MDkyNzBkODhhYzU0OTk0YjJhNzI1NWNhNiJ9fX0="
+    time: 42
+  s10_suit:
+    hp: 310.0
+    value: 600000
+    name: "Suit"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTkwYzY2ZDk2ZTY5NzUzMDBkNWQ3ZjQyOWJhZDJjZmY1ZTRhNDMyMDYzYjgyNzhlZjFlOTk4YTkzZGViZGJhZiJ9fX0="
+    time: 42
+  s10_vase:
+    hp: 320.0
+    value: 700000
+    name: "Vase"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWRkOTljNTljM2RmOGZlZTlmY2VlODg3Njg1N2I4ZjFhNDRhMjY1NTk3OTQ3YmMxYmM5NDBmZmQ1ZTkxM2MifX19"
+    time: 43
+  s10_plant:
+    hp: 325.0
+    value: 725000
+    name: "Plant"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjNiYTQ4NDQ4MTg5YmVmNGZkM2IzZTU2ZWU2ZjlmNWMxN2YxZWQ5NjQ4ZGE5NTU0NTFlZjFmZTY1NjAxYiJ9fX0="
+    time: 43
+  s10_lamp:
+    hp: 330.0
+    value: 750000
+    name: "Desk Lamp"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTBhNDY1MmRkOGI0YjJjYmU2ZmYwNDBhM2Y2N2I1OTU1YTA0ZTRmMTdjNGZlOWJhMzhiYWYwNGVhYWNmNzA0YiJ9fX0="
+    time: 44
+  s10_compclose:
+    hp: 335.0
+    value: 775000
+    name: "Computer"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTlmOGM4NDdiZTZmMGViNjM1ZGIzZGY1NjYyNzRhMjE4N2EyM2M4NDY3NTE1ZGZlMDk5MjZhYTYyZWRmOTA4YiJ9fX0="
+    time: 45
+  s10_paperclose:
+    hp: 340.0
+    value: 800000
+    name: "Papers"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2Y3OWQzYWRkZmRkNmM0MDQ4MTlhNTg2ZWY4MWFkZmRmNzdjOWY5NTU0YmMzM2Q3YTUwNTI2YzQwZDU5ZWY0OCJ9fX0="
+    time: 46
+  s10_flowerclose:
+    hp: 345.0
+    value: 825000
+    name: "Flower"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTVjNWEzMzM4YjliMmIxN2YwZmNlYTM0NTg0YjEzNzBlZmM5YjViMjc5MjM5MDIyOTRmMDMwOTkxNTUyMTVmYyJ9fX0="
+    time: 47
+  s10_coffeeclose:
+    hp: 350.0
+    value: 850000
+    name: "Coffee"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDA0Y2I5MWNiMzc1OTljN2ZiYWY1ZjUwMWIyZGI4MWEyZjg5NmIyYTAxN2ZiMTQxYjc4ODgzZjVhZGVlMmI4MSJ9fX0="
+    time: 48
+  s10_books:
+    hp: 355.0
+    value: 860000
+    name: "Books"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjhmYmVlMmNkZjQ0MDYxNzZlZGE5Y2Y5MjBiOWNlNjk1OTBhMDQ5MGM3MjRhZTZjYzJlMmYzMTZlNWU3ZGQxZCJ9fX0="
+    time: 49
+  s10_floweraway:
+    hp: 360.0
+    value: 880000
+    name: "Flower"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTVjNWEzMzM4YjliMmIxN2YwZmNlYTM0NTg0YjEzNzBlZmM5YjViMjc5MjM5MDIyOTRmMDMwOTkxNTUyMTVmYyJ9fX0="
+    time: 49
+  s10_compaway:
+    hp: 370.0
+    value: 900000
+    name: "Computer"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTlmOGM4NDdiZTZmMGViNjM1ZGIzZGY1NjYyNzRhMjE4N2EyM2M4NDY3NTE1ZGZlMDk5MjZhYTYyZWRmOTA4YiJ9fX0="
+    time: 50
+  s10_paperaway:
+    hp: 380.0
+    value: 910000
+    name: "Papers"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2Y3OWQzYWRkZmRkNmM0MDQ4MTlhNTg2ZWY4MWFkZmRmNzdjOWY5NTU0YmMzM2Q3YTUwNTI2YzQwZDU5ZWY0OCJ9fX0="
+    time: 50
+  s10_coffeeaway:
+    hp: 390.0
+    value: 925000
+    name: "Coffee"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDA0Y2I5MWNiMzc1OTljN2ZiYWY1ZjUwMWIyZGI4MWEyZjg5NmIyYTAxN2ZiMTQxYjc4ODgzZjVhZGVlMmI4MSJ9fX0="
+    time: 50
+  s10_printer:
+    hp: 395.0
+    value: 935000
+    name: "Printer"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGYzZWI4OWYzZmU5M2ViY2JjY2RhOWQwYTE5YjY0MGRkYTcxZTI4NGVhZjQ5NzgzMmZmNDdhZDJlYWM4ODIxIn19fQ=="
+    time: 50
+  s10_phone:
+    hp: 400.0
+    value: 950000
+    name: "Phone"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODI0NDJiYmY3MTcxYjVjYWZjYTIxN2M5YmE0NGNlMjc2NDcyMjVkZjc2Y2RhOTY4OWQ2MWE5ZjFjMGE1ZjE3NiJ9fX0="
+    time: 50
+  s11_remote:
+    hp: 275.0
+    value: 300000
+    name: "TV Remote"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTA1ZDZmOWZkOWRjY2M4ZDQ1YTc0MTQ0Zjg0MTBlOTE4MWIxNDM5NzVlY2Q2NGUyODRlMGM2NDQwN2U4M2M5MiJ9fX0="
+    time: 33
+  s11_ss:
+    hp: 278.0
+    value: 325000
+    name: "Samzung S"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGM0NWRlMTcyZjRmMmFhNmNkZDBjZjE0NTE3OGFlMTgxMDRiYTZmYjkxMDc4ZjU0ZTdlZjQ1NGRkOTNlZmFlNyJ9fX0="
+    time: 34
+  s11_sz:
+    hp: 280.0
+    value: 350000
+    name: "Samzung Z"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGUwN2FjMDJkOWU5NDdlNTYyYTdmNzM5NTJjMjllZjY4MmExZmM2MGRhMTE1Y2JjODE1NGE1YzRiOTkxMjBlOSJ9fX0="
+    time: 35
+  s11_sa:
+    hp: 285.0
+    value: 375000
+    name: "Samzung A"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWFlMGViYjcxOWM5NWMxOGViNGRkZjQzM2E5MmQ4NmQ2Nzk3MzdkOTNiMzJiZjExNTZiMGMzYmYzMDM3ZjcyZiJ9fX0="
+    time: 36
+  s11_earbuds:
+    hp: 285.0
+    value: 400000
+    name: "Earbuds"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWYyN2M5M2JkN2JiMjI4N2ZkMjU4Y2EyYjI3NDE4NzQ4ODRjYjAyMTYxMGJmMDg3OTU1Y2ZmYzBlNzQwYmYxMiJ9fX0="
+    time: 37
+  s11_keyboard:
+    hp: 290.0
+    value: 425000
+    name: "Keyboard"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjc4ZWEyYzhmMWRmNzRhMjA3Njk2MzYwNDg1NTRmNjhmODA1ZWY1YWMwNzlkNzY1YjdjNTE4YzFkYmU0ODVmZSJ9fX0="
+    time: 38
+  s11_microphone:
+    hp: 295.0
+    value: 450000
+    name: "Microphone"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2NmMGEyN2QyNDYzNTVlNGRjYmJkN2IzNjlkMzI2Y2ZlZDdhZWQxYmEwNGU1ZGQ5YmE2OGNkZWNjNDEzM2QzMyJ9fX0="
+    time: 39
+  s11_monitor:
+    hp: 300.0
+    value: 475000
+    name: "Monitor"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODQxYjkxYzUyMDViY2M2NGU3Zjg0OGU1ZGIzODY5OTBmYjFjZDUxNzNmMzMwZjVkMTQzOTYxODU2M2U3YzEwYiJ9fX0="
+    time: 40
+  s11_smonitor:
+    hp: 300.0
+    value: 500000
+    name: "Smart Monitor"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTU1MWUwOWNlNzdjZWQ4OWY5MTI2MGMxZDJiMjE5MTYyZDQxM2EyMzE2ODY3OWNlYTQ3NjYxNDczMThlZjhlNCJ9fX0="
+    time: 40
+  s11_tv:
+    hp: 305.0
+    value: 525000
+    name: "TV"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWI3MTBhMGE1NGIwNjM0YzY2NWY4MjZhMjdmNzE0NDM3ZDI4ZDRlNDZjYjIwYzY1YTA0MjA2Mzg5NmE5YmY5MyJ9fX0="
+    time: 41
+  s11_stv:
+    hp: 305.0
+    value: 550000
+    name: "Smart TV"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGJiYTgzYWJkZDFjNDlhMjIzZTkyMGVlNTI5M2VhM2RlMzFmZWNiNzUyMmU4MWYyYjMxYzE1ZjhkNDc3YTZiZiJ9fX0="
+    time: 41
+  s11_kk:
+    hp: 315.0
+    value: 575000
+    name: "Keyboard Keys"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzA1MmM5YjJjZjc5OTZkZGU0N2JjOGQ2YTM4ZGFiMzhjZjQ2ZjllODQ5ZTU5ZjdkYTNiMDVjYTA2NDU4In19fQ=="
+    time: 42
+  s11_tablet:
+    hp: 315.0
+    value: 600000
+    name: "Tablet"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDc1MjBlNTJjYjIyYWEwYTJlYjhiNTlkNWQ3YmFmZjdlZDY0MjhmMzQ3OTdiMjg2ZTc0NGFkMDA5NTJmZTc5NiJ9fX0="
+    time: 43
+  s11_giftcard:
+    hp: 315.0
+    value: 625000
+    name: "Giftcard"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWYzMzE1NTVmNzc2MWI2NmUxYjU1NWUzNGVmODE3NDI3YjE5YjYyMWE2Y2Q3ZWY1ODJiODRhM2VhNWFkN2EifX19"
+    time: 44
+  s11_fluid:
+    hp: 320.0
+    value: 650000
+    name: "Teleport Fluid"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGVjMWMzZjdkMDljZTZjMGNiNDhlZDMwYjQ1OTZhNWMxNGZhZTc5ZGVmOGJmZDE0YTU5ZmMxOTM1NjAwYmM3YiJ9fX0="
+    time: 45
+  s11_phone:
+    hp: 320.0
+    value: 675000
+    name: "Phone"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzc0ODgyMTUwNzkzMzNmMTdhMDliODRhYzQwMmZhMTA1NzVjZDUxNzYwNTc0OTdjYWUxYmE1ZjAyY2RiYjVlNCJ9fX0="
+    time: 45
+  s11_coffee:
+    hp: 325.0
+    value: 700000
+    name: "Coffee"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzA0OGFhOGJmMjM1ZTkwZTdlM2VkYzVkN2EzYjMzMTVlNTBmYzJlMWUxZDA0MjZmYmYzYTQ3MDAzNTJlODZhMSJ9fX0="
+    time: 45
+  s11_bread:
+    hp: 325.0
+    value: 725000
+    name: "Bread"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjIxZmUxY2Y2NDU4ODVlYzE5NTMyYWI2OWFiYjAyODJlNWExMGNjZTIxMmNjOWVhYjkyMzZhZDgyMDgyNjFkMCJ9fX0="
+    time: 45
+  s11_water:
+    hp: 330.0
+    value: 750000
+    name: "Water"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjU0M2JiZDkwNTcxYjFlMzVhYTAzOWE1ZWJhZDY1ZjQxNDI3YzhiODg3MWRkZjc2NzU4MGYzYTViMTAyMmZiZiJ9fX0="
+    time: 46
+  s11_toilet:
+    hp: 335.0
+    value: 775000
+    name: "Toilet Paper"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjI4MTQwZWM5MDk2YjY0MzBjOGUzYWQ0Y2JiNjYxM2Q0ZDI5ZTg1ZTgwNjVhM2QzMTc5ODQ3ZTlkIn19fQ=="
+    time: 46
+  s11_soap:
+    hp: 335.0
+    value: 800000
+    name: "Soap"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDI4ZTZkZWZhYjcyMTVlYTc0NTdjYzFhOWNmZDFlOTkxNDZlNTQzN2MzZjEzNTRlNGFlNTg2MmE1ODQ2YjQ0YyJ9fX0="
+    time: 46
+  s11_statue:
+    hp: 340.0
+    value: 810000
+    name: "Statue"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTQ3NGQwNDhlMmQyNzVkZjZkOWVmM2VkYjQxNDhmZDFmNmQxMTE1ODI3YTk4OWNiNDkxYTk2ZWNjNjlmYmEwIn19fQ=="
+    time: 46
+  s11_boxes:
+    hp: 340.0
+    value: 820000
+    name: "Boxes"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjRiMTU3NWNiNDllYjBhZThlMzdjMWQ1YTNjNGE0MzkxNzk4ZTFlZjkwNjk0M2YyYjkwNDdmOGQ0Njc5ZTk4MiJ9fX0="
+    time: 47
+  s11_lamp:
+    hp: 340.0
+    value: 830000
+    name: "Lamp"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzc2YjhmYjhlZDM5YWUyNTExNDEwZWZiZjQ2YzIxNjUwYTZiYmUxZjU1M2FlY2I2N2M4YTIxZGJmODZmZWNmMiJ9fX0="
+    time: 47
+  s11_clothes:
+    hp: 345.0
+    value: 840000
+    name: "Clothes"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTE2Y2UxMDRlYWVmOWZhYThjZmNlNmViMDYxNmI5MTVlODgwNGIyNjI5Y2VjMTQyODE2M2ZhOTUxNGY3NzA4MyJ9fX0="
+    time: 47
+  s11_crate:
+    hp: 350.0
+    value: 850000
+    name: "Crate"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzM1OWFlOTE5YzM3NzU5NDkzN2ZjZjFjMWY0NDY5YjdjODZlNDU5N2IwMGQzYzgzZWI5N2MwYmRhNjZlNWZmMSJ9fX0="
+    time: 47
+  s11_meat:
+    hp: 355.0
+    value: 860000
+    name: "Meat"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTEzZmRjZjdhNmUyNTU4MGQxYTA0NGI1N2U4NDNlMzE3NGEwY2E1YTlmYmRlMzYxMDU4YzhkMGY0ZmRmNjQ3NCJ9fX0="
+    time: 48
+  s11_towel:
+    hp: 355.0
+    value: 870000
+    name: "Towel"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGQxY2I5ZTBhMDRhODRkZGE0ZTcxODhkYzE5MTVlY2JmNmZhYjlhNDAxZTUyNTFjNjYyMDI4N2MxZGZmYTc4NCJ9fX0="
+    time: 48
+  s11_chicken:
+    hp: 355.0
+    value: 880000
+    name: "Chicken"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2UyOGEyZmM3YzFlMmMwYWE1OWUyOGUzZjFiMTMzZjdiYmQ1YWMzMzlkM2VhM2MzOWE1YWU1ZGYzOTZlM2JjNyJ9fX0="
+    time: 48
+  s11_table:
+    hp: 355.0
+    value: 890000
+    name: "Table"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGYzMTQ0ZDcyZGFkMTJhMTJlNmRkMjk1ZDEzYzhlOTgzYmM5Njk3ZDYxZmQ3MmFmMmQ3YzBhOGU4ZjY1MTQwYSJ9fX0="
+    time: 48
+  s11_minecart:
+    hp: 360.0
+    value: 900000
+    name: "Minecart"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjE3OTk1YTdhZjJmYWU3MDFhMDgyY2RhMWQzODU2MDZjN2NjYmYwYjIxODYxMTRiZTkwMGM5MTM4Y2VlNjkwZiJ9fX0="
+    time: 49
+  s11_apple:
+    hp: 360.0
+    value: 910000
+    name: "Apple"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmUzNzQ3Y2FiYWU2NWJmNzZkMGIyMGJmNDcwOTNhYWYzMDkwOTk3MjA1OTdjZjk2Zjg0YTAzMmYxMjQ2MmM3MCJ9fX0="
+    time: 49
+  s11_cards:
+    hp: 360.0
+    value: 920000
+    name: "Cards"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTVjMjUyMjhiZWJjZWFhYmU5YjhlZTliMzVkY2RkNTljMmQ5ODc4ODA1YTRmNjNmZTI1NDczNmQ5YzNkOWFiIn19fQ=="
+    time: 49
+  s11_leftSign:
+    hp: 365.0
+    value: 930000
+    name: "Left Sign"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjE5YmFkZTk5MjU0NDNlMDFlMDExZWZmNzFjZWFiMTJiODFlM2U0ZWZlZGMzZDViNTAxMTg5YzkwZWNhZWRmNSJ9fX0="
+    time: 50
+  s11_rightSign:
+    hp: 365.0
+    value: 940000
+    name: "Right Sign"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTliZjQyYzEwOTU3NjhjYzA2NTM5ZTJmZGNkNjJjMWI0ZWUyOTVjNDY2YmJhY2FmZTJjZjcwZDFjMTMxZDdlZiJ9fX0="
+    time: 50
+  s11_downSign:
+    hp: 365.0
+    value: 950000
+    name: "Down Sign"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDdlNjcyMzUzYTQ5NDRmZDExMTczMDQwZTJhMGVmM2Q3NWM5YWVmMWY5ZTc5MzU3MTlkYTliZTM5MTBjYjM0In19fQ=="
+    time: 50
+  s11_tpcodes:
+    hp: 370.0
+    value: 960000
+    name: "Teleport Codes"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2Y3OWQzYWRkZmRkNmM0MDQ4MTlhNTg2ZWY4MWFkZmRmNzdjOWY5NTU0YmMzM2Q3YTUwNTI2YzQwZDU5ZWY0OCJ9fX0="
+    time: 51
+  s11_scanner:
+    hp: 370.0
+    value: 970000
+    name: "Molecular Scanner"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDFlYzI2YTMxNDNhODcwMGRhZjNlNzdkYjU3M2M3YjViZTQ2NWY3ZjI1MWZlZDQxZDNiZmRmZTEyNmM0Njk5OCJ9fX0="
+    time: 51
+  s11_ai:
+    hp: 375.0
+    value: 980000
+    name: "AI Navigation"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjEwNjI3N2FkNTQxYWE3NmQ5ZDRhMTllN2FhYzkyNjIxYTNmMDI1MWZmOTQyN2RmZGVhNTM5YjUxZGQ4ZDFlYSJ9fX0="
+    time: 52
+  s11_ceo:
+    hp: 375.0
+    value: 990000
+    name: "CEO KeyCard"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjgwOTk0MTZjNDRhM2JkNWM5OTM2NThjNmMyN2Q4ZTZiZDdkZjI5NDczOTc0NTIzZTQ5MDgxNzEyYWY3NWUwYyJ9fX0="
+    time: 52
+  s11_wood:
+    hp: 380.0
+    value: 1000000
+    name: "New World Wood"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2M1YTRmODc5N2IyNDY4OTZhNjI3MzcyYWIxYTljMjQ1MmU1YWE0YzdjMDBmOWE1MDk1ZDk0YmQyN2ZjOGViZCJ9fX0="
+    time: 52
+  s11_leaves:
+    hp: 380.0
+    value: 1025000
+    name: "New World Leaves"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2VlMzk0MWQ0OGE2MjE2YWQyZDNjMTAxNjgyNGQ4Y2MxZTNhYzI0M2NiM2E1YzcwNDQwNzQwYzdkOTY5ZmRjMiJ9fX0="
+    time: 53
+  s11_grass:
+    hp: 385.0
+    value: 1050000
+    name: "New World Grass"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjkxMjA5YTIxMzAyZjc2NGIzNzA2MGM4NjA2MmE1MTVmNTMzYjFhNGY5MDU5MzY1M2FiMjNiMzNiZmQ3YTA2OCJ9fX0="
+    time: 53
+  s11_stone:
+    hp: 385.0
+    value: 1075000
+    name: "New World Stone"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWJjZGYwZmYwNzEyYWUzZGU1NTRjMzcyNjA3NzYxMDAwZDNiMGI2Yjg2MTNiOGEyYzZkZGEwMGNkMTBkNzhkOCJ9fX0="
+    time: 53
+  s11_mineral:
+    hp: 390.0
+    value: 1100000
+    name: "New World Mineral"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWJhMTZjMzg5MGFmMzljM2YyZDU3NjU4NmNmZjQ0M2RlMDdkYWQzMmIyMzE1ZTJmZjZmMGQ1ZDZhM2M2NjNkZCJ9fX0="
+    time: 53
+  s11_secrets:
+    hp: 390.0
+    value: 1125000
+    name: "New World Secrets"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWQzNGZiOGVkNzZmNTVkMWQ1NTljMzNhYWE1MGY4M2ZlMzYxZjFlNGJlZTkxNWRlNTJlYjg2MDJhZWZmMmE5NyJ9fX0="
+    time: 53
+  s11_sand:
+    hp: 395.0
+    value: 1150000
+    name: "New World Sand"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGY0OTNkZDgwNjUzM2Q5ZDIwZTg0OTUzOTU0MzY1ZjRkMzY5NzA5Y2ViYzlkZGVmMDIyZDFmZDQwZDg2YTY4ZiJ9fX0="
+    time: 53
+  s11_cacti:
+    hp: 395.0
+    value: 1160000
+    name: "New World Cacti"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGVmZDg1MmIzMzFmNzNjMzUwZTFiYjZkOTRlMzk3N2RhYTIwNzgzYzUxZWM1NTAyZTJmYzk2MDI0ZmQ5MGVjMSJ9fX0="
+    time: 54
+  s11_gsecrets:
+    hp: 400.0
+    value: 1175000
+    name: "Government Secrets"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzczZThiZDNjNDNjNDUxNGM3NjQ4MWNhMWRhZjU1MTQ5ZGZjOTNiZDFiY2ZhOGFiOTQzN2I5ZjdlYjMzOTJkOSJ9fX0="
+    time: 54
+  s11_bed:
+    hp: 405.0
+    value: 1200000
+    name: "New World Bed"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWZiNWM2ZDdjNDJlYjVmMzMzOTc3NjJhYWNiNGRjMWY4MmEzNDY3ZDk0MmQ0MjQ5YTM5OTgwZTg4MjhkNzYxMSJ9fX0="
+    time: 54
+  s11_iron:
+    hp: 410.0
+    value: 1215000
+    name: "New World Iron"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQzZTgzNTg4ZTk2NWM4MzU5ZTY0YmJjN2ZlNTNmNDgxY2NhNGY3ZmM2YzI3NzE0ZTRlYWNlOWY1ZTliMDhiZCJ9fX0="
+    time: 54
+  s11_entrance:
+    hp: 415.0
+    value: 1225000
+    name: "New World Entrance"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmI3ZDJlODRhZTEwYzk3MWQ5MmNiMDViNmFiNDExNmY3NjUwM2E4N2QzMTc0MjQ5Y2QxZjQ5OTJiYTE4MWRiNCJ9fX0="
+    time: 54
+  s11_gibberishone:
+    hp: 420.0
+    value: 1240000
+    name: "Xyq7-Vl9p"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTQ1MTlkYTA5OTk4NzJiOGRhMjU3NDI2YzVlZTJhMDg1NTA4YTNjZDM3YTI1ZTA2ZDExMDA3ZjZmYjExYjkxMSJ9fX0="
+    time: 55
+  s11_gibberishtwo:
+    hp: 420.0
+    value: 1250000
+    name: "Jr4k!Wp8qL"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTlmMzY1OWQzMTEzNGI0ZmM5ZWM3MWYwMjBiYzVmMGMxMGNjNDMwODI4YjRjZGI2Yjc5OWZkMzRlZjIyNWViYSJ9fX0="
+    time: 55
+  s12_wallete:
+    hp: 310.0
+    value: 900000
+    name: "Wallet"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmU3ZTNlOGFiMDYwZTY0ZDAyNTZiMzY4OGU2MmQ0MzNlYWIzNDFhMTU3ZjJhNzMzZWQ0MzQ1MGZlZTRlNzI2NCJ9fX0="
+    time: 32
+  s12_trashe:
+    hp: 315.0
+    value: 925000
+    name: "Trash Bin"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmZmYjkxMjYxMmEwNmU3ZWJmODY1YmU1MGNlOWZmNjA5MTk1ZWZkMTliYmU0OTdjNjFlMjI4YzczZWY3NzU3In19fQ=="
+    time: 33
+  s12_flowere:
+    hp: 320.0
+    value: 950000
+    name: "Flower"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2YxYTA0MjA4MTUzZWYzZTc3ODAyODUwNTdmM2ZiMjQ1MDdmMWRiNTNkYzdmZWZkNDhjOTY3MjU5OWFkZDdmNyJ9fX0="
+    time: 34
+  s12_lampe:
+    hp: 325.0
+    value: 975000
+    name: "Lamp"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTA1OWFjNWUyYTFiYWJkM2UxZDM0MTc5ODM1ZDYwN2RkZmVjOWEyYjhiZWQ3MDU3ZDVmYWQxZjIzOGY0YTc1MSJ9fX0="
+    time: 35
+  s12_registere:
+    hp: 330.0
+    value: 985000
+    name: "Register"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjRkNjI1Y2E3NmRjODliNjc4YWFjYWRkZTJiNjI2ZTQ3NmRjYjE0YmU2NGM4ZDk1ZGM1MWU4OTA3NWZhY2MzOCJ9fX0="
+    time: 36
+  s12_booke:
+    hp: 335.0
+    value: 1000000
+    name: "Books"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWI2MTEzYWY4MzBjYzNmMGIxMTIxNTJkZDA4OTdlNTBjODRiMjc1YjRhMmVmMTQxNmQxZjA5ODY4ZmQ5MjAxYSJ9fX0="
+    time: 37
+  s12_censorl:
+    hp: 340.0
+    value: 1025000
+    name: "Censor"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTQzOGZjMGI3ODdkZDk4NzIxZmY3NjNkM2IyYjhkMzJhNDdmYmIwOGY0ZDQyNjY2ZjQ1NDY5YWE0OWFkOWE5ZiJ9fX0="
+    time: 38
+  s12_scannerl:
+    hp: 345.0
+    value: 1030000
+    name: "Scanner"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDFlYzI2YTMxNDNhODcwMGRhZjNlNzdkYjU3M2M3YjViZTQ2NWY3ZjI1MWZlZDQxZDNiZmRmZTEyNmM0Njk5OCJ9fX0="
+    time: 39
+  s12_metall:
+    hp: 345.0
+    value: 1040000
+    name: "Metal Detector"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzI0ZWNhNjk4NzA5MWNjYTg3MjM0ZjQ2OTA1YmRmYTQ1NzhkZmIzZTVlN2ExMDYwOGJhMmUwYzE4YzM0MTk4OCJ9fX0="
+    time: 39
+  s12_pconel:
+    hp: 350.0
+    value: 1050000
+    name: "PC"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTlmOGM4NDdiZTZmMGViNjM1ZGIzZGY1NjYyNzRhMjE4N2EyM2M4NDY3NTE1ZGZlMDk5MjZhYTYyZWRmOTA4YiJ9fX0="
+    time: 40
+  s12_filesl:
+    hp: 350.0
+    value: 1075000
+    name: "Files"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzczZThiZDNjNDNjNDUxNGM3NjQ4MWNhMWRhZjU1MTQ5ZGZjOTNiZDFiY2ZhOGFiOTQzN2I5ZjdlYjMzOTJkOSJ9fX0="
+    time: 40
+  s12_trashl:
+    hp: 355.0
+    value: 1090000
+    name: "Trash Bin"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmZmYjkxMjYxMmEwNmU3ZWJmODY1YmU1MGNlOWZmNjA5MTk1ZWZkMTliYmU0OTdjNjFlMjI4YzczZWY3NzU3In19fQ=="
+    time: 40
+  s12_booksl:
+    hp: 355.0
+    value: 1100000
+    name: "Books"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjgyMDllZWEwYjYyYjBkMWY1NmQ4YWZkNGY5Y2UyOGYzNDMzNDkwY2I2NmMzNWYxYTA5ZWI3MWNhNzY2ZmZkYiJ9fX0="
+    time: 41
+  s12_snackl:
+    hp: 360.0
+    value: 1115000
+    name: "Scnacks"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjA1ZWY4ODE5ZmI2YTkyMTQ4MjQ5ZmY0OGMzOTE0ZTkyYzI3M2U3ODc0NTIzZmY3OTMwYjlmNWNjOTNjZWFhZSJ9fX0="
+    time: 41
+  s12_pctwol:
+    hp: 365.0
+    value: 1130000
+    name: "PC"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWZiNzFlNzllZDVlOWRiYzUwNWY0N2RlMzQ0ZWFkZDk1ODg5NzNhZGU5Y2FiNzc2M2M0YTU5ZjgyMTMwZDMifX19"
+    time: 42
+  s12_idl:
+    hp: 370.0
+    value: 1145000
+    name: "Id's"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmJiOGU4Njg4N2QwMThjZDI5YmQ1ODlmZjY2YWMxMWI4N2E2NzRiYTM3ZGJkZjk3OGQ4NjI1NGVmOGI5ZCJ9fX0="
+    time: 42
+  s12_taserl:
+    hp: 370.0
+    value: 1160000
+    name: "Taser"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDk1MDg2OTVlZGVlODc3ZTFlNmQwYjE3MDUyMjA1NjRlYTk2N2YwYzFhNTczZjMzNzgwMmY2ZDFkYzUxYjBmIn19fQ=="
+    time: 43
+  s12_statuel:
+    hp: 375.0
+    value: 1180000
+    name: "Statue"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2FmN2FmZGUxMTdiZjU2MDhjMmQzMmZiZTJhNDEzMmIzNDIwYjAwY2Q4M2U2NTYwMzFlMTI1NTZhOTEzYTM2MyJ9fX0="
+    time: 43
+  s12_elevatorl:
+    hp: 375.0
+    value: 1200000
+    name: "Elevator"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmU4NDQwZTlkNTRlYzc2MzBiM2UzODdmODRlMTllMTVmMGIwOWQ0MzhhNmJkNzg0MzA1ZGY1ZDc2MDhlNjkwMyJ9fX0="
+    time: 44
+  s12_computerr:
+    hp: 345.0
+    value: 1025000
+    name: "Computer"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTlmOGM4NDdiZTZmMGViNjM1ZGIzZGY1NjYyNzRhMjE4N2EyM2M4NDY3NTE1ZGZlMDk5MjZhYTYyZWRmOTA4YiJ9fX0="
+    time: 39
+  s12_monitorr:
+    hp: 350.0
+    value: 1030000
+    name: "Monitor"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWZiNzFlNzllZDVlOWRiYzUwNWY0N2RlMzQ0ZWFkZDk1ODg5NzNhZGU5Y2FiNzc2M2M0YTU5ZjgyMTMwZDMifX19"
+    time: 40
+  s12_coffeer:
+    hp: 350.0
+    value: 1040000
+    name: "Coffee"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTQ1NDBlNzVmYTM1ZWZjNDA5ZWZhNzA0OGUzNDJhYjZhNTU4OGIwNmNjMGNjYWMwMGJkNWY0NjhlZDYxYTZhMCJ9fX0="
+    time: 40
+  s12_mouser:
+    hp: 355.0
+    value: 1050000
+    name: "Mouse"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjc0ZmRhYzYyZjMyZjZmMWI4MjgzYTc3MTAyNDljMmJmMjJiNGRmZmRkMTkyNzMxOGNmMDlkODUzNGEwZTMxZCJ9fX0="
+    time: 40
+  s12_filesr:
+    hp: 355.0
+    value: 1060000
+    name: "Files"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzczZThiZDNjNDNjNDUxNGM3NjQ4MWNhMWRhZjU1MTQ5ZGZjOTNiZDFiY2ZhOGFiOTQzN2I5ZjdlYjMzOTJkOSJ9fX0="
+    time: 41
+  s12_flowerr:
+    hp: 360.0
+    value: 1075000
+    name: "Flower"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTVjNWEzMzM4YjliMmIxN2YwZmNlYTM0NTg0YjEzNzBlZmM5YjViMjc5MjM5MDIyOTRmMDMwOTkxNTUyMTVmYyJ9fX0="
+    time: 41
+  s12_waterr:
+    hp: 365.0
+    value: 1100000
+    name: "Water"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjU0M2JiZDkwNTcxYjFlMzVhYTAzOWE1ZWJhZDY1ZjQxNDI3YzhiODg3MWRkZjc2NzU4MGYzYTViMTAyMmZiZiJ9fX0="
+    time: 42
+  s12_breadr:
+    hp: 370.0
+    value: 1125000
+    name: "Bread"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjIxZmUxY2Y2NDU4ODVlYzE5NTMyYWI2OWFiYjAyODJlNWExMGNjZTIxMmNjOWVhYjkyMzZhZDgyMDgyNjFkMCJ9fX0="
+    time: 42
+  s12_machiner:
+    hp: 370.0
+    value: 1150000
+    name: "Coffee Machine"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTBmNTU0OGZhMTg0NGU1YWRhYWViN2ViNmJkYzE5MTJkNmVkMTRjOTg5ODZlOTRiZjM3ZjE4YmUzMDZlMzRlNCJ9fX0="
+    time: 43
+  s12_ovenr:
+    hp: 375.0
+    value: 1180000
+    name: "Oven"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmY1Y2ZmY2M1NTVjMjFlMTdhNjhmNDExYWQ1YzE5ZjA4OWQzNmY0MmM5ZTA0Y2Q1YzVlZTZjZDc3NDM5OTcwZSJ9fX0="
+    time: 43
+  s12_trashr:
+    hp: 375.0
+    value: 1200000
+    name: "Trash Bin"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmZmYjkxMjYxMmEwNmU3ZWJmODY1YmU1MGNlOWZmNjA5MTk1ZWZkMTliYmU0OTdjNjFlMjI4YzczZWY3NzU3In19fQ=="
+    time: 44
+  s12_cameratl:
+    hp: 380.0
+    value: 1500000
+    name: "Camera"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzdmNzM3YjE2ZjliOGE0Yjg2YjkzOTQyNDRmNGE3OWEyM2ExNzk5NDliY2QzMGQzYTVlOTI1YWFjMzE3ZDgzMSJ9fX0="
+    time: 45
+  s12_monitortl:
+    hp: 380.0
+    value: 1525000
+    name: "Monitor"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWZiNzFlNzllZDVlOWRiYzUwNWY0N2RlMzQ0ZWFkZDk1ODg5NzNhZGU5Y2FiNzc2M2M0YTU5ZjgyMTMwZDMifX19"
+    time: 45
+  s12_papertl:
+    hp: 385.0
+    value: 1550000
+    name: "Papers"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2Y3OWQzYWRkZmRkNmM0MDQ4MTlhNTg2ZWY4MWFkZmRmNzdjOWY5NTU0YmMzM2Q3YTUwNTI2YzQwZDU5ZWY0OCJ9fX0="
+    time: 45
+  s12_computertl:
+    hp: 390.0
+    value: 1575000
+    name: "Computer"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTlmOGM4NDdiZTZmMGViNjM1ZGIzZGY1NjYyNzRhMjE4N2EyM2M4NDY3NTE1ZGZlMDk5MjZhYTYyZWRmOTA4YiJ9fX0="
+    time: 46
+  s12_trashtl:
+    hp: 395.0
+    value: 1600000
+    name: "Trash Bin"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmZmYjkxMjYxMmEwNmU3ZWJmODY1YmU1MGNlOWZmNjA5MTk1ZWZkMTliYmU0OTdjNjFlMjI4YzczZWY3NzU3In19fQ=="
+    time: 46
+  s12_filetl:
+    hp: 400.0
+    value: 1620000
+    name: "Files"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzczZThiZDNjNDNjNDUxNGM3NjQ4MWNhMWRhZjU1MTQ5ZGZjOTNiZDFiY2ZhOGFiOTQzN2I5ZjdlYjMzOTJkOSJ9fX0="
+    time: 46
+  s12_lamptl:
+    hp: 405.0
+    value: 1640000
+    name: "Lamp"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTA1OWFjNWUyYTFiYWJkM2UxZDM0MTc5ODM1ZDYwN2RkZmVjOWEyYjhiZWQ3MDU3ZDVmYWQxZjIzOGY0YTc1MSJ9fX0"
+    time: 47
+  s12_cardtl:
+    hp: 410.0
+    value: 1660000
+    name: "Card"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjczMmM2NDU3MWMzZTAxY2VhMTNjYzc3MzA2Zjc1YWUzOTcyNjEwZmEzMGFjZGRjNWQzMThjMjE4NjY1MGVhNiJ9fX0="
+    time: 47
+  s12_bookstr:
+    hp: 380.0
+    value: 1480000
+    name: "Books"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWI2MTEzYWY4MzBjYzNmMGIxMTIxNTJkZDA4OTdlNTBjODRiMjc1YjRhMmVmMTQxNmQxZjA5ODY4ZmQ5MjAxYSJ9fX0="
+    time: 45
+  s12_filestr:
+    hp: 380.0
+    value: 1490000
+    name: "Files"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzczZThiZDNjNDNjNDUxNGM3NjQ4MWNhMWRhZjU1MTQ5ZGZjOTNiZDFiY2ZhOGFiOTQzN2I5ZjdlYjMzOTJkOSJ9fX0="
+    time: 45
+  s12_papertr:
+    hp: 380.0
+    value: 1500000
+    name: "Papers"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2Y3OWQzYWRkZmRkNmM0MDQ4MTlhNTg2ZWY4MWFkZmRmNzdjOWY5NTU0YmMzM2Q3YTUwNTI2YzQwZDU5ZWY0OCJ9fX0="
+    time: 45
+  s12_bagtr:
+    hp: 385.0
+    value: 1520000
+    name: "Bag"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTRjYWU0OWExZTdmNjVmOTM1YmQ2MjAzYmYzZjNjOTQ0ZGU4M2Y0YTk2MDhhMjZjOGM3NzVjMTg0OWI1YTc0ZiJ9fX0="
+    time: 45
+  s12_coffeetr:
+    hp: 390.0
+    value: 1540000
+    name: "Coffee"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTQ1NDBlNzVmYTM1ZWZjNDA5ZWZhNzA0OGUzNDJhYjZhNTU4OGIwNmNjMGNjYWMwMGJkNWY0NjhlZDYxYTZhMCJ9fX0="
+    time: 46
+  s12_trashtr:
+    hp: 395.0
+    value: 1560000
+    name: "Trash Bin"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmZmYjkxMjYxMmEwNmU3ZWJmODY1YmU1MGNlOWZmNjA5MTk1ZWZkMTliYmU0OTdjNjFlMjI4YzczZWY3NzU3In19fQ=="
+    time: 46
+  s12_flowertr:
+    hp: 400.0
+    value: 1580000
+    name: "Flower"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzlkMTEyODAyZDM0NDlhNTZiNjJhZTEwMDMzYmI5MjYzZmVkOGU1YTM5NTBlNzQwOGIzYzNkZjI2ZTlkNWZkYyJ9fX0="
+    time: 46
+  s12_pottr:
+    hp: 405.0
+    value: 1600000
+    name: "Pot"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzIyN2I0ZmE2ZmM4YWQ0ZDk4NjhjNDYzMDllYzVhOGE4NmZmNTVjYjYzMjkzMmM3ZTdhNzUzMGU2YjE0NzQ4MyJ9fX0="
+    time: 47
+  s12_cratestr:
+    hp: 405.0
+    value: 1620000
+    name: "Crates"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzM1OWFlOTE5YzM3NzU5NDkzN2ZjZjFjMWY0NDY5YjdjODZlNDU5N2IwMGQzYzgzZWI5N2MwYmRhNjZlNWZmMSJ9fX0="
+    time: 47
+  s12_boxestr:
+    hp: 410.0
+    value: 1640000
+    name: "Boxes"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjJjYTk3YzRjZjE5YjU0YjE3MDZhYzk1Zjc5ZmEyODQ5ZmZkZGIwZjYzMDllNzBmZDJkMjQ3MTgwMTYxYmI1NyJ9fX0="
+    time: 47
+  s12_cameratr:
+    hp: 410.0
+    value: 1660000
+    name: "Camera"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzdmNzM3YjE2ZjliOGE0Yjg2YjkzOTQyNDRmNGE3OWEyM2ExNzk5NDliY2QzMGQzYTVlOTI1YWFjMzE3ZDgzMSJ9fX0="
+    time: 47
+  s12_wallettm:
+    hp: 415.0
+    value: 1670000
+    name: "Wallet"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmU3ZTNlOGFiMDYwZTY0ZDAyNTZiMzY4OGU2MmQ0MzNlYWIzNDFhMTU3ZjJhNzMzZWQ0MzQ1MGZlZTRlNzI2NCJ9fX0="
+    time: 48
+  s12_trashtm:
+    hp: 420.0
+    value: 1680000
+    name: "Trash Bin"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmZmYjkxMjYxMmEwNmU3ZWJmODY1YmU1MGNlOWZmNjA5MTk1ZWZkMTliYmU0OTdjNjFlMjI4YzczZWY3NzU3In19fQ=="
+    time: 48
+  s12_papertm:
+    hp: 425.0
+    value: 1690000
+    name: "Classified"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzczZThiZDNjNDNjNDUxNGM3NjQ4MWNhMWRhZjU1MTQ5ZGZjOTNiZDFiY2ZhOGFiOTQzN2I5ZjdlYjMzOTJkOSJ9fX0="
+    time: 49
+  s12_cameratm:
+    hp: 430.0
+    value: 1700000
+    name: "Camera"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzdmNzM3YjE2ZjliOGE0Yjg2YjkzOTQyNDRmNGE3OWEyM2ExNzk5NDliY2QzMGQzYTVlOTI1YWFjMzE3ZDgzMSJ9fX0="
+    time: 49
+  s12_ceotm:
+    hp: 435.0
+    value: 1710000
+    name: "CEO's ID"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjJmODY4NTJiNTk3YzNiNDNjZGZkZjc4NDI0NThmM2EzYzQyODI5ODA4ZmVlYmE5YWUyNWI1YjZlN2IwIn19fQ=="
+    time: 50
+  s12_credittm:
+    hp: 440.0
+    value: 1715000
+    name: "Credit Card"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTYxNDNhMTIyZGE2YzIyZjQwMTM5YmNkMWJhMjcwZmUzNGVlZTMxM2E2MWVlNzBiM2JiZDNlNWMxZWQ3ODg1YSJ9fX0="
+    time: 50
+  s12_keystm:
+    hp: 445.0
+    value: 1720000
+    name: "Keys"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGViNDYxMzU0NDBjMmUwNDJhZWY4NzUyNGMzMTkyMDRhZjcwMWQzNWFiY2U3NDc4YWY2NGU4ZWY4ZTU5MGQzNSJ9fX0="
+    time: 50
+  s12_passwordtm:
+    hp: 450.0
+    value: 1725000
+    name: "Passwords"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2Y3OWQzYWRkZmRkNmM0MDQ4MTlhNTg2ZWY4MWFkZmRmNzdjOWY5NTU0YmMzM2Q3YTUwNTI2YzQwZDU5ZWY0OCJ9fX0="
+    time: 50
+  s13_trashfc:
+    hp: 380.0
+    value: 1925000
+    name: "Trash Bin"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmZmYjkxMjYxMmEwNmU3ZWJmODY1YmU1MGNlOWZmNjA5MTk1ZWZkMTliYmU0OTdjNjFlMjI4YzczZWY3NzU3In19fQ=="
+    time: 42
+  s13_lampfc:
+    hp: 380.0
+    value: 1950000
+    name: "Lamp"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODdjZDI3NTY3ODFjNWQwY2NmODEyYWJjN2Q4MzBiMzdmOWExOTIzNTQ0ZmMzMTJkOTg2Y2U2MzhmZTRiMjYyZiJ9fX0="
+    time: 42
+  s13_camerafc:
+    hp: 385.0
+    value: 1975000
+    name: "Camera"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGZiZWQzNzI1YzA1Mjc0OGI2NWJlODQ3ZTE5NDJmNzU5YzNhOGRhMDY0OWY4MDUwODdiMDM2Nzk2NDE2MWI0ZCJ9fX0="
+    time: 42
+  s13_monitorfc:
+    hp: 385.0
+    value: 1990000
+    name: "Monitor"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjNjYjIyMDQ4ZTc4N2FhNWY0ZWJlYTNhNGM4ZWY3ZDIyMzUwZmI2NDYwMjMwMmFjZWUyYWRkNTA2YTM1ZWM2ZSJ9fX0="
+    time: 43
+  s13_keysfc:
+    hp: 390.0
+    value: 2000000
+    name: "Keys"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGViNDYxMzU0NDBjMmUwNDJhZWY4NzUyNGMzMTkyMDRhZjcwMWQzNWFiY2U3NDc4YWY2NGU4ZWY4ZTU5MGQzNSJ9fX0="
+    time: 43
+  s13_chessfc:
+    hp: 390.0
+    value: 2025000
+    name: "Chess"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWE5OTA1ZDQzNDBmZTExZmZlNWRlNGFjMjc4MGEwYzM3ZjdmZTI3ZGY5ZjYyMjdiMTlmNjk4MzAwZjdhNzgzZiJ9fX0="
+    time: 43
+  s13_scannerfc:
+    hp: 395.0
+    value: 2050000
+    name: "Scanner"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDFlYzI2YTMxNDNhODcwMGRhZjNlNzdkYjU3M2M3YjViZTQ2NWY3ZjI1MWZlZDQxZDNiZmRmZTEyNmM0Njk5OCJ9fX0="
+    time: 45
+  s13_moneyfc:
+    hp: 395.0
+    value: 2075000
+    name: "Money"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQwMDVlYmJmOTgxN2Q2OTI4ZGU4YmM1ZjdkMWMzODkyNzYwMjBhYzg3NjQ3ZDI4YWI4Zjk5ZWIzOWZmZGU3NiJ9fX0="
+    time: 45
+  s13_bagfc:
+    hp: 400.0
+    value: 2100000
+    name: "Money Bag"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjdmOGQ4YzM5Zjk5MjFhNjRkN2I3NTVkZTMyMmU0NDFmZGVkNGI3NzVhNzY1N2UwYjMxOTZiNmZkYTg2MzY0NiJ9fX0="
+    time: 46
+  s13_vaultfc:
+    hp: 400.0
+    value: 2125000
+    name: "Vault Code"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2Y3OWQzYWRkZmRkNmM0MDQ4MTlhNTg2ZWY4MWFkZmRmNzdjOWY5NTU0YmMzM2Q3YTUwNTI2YzQwZDU5ZWY0OCJ9fX0="
+    time: 46
+  s13_camfc:
+    hp: 405.0
+    value: 2150000
+    name: "Camera"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWI0MWQwZmZjOTg4MjVkYWM2MzZhZmJjZjYxMzU3MmRmZTBkMTg0MGYyZDA2OGZlNDNhMjViMGQzYjYwOTA4YSJ9fX0="
+    time: 47
+  s13_monfc:
+    hp: 405.0
+    value: 2160000
+    name: "Money"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQwMDVlYmJmOTgxN2Q2OTI4ZGU4YmM1ZjdkMWMzODkyNzYwMjBhYzg3NjQ3ZDI4YWI4Zjk5ZWIzOWZmZGU3NiJ9fX0="
+    time: 47
+  s13_paintfc:
+    hp: 410.0
+    value: 2170000
+    name: "Painting"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTRiZGE5ZWEyZmNlYWFhOTQ1YzM4ZWQ0N2IxNDMxZDM5OTY3M2I4M2IyNzY5Njc0YWU5ZDllODNjM2ZmZDQzIn19fQ=="
+    time: 48
+  s13_mofc:
+    hp: 410.0
+    value: 2180000
+    name: "Monitor"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODQxYjkxYzUyMDViY2M2NGU3Zjg0OGU1ZGIzODY5OTBmYjFjZDUxNzNmMzMwZjVkMTQzOTYxODU2M2U3YzEwYiJ9fX0="
+    time: 48
+  s13_flowerfc:
+    hp: 415.0
+    value: 2190000
+    name: "Flower"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTVjNWEzMzM4YjliMmIxN2YwZmNlYTM0NTg0YjEzNzBlZmM5YjViMjc5MjM5MDIyOTRmMDMwOTkxNTUyMTVmYyJ9fX0="
+    time: 49
+  s13_filefc:
+    hp: 415.0
+    value: 2200000
+    name: "File"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzczZThiZDNjNDNjNDUxNGM3NjQ4MWNhMWRhZjU1MTQ5ZGZjOTNiZDFiY2ZhOGFiOTQzN2I5ZjdlYjMzOTJkOSJ9fX0="
+    time: 49
+  s13_bagdc:
+    hp: 410.0
+    value: 2140000
+    name: "Money Bag"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjdmOGQ4YzM5Zjk5MjFhNjRkN2I3NTVkZTMyMmU0NDFmZGVkNGI3NzVhNzY1N2UwYjMxOTZiNmZkYTg2MzY0NiJ9fX0="
+    time: 48
+  s13_moneydc:
+    hp: 410.0
+    value: 2150000
+    name: "Money"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQwMDVlYmJmOTgxN2Q2OTI4ZGU4YmM1ZjdkMWMzODkyNzYwMjBhYzg3NjQ3ZDI4YWI4Zjk5ZWIzOWZmZGU3NiJ9fX0="
+    time: 48
+  s13_bagtwodc:
+    hp: 415.0
+    value: 2160000
+    name: "Money Bag"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjdmOGQ4YzM5Zjk5MjFhNjRkN2I3NTVkZTMyMmU0NDFmZGVkNGI3NzVhNzY1N2UwYjMxOTZiNmZkYTg2MzY0NiJ9fX0="
+    time: 49
+  s13_goldbardc:
+    hp: 420.0
+    value: 2170000
+    name: "Gold Bar"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGE5MDBlYWRjMDBhZmUwNjY2ZTZkMDhiYTVhOTNjNmZkYjc0OTc4ZjMzNGY0OGM4YjcxZjMwNjhkYTJhZWQ4MiJ9fX0="
+    time: 50
+  s13_diamonddc:
+    hp: 425.0
+    value: 2180000
+    name: "Diamonds"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2I1ZmFmNGNkODcxMzhjODcxY2M2YTg2NzU4MTdhODk5ODVhM2NiODk3MjFhNGM3NjJmZTY2NmZmNjE4MWMyNCJ9fX0="
+    time: 50
+  s13_emeralddc:
+    hp: 425.0
+    value: 2190000
+    name: "Emeralds"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmMwZTZkOWUyNDI3MzU0ODE5MThjNWZkMTQ0OThiZDc2MGJiOWY0ZmY2NDMwYWQ0Njk2YjM4ZThhODgzZGE5NyJ9fX0="
+    time: 50
+  s13_ringdc:
+    hp: 430.0
+    value: 2200000
+    name: "Rings"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjA0OTRjYzM3OWM0Zjk0ZjNiMmMzZGY2ZjQzNzA3ZjdkM2ZjYjIxZDlhZTFhMWI2NWE1ZmVlMWVjZDI4MjdkIn19fQ=="
+    time: 51
+  s13_goldnuggetdc:
+    hp: 430.0
+    value: 2210000
+    name: "Gold Nugget"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGE5MDBlYWRjMDBhZmUwNjY2ZTZkMDhiYTVhOTNjNmZkYjc0OTc4ZjMzNGY0OGM4YjcxZjMwNjhkYTJhZWQ4MiJ9fX0="
+    time: 51
+  s13_orangedc:
+    hp: 435.0
+    value: 2220000
+    name: "Orange Gemstone"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzdhZTIzNmNkZWMzZjJhNmY1MWVhZTE1ZTJjOGY2MjI4YjM0ZjEzN2RhMTU2OWZlYzllODAzZjljZDgxNzU5ZCJ9fX0="
+    time: 52
+  s13_reddc:
+    hp: 435.0
+    value: 2230000
+    name: "Red Gemstone"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzliNmUwNDdkM2IyYmNhODVlOGNjNDllNTQ4MGY5Nzc0ZDhhMGVhZmU2ZGZhOTU1OTUzMDU5MDI4MzcxNTE0MiJ9fX0="
+    time: 52
+  s13_pinkdc:
+    hp: 440.0
+    value: 2240000
+    name: "Pink Gemstone"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjYzZjk5MWI4ZTAzOGU0NmI4ZWQ3NjMyZjQ0Y2EyZTMwYzE1ZjQyOTc3MDcwYThjOGQ4NzI4ZTNmYzA0ZmM3YyJ9fX0="
+    time: 53
+  s13_bluedc:
+    hp: 440.0
+    value: 2250000
+    name: "Blue Gemstone"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGU5M2ViYWNiNjBiNzE3OTMzNTVmZGUwZDRiYmE0M2E5YzVlYzA5YzNmMzg4OTdjNDhjMWY4NTc1MjNhMGEyOSJ9fX0="
+    time: 53
+  s13_purpledc:
+    hp: 445.0
+    value: 2260000
+    name: "Purple Gemstone"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDg4NmUwZjQxMTg1YjE4YTNhZmQ4OTQ4OGQyZWU0Y2FhMDczNTAwOTI0N2NjY2YwMzljZWQ2YWVkNzUyZmYxYSJ9fX0="
+    time: 54
+  s13_netheritedc:
+    hp: 450.0
+    value: 2270000
+    name: "Netherite"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTViMzE3MjM2MDNjYjA3YzE1MGUzNGQ2NWJlODhlNWE2MWFhNDY0NGFhNjI2Y2RlNTI0ZjNiZDg2MTRmY2QyOSJ9fX0="
+    time: 54
+  s13_golddc:
+    hp: 450.0
+    value: 2280000
+    name: "Gold"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDFiNWZkZWZmZmZmYTcwODM4MWU3MGYzNTAzYTI3NTc3MmI0NTI5NmNmOWYxNjI1YTg3ZWRjNmI2MjU0OWVmNiJ9fX0="
+    time: 54
+  s13_classifieddc:
+    hp: 450.0
+    value: 2290000
+    name: "Classified"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2Y3OWQzYWRkZmRkNmM0MDQ4MTlhNTg2ZWY4MWFkZmRmNzdjOWY5NTU0YmMzM2Q3YTUwNTI2YzQwZDU5ZWY0OCJ9fX0="
+    time: 55
+  s13_filesdc:
+    hp: 455.0
+    value: 2300000
+    name: "Files"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzczZThiZDNjNDNjNDUxNGM3NjQ4MWNhMWRhZjU1MTQ5ZGZjOTNiZDFiY2ZhOGFiOTQzN2I5ZjdlYjMzOTJkOSJ9fX0="
+    time: 55
+  s13_safedc:
+    hp: 460.0
+    value: 2310000
+    name: "Safe"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTFkZGIyZmQ3NzIwMDcxNjk0ZTllODBhNmY0YThiOGFiYTc3NjBiYjFkYTQ2OGRlNjM3YTZiZjljODVlYTVhZSJ9fX0="
+    time: 55
+  s13_goldsafedc:
+    hp: 465.0
+    value: 2320000
+    name: "Gold Safe"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjc1MDVjYjQ1YTBkZmM0ZWMwYjc0MWFkYmNlNmI1MDU2ZWQ1MWFiYTYzZmVhOWIyZDY2ZDc1OGNhYzBmMjQxMiJ9fX0="
+    time: 55
+  s13_diamondsafedc:
+    hp: 435.0
+    value: 2325000
+    name: "Diamond Safe"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmFkNjM1YjBhMjFjZjY3NDFlYTM2ODg0N2QzNGVjNWIwNDFkMzZkMjkyOGJmNDJjNTk0YzY0MWY2N2RiMDQxZSJ9fX0="
+    time: 55
+  s13_crowndc:
+    hp: 700.0
+    value: 3000000
+    name: "The Crown"
+    playername: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTFiMGE1YmJjNjk3YzBjNDJhNmNmMWI5YzRjNDQzNWIwNzMyMmZjZTViYjI3ZDgyYjY5MzA4NDNlNWFiN2EwOSJ9fX0="
+    time: 67
 

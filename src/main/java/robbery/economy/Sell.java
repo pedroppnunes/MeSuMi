@@ -170,30 +170,29 @@ public class Sell implements CommandExecutor {
 
             double hp = main.getItemConfig().getDouble("items." + itemId + ".hp", 1.0);
 
-            // 2. Calculate Store Multiplier
-            // We extract the number after 's' but before '_'
-            double storeMultiplier = 1.0;
-            try {
-                if (itemId.startsWith("s") && itemId.contains("_")) {
-                    int storeNumber = Integer.parseInt(itemId.substring(1, itemId.indexOf("_")));
-                    // 10% increase per store (Store 1 = 1.1, Store 2 = 1.2, etc.)
-                    storeMultiplier = 1.0 + (storeNumber * 0.10);
-                }
-            } catch (Exception e) {
-                Bukkit.getLogger().warning("Could not parse store number for ID: " + itemId);
-            }
+            double xpPerItem = getXpPerItem(itemId, hp);
 
-            // 3. Calculate Final XP
-            // XP = (HP * Factor) * Store Multiplier
-            double xpDouble = (hp * BASE_HP_XP_FACTOR) * storeMultiplier;
-
-            total += (long) xpDouble;
-
-            // Debugging
-            Bukkit.getLogger().info(String.format("[XP] Item: %s | HP: %.1f | Mult: %.2f | Result: %.2f",
-                    itemId, hp, storeMultiplier, xpDouble));
+            total += (long) xpPerItem;
         }
         return total;
+    }
+
+    private double getXpPerItem(String itemId, double hp) {
+        double storeMultiplier = 1.0;
+
+        int underscoreIndex = itemId.indexOf("_");
+
+        if (itemId.startsWith("s") && underscoreIndex > 1) {
+            try {
+                String storeNumStr = itemId.substring(1, underscoreIndex);
+                int storeNumber = Integer.parseInt(storeNumStr);
+                storeMultiplier = 1.0 + (storeNumber * 0.10);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        double baseValue = Math.pow(hp, 0.85) * 1.4;
+        return baseValue * storeMultiplier;
     }
 
 }

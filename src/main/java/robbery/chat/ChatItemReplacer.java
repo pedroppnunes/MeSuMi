@@ -85,7 +85,7 @@ public class ChatItemReplacer implements Listener {
         // Retrieve placeholders
         String prestige = PlaceholderAPI.setPlaceholders(player, "%robbery_prestige%");
         String level     = PlaceholderAPI.setPlaceholders(player, "%robbery_level%");
-        String levelColor = PlaceholderAPI.setPlaceholders(player, "%robbery_levelcolor%");
+        String levelHex = PlaceholderAPI.setPlaceholders(player, "%robbery_levelcolor%");
         String tag      = PlaceholderAPI.setPlaceholders(player, "%deluxetags_tag%");
         String prefix   = PlaceholderAPI.setPlaceholders(player, "%luckperms_prefix%");
         String name     = player.getDisplayName();
@@ -110,6 +110,9 @@ public class ChatItemReplacer implements Listener {
             itemComp = Component.empty();
         }
 
+        TextColor levelTextColor = TextColor.fromHexString(levelHex);
+        if (levelTextColor == null) levelTextColor = NamedTextColor.GRAY;
+
         // Assemble full chat component
         Component full = Component.empty()
                 .append(Component.text("[")
@@ -119,7 +122,7 @@ public class ChatItemReplacer implements Listener {
                 )
                 .append(Component.text(" "))
                 .append(Component.text("[", NamedTextColor.DARK_GRAY)
-                        .append(Component.text(level, TextColor.fromHexString(levelColor)))
+                        .append(Component.text(level, levelTextColor))
                         .append(Component.text("]", NamedTextColor.DARK_GRAY))
                 )
                 .append(Component.text(" "))

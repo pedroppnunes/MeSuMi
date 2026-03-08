@@ -1,0 +1,23 @@
+perks:
+  - id: stealth
+    name: "Stealth"
+    required_level: 2
+    max_level: 5
+    # cost list per upgrade step (level1 cost, level2 cost, ...)
+    costs: [1, 1, 2, 2, 3]
+    description: "Reduces chance of detection while robbing."
+
+  - id: lockpicking
+    name: "Lockpicking"
+    required_level: 10
+    max_level: 3
+    base_cost: 2
+    increment: 1
+    description: "Faster pick times."
+
+  - id: payout
+    name: "Payout"
+    required_level: 25
+    max_level: 4
+    costs: [2, 3, 4, 5]
+    description: "Increases money gained from robberies."

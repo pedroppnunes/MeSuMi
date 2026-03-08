@@ -101,6 +101,22 @@ public class PlayerEventListener implements Listener {
             memory.setKeys(cfg.getString("stats.haskeys"));
             memory.setKey(getStoreName(cfg.getString("stats.key")));
             memory.setPrestige(Integer.parseInt(cfg.getString("stats.prestige")));
+            memory.setItemsStolen(cfg.getInt("stats.itemsStolen", 0));
+            memory.setItemsStolen(cfg.getInt("stats.itemsStolen", 0));
+            if (cfg.contains("stats.storeItems")) {
+                Map<String, Integer> storeItems = new java.util.HashMap<>();
+                for (String key : cfg.getConfigurationSection("stats.storeItems").getKeys(false)) {
+                    storeItems.put(key, cfg.getInt("stats.storeItems." + key));
+                }
+                memory.setStoreItemsMap(storeItems);
+            }
+            if (cfg.contains("stats.storeMilestones")) {
+                Map<String, Integer> storeMilestones = new java.util.HashMap<>();
+                for (String key : cfg.getConfigurationSection("stats.storeMilestones").getKeys(false)) {
+                    storeMilestones.put(key, cfg.getInt("stats.storeMilestones." + key));
+                }
+                memory.setStoreMilestoneMap(storeMilestones);
+            }
             memory.setBoostersPaused(cfg.getBoolean("stats.boosterpaused"));
             memory.setActiveBooster(cfg.getString("stats.booster"));
             memory.setBoostersFromString(cfg.getString("stats.hasbooster"));
@@ -167,10 +183,7 @@ public class PlayerEventListener implements Listener {
     public void onQuit(PlayerQuitEvent event) {
         if (!plugin.getIsBackup()) {
             PlayerData memory = PlayerDataManager.getPlayerData(event.getPlayer());
-            File playerFolder = new File(plugin.getDataFolder(), "player/" + event.getPlayer().getUniqueId());
-            File file = new File(playerFolder, "general.yml");
             Player player = event.getPlayer();
-            FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
             if (player.hasPermission("robbery.rank7") || player.hasPermission("robbery.staff")) {
                 String prefix = getLuckPermsPrefix(player);
@@ -182,73 +195,66 @@ public class PlayerEventListener implements Listener {
                 }
             }
 
-            cfg.set("stats.xp", memory.getXp());
-            cfg.set("stats.level", memory.getLevel());
-            cfg.set("stats.backpack", memory.getBackpackString());
-            cfg.set("stats.material", memory.getBackpack().getMaterial());
-            cfg.set("stats.itemsbackpack", memory.getBackpackItemsString());
-            cfg.set("stats.hasbackpack", memory.getBackpackunlucked());
-            cfg.set("stats.colorbackpack", memory.getBackpack().getColorname());
-            cfg.set("stats.hastool", memory.getToolsunlucked());
-            cfg.set("stats.tool", memory.getToolString());
-            cfg.set("stats.key", memory.getKeyString());
-            cfg.set("stats.haskeys", memory.getKeysString());
-            cfg.set("stats.prestige", memory.getPrestige());
-            cfg.set("stats.boosterpaused", memory.isBoostersPaused());
-            cfg.set("stats.booster", memory.getActiveBoostString());
-            cfg.set("stats.hasbooster", memory.getBoostersString());
-            cfg.set("stats.rank", memory.getRank());
-            cfg.set("stats.skillpoints", memory.getSP());
-            cfg.set("stats.spshop", memory.getSPShopString());
-            cfg.set("stats.location.world", player.getWorld().getName());
-            cfg.set("stats.location.x", player.getLocation().getX());
-            cfg.set("stats.location.y", player.getLocation().getY());
-            cfg.set("stats.location.z", player.getLocation().getZ());
-            cfg.set("stats.location.yaw", player.getLocation().getYaw());
-            cfg.set("stats.location.pitch", player.getLocation().getPitch());
-            PrestigeLeaderboard.updateLeaderboard(event.getPlayer());
-            PvCommand.saveAllInventories(player.getUniqueId());
-            Rcrate.saveRewards(player.getUniqueId());
-            try {
-                cfg.save(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            savePlayerData(player, memory);
+            PlayerDataManager.setPlayerData(player, null);
             PlayerDataManager.setPlayerData(event.getPlayer(), null);
         }
         event.quitMessage(null);
     }
 
     public void savePlayerData(Player player, PlayerData memory) {
+
         File playerFolder = new File(plugin.getDataFolder(), "player/" + player.getUniqueId());
+        if (!playerFolder.exists()) playerFolder.mkdirs();
+
         File file = new File(playerFolder, "general.yml");
         FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
+        // Basic stats
         cfg.set("stats.xp", memory.getXp());
         cfg.set("stats.level", memory.getLevel());
+        cfg.set("stats.rank", memory.getRank());
+        cfg.set("stats.prestige", memory.getPrestige());
+
+        // Store robbery stats
+        cfg.set("stats.itemsStolen", memory.getItemsStolen());
+        cfg.set("stats.storeItems", memory.getStoreItemsMap());
+        cfg.set("stats.storeMilestones", memory.getStoreMilestoneMap());
+
+        // Backpack
         cfg.set("stats.backpack", memory.getBackpackString());
         cfg.set("stats.material", memory.getBackpack().getMaterial());
         cfg.set("stats.itemsbackpack", memory.getBackpackItemsString());
-        cfg.set("stats.hasbackpack", memory.getBackpackunlucked());
         cfg.set("stats.colorbackpack", memory.getBackpack().getColorname());
+        cfg.set("stats.hasbackpack", memory.getBackpackunlucked());
+
+        // Tools
         cfg.set("stats.hastool", memory.getToolsunlucked());
         cfg.set("stats.tool", memory.getToolString());
+
+        // Keys
         cfg.set("stats.key", memory.getKeyString());
         cfg.set("stats.haskeys", memory.getKeysString());
-        cfg.set("stats.prestige", memory.getPrestige());
+
+        // Boosters
         cfg.set("stats.booster", memory.getActiveBoostString());
         cfg.set("stats.hasbooster", memory.getBoostersString());
         cfg.set("stats.boosterpaused", memory.isBoostersPaused());
-        cfg.set("stats.rank", memory.getRank());
+
+        // Skillpoints
         cfg.set("stats.skillpoints", memory.getSP());
         cfg.set("stats.spshop", memory.getSPShopString());
-        cfg.set("stats.location.world", player.getWorld().getName());
-        cfg.set("stats.location.x", player.getLocation().getX());
-        cfg.set("stats.location.y", player.getLocation().getY());
-        cfg.set("stats.location.z", player.getLocation().getZ());
-        cfg.set("stats.location.yaw", player.getLocation().getYaw());
-        cfg.set("stats.location.pitch", player.getLocation().getPitch());
 
+        // Player location
+        Location loc = player.getLocation();
+        cfg.set("stats.location.world", loc.getWorld().getName());
+        cfg.set("stats.location.x", loc.getX());
+        cfg.set("stats.location.y", loc.getY());
+        cfg.set("stats.location.z", loc.getZ());
+        cfg.set("stats.location.yaw", loc.getYaw());
+        cfg.set("stats.location.pitch", loc.getPitch());
+
+        // External systems
         PrestigeLeaderboard.updateLeaderboard(player);
         PvCommand.saveAllInventories(player.getUniqueId());
         Rcrate.saveRewards(player.getUniqueId());
@@ -258,58 +264,6 @@ public class PlayerEventListener implements Listener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public void saveOnDisable(Player player) {
-        PlayerData memory = PlayerDataManager.getPlayerData(player);
-        if (memory == null)
-            return;
-        File playerFolder = new File(plugin.getDataFolder(), "player/" + player.getUniqueId());
-        File file = new File(playerFolder, "general.yml");
-        FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-
-        if (player.hasPermission("robbery.rank7") || player.hasPermission("robbery.staff")) {
-            String prefix = getLuckPermsPrefix(player);
-            String color = extractColorFromPrefix(prefix);
-
-            for (Player online : Bukkit.getOnlinePlayers()) {
-                Messages.sendComponentMessageFormatted(online, "quit-message",
-                        Map.of("prefix", prefix, "player", color + "&l" + player.getName()));
-            }
-        }
-
-        cfg.set("stats.xp", memory.getXp());
-        cfg.set("stats.level", memory.getLevel());
-        cfg.set("stats.backpack", memory.getBackpackString());
-        cfg.set("stats.material", memory.getBackpack().getMaterial());
-        cfg.set("stats.itemsbackpack", memory.getBackpackItemsString());
-        cfg.set("stats.hasbackpack", memory.getBackpackunlucked());
-        cfg.set("stats.colorbackpack", memory.getBackpack().getColorname());
-        cfg.set("stats.hastool", memory.getToolsunlucked());
-        cfg.set("stats.tool", memory.getToolString());
-        cfg.set("stats.key", memory.getKeyString());
-        cfg.set("stats.haskeys", memory.getKeysString());
-        cfg.set("stats.prestige", memory.getPrestige());
-        cfg.set("stats.booster", memory.getActiveBoostString());
-        cfg.set("stats.hasbooster", memory.getBoostersString());
-        cfg.set("stats.rank", memory.getRank());
-        cfg.set("stats.skillpoints", memory.getSP());
-        cfg.set("stats.spshop", memory.getSPShopString());
-        cfg.set("stats.location.world", player.getWorld().getName());
-        cfg.set("stats.location.x", player.getLocation().getX());
-        cfg.set("stats.location.y", player.getLocation().getY());
-        cfg.set("stats.location.z", player.getLocation().getZ());
-        cfg.set("stats.location.yaw", player.getLocation().getYaw());
-        cfg.set("stats.location.pitch", player.getLocation().getPitch());
-        PrestigeLeaderboard.updateLeaderboard(player);
-        PvCommand.saveAllInventories(player.getUniqueId());
-        Rcrate.saveRewards(player.getUniqueId());
-        try {
-            cfg.save(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        PlayerDataManager.setPlayerData(player, null);
     }
 
     private String getLuckPermsPrefix(Player player) {
@@ -391,8 +345,8 @@ public class PlayerEventListener implements Listener {
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
         Component mainTitle = Component.text("Robbery Level Up!", NamedTextColor.AQUA);
 
-        Component subTitle = Component.text("You reached level ", NamedTextColor.AQUA)
-                .append(Component.text(newLevel, NamedTextColor.GOLD))
+        Component subTitle = Component.text("You reached ", NamedTextColor.AQUA)
+                .append(Component.text("Level " + newLevel, NamedTextColor.GOLD))
                 .append(Component.text("!", NamedTextColor.AQUA));
 
         Title.Times times = Title.Times.times(

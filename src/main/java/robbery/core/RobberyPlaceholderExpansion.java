@@ -9,9 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import robbery.backpacks.BackpackManager;
 import robbery.booster.BoosterManager;
 import robbery.chat.ChatStyleManager;
-import robbery.prestige.Prestige;
 import robbery.keys.KeyManager;
-import robbery.keys.Keys;
 import robbery.number.NumberFormatter;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
@@ -31,206 +29,201 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
     }
 
     @Override
-    public @NotNull String getIdentifier() {
-        return "robbery"; // Placeholder identifier: %robbery_...%
-    }
+    public @NotNull String getIdentifier() { return "robbery"; }
 
     @Override
-    public @NotNull String getAuthor() {
-        return "Mesumi"; // Your name or alias
-    }
+    public @NotNull String getAuthor() { return "Mesumi"; }
 
     @Override
-    public @NotNull String getVersion() {
-        return "1.0"; // Version of your expansion
-    }
+    public @NotNull String getVersion() { return "1.1"; }
 
     @Override
     public String onRequest(OfflinePlayer offlinePlayer, @NotNull String identifier) {
-        if (offlinePlayer == null || !offlinePlayer.isOnline()) return null;
-
+        if (offlinePlayer == null) return null;
         Player player = offlinePlayer.getPlayer();
-        PlayerData playerData = PlayerDataManager.getPlayerData(player);
-        if (playerData == null) return "";
+        if (player == null) return null;
+
+        PlayerData pd = PlayerDataManager.getPlayerData(player);
+        if (pd == null) return null;
 
         String id = identifier.toLowerCase();
-        String[] parts = id.split("_");
 
-        // Handle 3-part placeholders: %robbery_type_category_num%
-        if (parts.length == 3) {
-            return handleTriPartIdentifier(playerData, parts[0], parts[1], parts[2], player);
+        // 1. Try static/exact matches first (Prevents total_items_stolen from breaking)
+        String staticMatch = handleStaticIdentifier(pd, id, player);
+        if (staticMatch != null) return staticMatch;
+
+        // 2. Fallback to Dynamic (Split) Logic
+        String[] parts = id.split("_");
+        if (parts.length >= 2) {
+            return handleDynamicIdentifier(pd, parts, id);
         }
 
-        // Handle static/2-part placeholders: %robbery_level%
-        return handleStaticIdentifier(playerData, id, player);
-    }
-
-    private String handleTriPartIdentifier(PlayerData pd, String type, String category, String num, Player p) {
-        try {
-            switch (type) {
-                case "has":
-                    return switch (category) {
-                        case "back" -> String.valueOf(pd.hasBackpackName("back" + num));
-                        case "tool" -> String.valueOf(pd.hasToolName("tool" + num));
-                        case "key"  -> String.valueOf(pd.hasKey("store" + num));
-                        default -> null;
-                    };
-
-                case "price":
-                    return switch (category) {
-                        case "back"      -> String.valueOf(BackpackManager.getBackpackName("back" + num, 0).getPrice());
-                        case "tool"      -> String.valueOf(ToolManager.getToolsName("tool" + num).getPrice());
-                        case "key"       -> String.valueOf(KeyManager.getStoreName("store" + num).getPrice(pd));
-                        case "backshort" -> BackpackManager.getBackpackName("back" + num, 0).getPriceformatted();
-                        case "toolshort" -> ToolManager.getToolsName("tool" + num).getPriceformatted();
-                        case "keyshort"  -> KeyManager.getStoreName("store" + num).getPriceformatted(pd);
-                        default -> null;
-                    };
-
-                case "colorname":
-                    return switch (category) {
-                        case "back" -> BackpackManager.getBackpackName("back" + num, 0).getColorname();
-                        case "tool" -> ToolManager.getToolsName("tool" + num).getColorname();
-                        case "key"  -> KeyManager.getStoreName("store" + num).getColorname();
-                        default -> null;
-                    };
-
-                case "name":
-                    return switch (category) {
-                        case "back" -> BackpackManager.getBackpackName("back" + num, 0).getName();
-                        case "tool" -> ToolManager.getToolsName("tool" + num).getName();
-                        case "key"  -> KeyManager.getStoreName("store" + num).getName();
-                        default -> null;
-                    };
-
-                case "prestige":
-                    int index = Integer.parseInt(num);
-                    return category.equals("name") ?
-                            PrestigeLeaderboard.getTopPrestigePlayer(index) :
-                            String.valueOf(PrestigeLeaderboard.getTopPrestige(index));
-
-                case "booster":
-                    return switch (category) {
-                        case "quantity" -> String.valueOf(pd.getBoosterQuantity("boost" + num));
-                        case "name"     -> BoosterManager.getBooster("boost" + num).getName();
-                        case "time"     -> String.valueOf(BoosterManager.getBooster("boost" + num).getSeconds() / 60);
-                        case "priority" -> String.valueOf(BoosterManager.getBooster("boost" + num).getPriority());
-                        default -> null;
-                    };
-
-                case "skillpoint":
-                    return String.valueOf((int) (SkillUpgradeData.getUpgradePercentage(pd, category, num) * 100));
-
-                case "damage":
-                    if (category.equals("tool"))
-                        return String.valueOf((int) (ToolManager.getToolsName("tool" + num).getDamage() * 10));
-                    break;
-
-                case "size":
-                    if (category.equals("back"))
-                        return String.valueOf(BackpackManager.getBackpackName("back" + num, 0).getcapacity());
-                    break;
-
-                case "material":
-                    if (category.equals("tool"))
-                        return String.valueOf(ToolManager.getToolsName("tool" + num).getMaterial());
-                    break;
-            }
-        } catch (Exception ignored) {}
         return null;
     }
 
+    /**
+     * Handles exact string matches.
+     * Put anything here that doesn't need to be parsed by index/number.
+     */
     private String handleStaticIdentifier(PlayerData pd, String id, Player p) {
         XPManager xp = main.getXpManager();
-
         return switch (id) {
-            // Backpack & Tools
-            case "backpack_name"      -> pd.getBackpack().getColorname();
-            case "backpack_capacity"  -> String.valueOf(pd.getBackpack().getcapacity());
-            case "backpack_size"      -> String.valueOf(pd.getBackpack().getSize());
-            case "backpack_total"     -> NumberFormatter.formatDoubleNumber(Double.parseDouble(NumberFormatter.formatDouble(pd.getBackpack().getTotal())));
-            case "tool_name"          -> pd.getTool().getColorname();
-            case "key_name"           -> pd.getKey().getColorname();
-            case "tool_n"             -> String.valueOf(ToolManager.getToolsNameR(pd.getTool().getName()));
-            case "back_n"             -> String.valueOf(BackpackManager.getBackpackNameR(pd.getBackpack().getName()));
-
-            // Prestige & Money
-            case "prestige"           -> String.valueOf(pd.getPrestige());
-            case "prestige_price"     -> String.valueOf(Prestige.getPrestigeValue(pd));
-            case "prestige_priceshort"-> NumberFormatter.formatDoubleNumber(Prestige.getPrestigeValue(pd));
-            case "next_store"         -> nextStorePercentage(pd, p);
-
-            // Levels & XP
-            case "level"              -> String.valueOf(pd.getLevel());
-            case "xp"                 -> String.valueOf(pd.getXp());
-            case "xptonext"           -> String.valueOf(xp.xpRemainingForNextLevel(pd.getXp(), pd.getLevel()));
-            case "levelcolored"       -> xp.colorizeLevel(pd.getLevel());
-            case "levelcolor"         -> xp.getLevelColor(pd.getLevel()).toString();
-
-            // Active Boosters
-            case "boosterx"           -> String.valueOf(pd.getBoost());
-            case "booster_name"       -> pd.getActiveboost().getName();
-            case "booster_time"       -> String.valueOf(pd.getActiveboost().getSeconds());
-            case "booster_paused"     -> String.valueOf(pd.isBoostersPaused());
-
-            // Skill Points
-            case "skillpoints"        -> String.valueOf(pd.getSP());
-            case "skillpoint_damage"  -> String.valueOf((int)(pd.getSPShop().extraDamage()*100));
-            case "skillpoint_itemchance" -> String.valueOf((int)(pd.getSPShop().doubleItemChance()*100));
-            case "skillpoint_extramoney" -> String.valueOf((int)(pd.getSPShop().extraMoney()*100));
-
-            // Outpost & Misc
-            case "outstatustitle"     -> main.getOutpostManager().getStatusTitle();
-            case "outtime"            -> main.getOutpostManager().getStatusLoreLine1();
-            case "chatstyle"          -> getColor(p);
+            case "backpack_name" -> pd.getBackpack().getColorname();
+            case "backpack_capacity" -> String.valueOf(pd.getBackpack().getcapacity());
+            case "backpack_size" -> String.valueOf(pd.getBackpack().getSize());
+            case "backpack_total" -> NumberFormatter.formatDoubleNumber(pd.getBackpack().getTotal());
+            case "tool_name" -> pd.getTool().getColorname();
+            case "key_name" -> pd.getKey().getColorname();
+            case "tool_n" -> String.valueOf(ToolManager.getToolsNameR(pd.getTool().getName()));
+            case "back_n" -> String.valueOf(BackpackManager.getBackpackNameR(pd.getBackpack().getName()));
+            case "prestige" -> String.valueOf(pd.getPrestige());
+            case "prestige_price" -> String.valueOf(robbery.prestige.Prestige.getPrestigeValue(pd));
+            case "prestige_priceshort" -> NumberFormatter.formatDoubleNumber(robbery.prestige.Prestige.getPrestigeValue(pd));
+            case "next_store" -> nextStorePercentage(pd, p);
+            case "level" -> String.valueOf(pd.getLevel());
+            case "xp" -> String.valueOf(pd.getXp());
+            case "xptonext" -> String.valueOf(xp.xpRemainingForNextLevel(pd.getXp(), pd.getLevel()));
+            case "levelcolored" -> xp.colorizeLevel(pd.getLevel());
+            case "levelcolor" -> xp.getLevelHexColor(pd.getLevel());
+            case "boosterx" -> String.valueOf(pd.getBoost());
+            case "booster_name" -> pd.getActiveboost().getName();
+            case "booster_time" -> String.valueOf(pd.getActiveboost().getSeconds());
+            case "booster_paused" -> String.valueOf(pd.isBoostersPaused());
+            case "booster_priority" -> String.valueOf(pd.getActiveboost().getPriority());
+            case "skillpoints" -> String.valueOf(pd.getSP());
+            case "skillpoint_damage" -> String.valueOf((int) (pd.getSPShop().extraDamage() * 100));
+            case "skillpoint_itemchance" -> String.valueOf((int) (pd.getSPShop().doubleItemChance() * 100));
+            case "skillpoint_extramoney" -> String.valueOf((int) (pd.getSPShop().extraMoney() * 100));
+            case "skillpoint_slots" -> String.valueOf(pd.getSPShop().extraSlots());
+            case "skillpoint_skillpointchance" -> String.valueOf((int) (pd.getSPShop().skillpointChance() * 100));
+            case "skillpoint_moneypouchchance" -> String.valueOf((int) (pd.getSPShop().moneypouchChance() * 100));
+            case "skillpoint_instastealchance" -> String.valueOf((int) (pd.getSPShop().instastealChance() * 100));
+            case "outmaterial" -> main.getOutpostManager().getOutpostMaterial(p);
+            case "outstatustitle" -> main.getOutpostManager().getStatusTitle();
+            case "outtime" -> main.getOutpostManager().getStatusLoreLine1();
+            case "outholderhead" -> main.getOutpostManager().getHolderLeaderName();
+            case "outholdername" -> main.getOutpostManager().getHolderIslandName();
+            case "outperk1" -> String.valueOf(main.getOutpostManager().getPerk1());
+            case "outperk2" -> main.getOutpostManager().getPerk2();
+            case "chatstyle" -> getColor(p);
+            case "total_items_stolen" -> String.valueOf(pd.getItemsStolen());
             case "voteparty_required" -> String.valueOf(main.getVotePartyManager().getDisplayRequiredVotes());
-            case "voteparty_current"  -> String.valueOf(main.getVotePartyManager().getDisplayCurrentVotes());
-
+            case "voteparty_current" -> String.valueOf(main.getVotePartyManager().getDisplayCurrentVotes());
             default -> null;
         };
     }
 
-    private String getColor(Player player){
+    /**
+     * Handles patterns like has_back_1, price_tool_2, store_items_1
+     */
+    private String handleDynamicIdentifier(PlayerData pd, String[] parts, String fullId) {
+        String type = parts[0];
+        try {
+            switch (type) {
+                case "has":
+                    if (parts.length < 3) return null;
+                    return switch (parts[1]) {
+                        case "back" -> String.valueOf(pd.hasBackpackName("back" + parts[2]));
+                        case "tool" -> String.valueOf(pd.hasToolName("tool" + parts[2]));
+                        case "key" -> String.valueOf(pd.hasKey("store" + parts[2]));
+                        default -> null;
+                    };
+
+                case "price":
+                    if (parts.length < 3) return null;
+                    String num = parts[2];
+                    return switch (parts[1]) {
+                        case "back" -> String.valueOf(BackpackManager.getBackpackName("back" + num, 0).getPrice());
+                        case "tool" -> String.valueOf(ToolManager.getToolsName("tool" + num).getPrice());
+                        case "key" -> String.valueOf(KeyManager.getStoreName("store" + num).getPrice(pd));
+                        case "backshort" -> BackpackManager.getBackpackName("back" + num, 0).getPriceformatted();
+                        case "toolshort" -> ToolManager.getToolsName("tool" + num).getPriceformatted();
+                        case "keyshort" -> KeyManager.getStoreName("store" + num).getPriceformatted(pd);
+                        default -> null;
+                    };
+
+                case "colorname":
+                case "name":
+                    if (parts.length < 3) return null;
+                    boolean isColor = type.equals("colorname");
+                    return switch (parts[1]) {
+                        case "back" -> isColor ? BackpackManager.getBackpackName("back" + parts[2], 0).getColorname() : BackpackManager.getBackpackName("back" + parts[2], 0).getName();
+                        case "tool" -> isColor ? ToolManager.getToolsName("tool" + parts[2]).getColorname() : ToolManager.getToolsName("tool" + parts[2]).getName();
+                        case "key" -> isColor ? KeyManager.getStoreName("store" + parts[2]).getColorname() : KeyManager.getStoreName("store" + parts[2]).getName();
+                        default -> null;
+                    };
+
+                case "store":
+                    // Format: %robbery_store_<stat>_<id>%
+                    if (parts.length < 3) return null;
+                    String stat = parts[1];
+                    String storeId = "store" + parts[2];
+                    return switch (stat) {
+                        case "items" -> String.valueOf(pd.getStoreItems(storeId));
+                        case "milestone" -> String.valueOf(pd.getStoreMilestone(storeId));
+                        case "level" -> String.valueOf(main.getMasteryManager().getLevelFromItems(storeId, pd.getStoreItems(storeId)));
+                        case "nextmilestone" -> String.valueOf(main.getMasteryManager().getNextStoreMilestone(pd, storeId));
+                        case "reward" -> (parts.length == 4) ? main.getRewardManager().getRewardDisplay(storeId, Integer.parseInt(parts[3])) : null;
+                        case "required" -> (parts.length == 4) ? String.valueOf(main.getMasteryManager().getItemsRequiredForLevel(storeId, Integer.parseInt(parts[3]))) : null;
+                        case "remaining" -> {
+                            if (parts.length < 4) yield null;
+                            int req = main.getMasteryManager().getItemsRequiredForLevel(storeId, Integer.parseInt(parts[3]));
+                            yield String.valueOf(Math.max(req - pd.getStoreItems(storeId), 0));
+                        }
+                        default -> null;
+                    };
+
+                case "booster":
+                    if (parts.length < 3) return null;
+                    var b = BoosterManager.getBooster("boost" + parts[2]);
+                    return switch (parts[1]) {
+                        case "quantity" -> String.valueOf(pd.getBoosterQuantity("boost" + parts[2]));
+                        case "name" -> b.getName();
+                        case "time" -> String.valueOf(b.getSeconds() / 60);
+                        case "priority" -> String.valueOf(b.getPriority());
+                        default -> null;
+                    };
+
+                case "prestige":
+                    if (parts.length < 3) return null;
+                    int rank = Integer.parseInt(parts[2]);
+                    return switch (parts[1]) {
+                        case "name" -> PrestigeLeaderboard.getTopPrestigePlayer(rank);
+                        case "top" -> String.valueOf(PrestigeLeaderboard.getTopPrestige(rank));
+                        default -> null;
+                    };
+
+                case "skillpoint":
+                    // Format: %robbery_skillpoint_<category>_<num>%
+                    if (parts.length < 3) return null;
+                    return String.valueOf((int)(SkillUpgradeData.getUpgradePercentage(pd, parts[1], parts[2]) * 100));
+
+                default: return null;
+            }
+        } catch (Exception e) { return null; }
+    }
+
+    private String getColor(Player player) {
         ChatStyleManager styles = main.getChatStyleManager();
         Optional<String> stored = styles.getColor(player.getUniqueId());
         ChatColor color = stored.map(s -> {
-            try {
-                return ChatColor.valueOf(s);
-            } catch (Exception e) {
-                return ChatColor.GRAY;
-            }
+            try { return ChatColor.valueOf(s); } catch (Exception e) { return ChatColor.GRAY; }
         }).orElse(ChatColor.GRAY);
-
-        String out = color.toString();
-        if (styles.isBold(player.getUniqueId())) {
-            out += ChatColor.BOLD;
-        }
-        return out;
-    }
-
-    public static void registerHook(){
-        new RobberyPlaceholderExpansion(Robbery.getInstance()).register();
+        return color + (styles.isBold(player.getUniqueId()) ? ChatColor.BOLD.toString() : "");
     }
 
     private String nextStorePercentage(PlayerData pd, Player p) {
         int nextStore = pd.getKey().getOrder() + 1;
-        Keys key = KeyManager.getKeyByOrder(nextStore);
+        var key = KeyManager.getKeyByOrder(nextStore);
+        if (key == null) return "MAX";
         Economy econ = Robbery.getEconomy();
         double balance = econ.getBalance(p);
-        double price;
-        if(key == null)
-            price = balance;
-        else
-            price = key.getPrice(pd);
-
-        double percentage = (balance / price) * 100.0;
-
-        percentage = Math.min(percentage, 100.0);
-
+        double price = key.getPrice(pd);
+        double percentage = Math.min((balance / price) * 100.0, 100.0);
         return String.format("%.2f%%", percentage);
     }
 
-
-
+    public static void registerHook() {
+        new RobberyPlaceholderExpansion(Robbery.getInstance()).register();
+    }
 }
-
