@@ -15,10 +15,14 @@ import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 import robbery.player.PrestigeLeaderboard;
 import robbery.robberyLevel_XP.XPManager;
-import robbery.skillpoints.SkillUpgradeData;
+import robbery.skilltree.SkillPerk;
+import robbery.skilltree.SkillTreeConfig;
 import robbery.tool.ToolManager;
 
+import java.util.Arrays;
 import java.util.Optional;
+
+import static robbery.attribute.Attribute.PERCENTAGE_PERKS;
 
 public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
 
@@ -90,14 +94,7 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             case "booster_time" -> String.valueOf(pd.getActiveboost().getSeconds());
             case "booster_paused" -> String.valueOf(pd.isBoostersPaused());
             case "booster_priority" -> String.valueOf(pd.getActiveboost().getPriority());
-            case "skillpoints" -> String.valueOf(pd.getSP());
-            case "skillpoint_damage" -> String.valueOf((int) (pd.getSPShop().extraDamage() * 100));
-            case "skillpoint_itemchance" -> String.valueOf((int) (pd.getSPShop().doubleItemChance() * 100));
-            case "skillpoint_extramoney" -> String.valueOf((int) (pd.getSPShop().extraMoney() * 100));
-            case "skillpoint_slots" -> String.valueOf(pd.getSPShop().extraSlots());
-            case "skillpoint_skillpointchance" -> String.valueOf((int) (pd.getSPShop().skillpointChance() * 100));
-            case "skillpoint_moneypouchchance" -> String.valueOf((int) (pd.getSPShop().moneypouchChance() * 100));
-            case "skillpoint_instastealchance" -> String.valueOf((int) (pd.getSPShop().instastealChance() * 100));
+            case "skillpoints" -> String.valueOf(pd.getSkillPoints());
             case "outmaterial" -> main.getOutpostManager().getOutpostMaterial(p);
             case "outstatustitle" -> main.getOutpostManager().getStatusTitle();
             case "outtime" -> main.getOutpostManager().getStatusLoreLine1();
@@ -153,8 +150,19 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                         default -> null;
                     };
 
+                case "damage":
+                    if (parts.length < 3 || !parts[1].equals("tool")) return null;
+                    return String.valueOf((int) (ToolManager.getToolsName("tool" + parts[2]).getDamage() * 10));
+
+                case "size":
+                    if (parts.length < 3 || !parts[1].equals("back")) return null;
+                    return String.valueOf(BackpackManager.getBackpackName("back" + parts[2], 0).getcapacity());
+
+                case "material":
+                    if (parts.length < 3 || !parts[1].equals("tool")) return null;
+                    return String.valueOf(ToolManager.getToolsName("tool" + parts[2]).getMaterial());
+
                 case "store":
-                    // Format: %robbery_store_<stat>_<id>%
                     if (parts.length < 3) return null;
                     String stat = parts[1];
                     String storeId = "store" + parts[2];
@@ -163,7 +171,7 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                         case "milestone" -> String.valueOf(pd.getStoreMilestone(storeId));
                         case "level" -> String.valueOf(main.getMasteryManager().getLevelFromItems(storeId, pd.getStoreItems(storeId)));
                         case "nextmilestone" -> String.valueOf(main.getMasteryManager().getNextStoreMilestone(pd, storeId));
-                        case "reward" -> (parts.length == 4) ? main.getRewardManager().getRewardDisplay(storeId, Integer.parseInt(parts[3])) : null;
+                        case "reward" -> (parts.length == 4) ? main.getMasteryManager().getRewardDisplay(storeId, Integer.parseInt(parts[3])) : null;
                         case "required" -> (parts.length == 4) ? String.valueOf(main.getMasteryManager().getItemsRequiredForLevel(storeId, Integer.parseInt(parts[3]))) : null;
                         case "remaining" -> {
                             if (parts.length < 4) yield null;
@@ -193,10 +201,52 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                         default -> null;
                     };
 
-                case "skillpoint":
-                    // Format: %robbery_skillpoint_<category>_<num>%
+                case "skilltree":
                     if (parts.length < 3) return null;
-                    return String.valueOf((int)(SkillUpgradeData.getUpgradePercentage(pd, parts[1], parts[2]) * 100));
+
+                    String metric = parts[1];
+                    String perkId = parts[2];
+
+                    SkillTreeConfig cfg = main.getSkillTreeConfig();
+                    if (cfg == null) return null;
+
+
+                    SkillPerk perk = cfg.getTier(perkId);
+                    if (perk == null) return null;
+
+                    int current = pd.getSkillTreeLevel(perkId);
+                    int max = perk.maxLevel();
+                    int requiredLevel = perk.requiredLevel();
+                    int costNext = current < max ? perk.costForNext(current) : 0;
+                    double currentValue = pd.getPerkValue(perkId);
+                    double nextValue = current < max ? perk.valueForLevel(current + 1) : perk.valueForLevel(current);
+                    boolean meetReq = pd.canBuyPerk(perk);
+
+                    return switch (metric) {
+                        case "currentlevel" -> String.valueOf(current);
+                        case "maxlevel" -> String.valueOf(max);
+                        case "costnextlevel" -> String.valueOf(costNext);
+                        case "currentvalue" -> {
+                            double displayValue = currentValue;
+                            if (PERCENTAGE_PERKS.contains(perkId)) {
+                                displayValue *= 100;
+                            }
+                            yield String.format("%.3f", displayValue);
+                        }
+                        case "nextvalue" -> String.format("%.3f", nextValue);
+                        case "canupgrade" -> {
+                            if (pd.getLevel() < requiredLevel) yield "2";
+                            if (!meetReq) yield "4";
+                            if (current >= max) yield "3";
+                            if (pd.getSkillPoints() >= costNext) yield "1";
+                            yield "0";
+                        }
+                        case "displayname" -> perk.name();
+                        case "requiredlevel" -> String.valueOf(requiredLevel);
+                        case "description" -> perk.description();
+                        default -> null;
+                    };
+
 
                 default: return null;
             }

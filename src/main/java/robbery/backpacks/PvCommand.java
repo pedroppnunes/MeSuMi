@@ -75,8 +75,7 @@ public class PvCommand implements CommandExecutor {
             }
         }
 
-        int totalslots = pd.getExtraSlots() - pd.getSPShop().extraSlots();
-        if (Objects.equals(pd.getRank(), "rank0")) totalslots = 2;
+        int totalslots = pd.getExtraPvSlots();
 
         if (slot < 1 || slot > totalslots) {
             Messages.sendFormatted(p, "command.pv.invalid-slot", "max", String.valueOf(totalslots));

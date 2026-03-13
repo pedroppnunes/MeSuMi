@@ -20,13 +20,14 @@ import robbery.keys.Keys;
 import robbery.messages.Messages;
 import robbery.ranks.Rank;
 import robbery.ranks.RankManager;
-import robbery.skillpoints.SkillPoint;
-import robbery.skillpoints.SkillPointItem;
+import robbery.skilltree.SkillPerk;
+import robbery.skilltree.SkillTreeItem;
 import robbery.tool.ToolManager;
 import robbery.tool.Tools;
 
 import java.util.*;
 
+import static robbery.attribute.Attribute.*;
 import static robbery.backpacks.BackpackManager.BACK1;
 import static robbery.keys.KeyManager.STORE1;
 import static robbery.ranks.RankManager.NONE;
@@ -51,17 +52,17 @@ public class PlayerData {
     private final Map<String, Integer> storeItems = new java.util.HashMap<>();
     private final Map<String, Integer> storeMilestones = new java.util.HashMap<>();
     private final Map<String, Integer> skillTreeLevels = new HashMap<>();
+    private final Map<String, Double> perkValues = new HashMap<>();
+    private final Map<String, Long> temporaryPerks = new HashMap<>();
+    private double itemStreakBonus = 0.0;
+    private long lastItemStolenTimestamp = 0;
 
-    private SkillPoint sp;
+    private int resetSkillTreePoints = 0;
     private Rank rank;
     private final Player player;
     private int prestige;
     private double boostx = 0.0;
     private boolean doubleJump = true;
-    private double outboost = 0.0;
-    private double outspchance = 0.0;
-    private double outboosterchance = 0.0;
-    private double outspeed = 0.0;
 
     public PlayerData(Player p) {
         this.backpack = BACK1;
@@ -73,14 +74,11 @@ public class PlayerData {
         this.player = p;
         this.prestige = 0;
         this.skillpoints = 0;
-        this.sp = new SkillPoint(0,0,0,0,0,0,0);
         this.rank = NONE;
-        this.xp = 0L;
-        this.level = 1;
         this.itemsStolen = 0;
     }
 
-    //Backpacks
+//Backpacks
     public Backpacks getBackpack() {
         return backpack;
     }
@@ -121,7 +119,7 @@ public class PlayerData {
         this.backpack = b;
     }
 
-    //Tools
+//Tools
     public Tools getTool() {
         return tool;
     }
@@ -160,7 +158,7 @@ public class PlayerData {
         return total.toString();
     }
 
-    //Keys
+//Keys
     public String getKeysString() {
         StringBuilder stores = new StringBuilder();
         for (String k : keys) {
@@ -202,7 +200,7 @@ public class PlayerData {
             this.key = k;
     }
 
-    //Prestige
+//Prestige
     public int getPrestige() {
         return prestige;
     }
@@ -217,13 +215,16 @@ public class PlayerData {
         keys.add("store1");
     }
 
-    //General stuff
+//General stuff
     public void setBoostersPaused(boolean paused){
         this.boostersPaused = paused;
     }
 
     public void addItemToBackpack(Items item) {
         backpack.addBackpackItem(item,getBoost());
+    }
+    public double getXPBoost() {
+        return getPerkValue(PERK_XP1) + getPerkValue(PERK_XP2) + rank.xpboost();
     }
 
     public void busted() {
@@ -236,8 +237,21 @@ public class PlayerData {
 
 
     public double getBoost() {
-        return 1 + prestige * 0.10 + rank.boost() + sp.extraMoney() + outboost + boostx;
+        double boost = 1
+                + prestige * 0.10
+                + rank.boost()
+                + boostx
+                + getOutMoneyMult()
+                + getPerkValue(PERK_MONEY_MULT1)
+                + getPerkValue(PERK_MONEY_MULT2);
+
+        if (hasTemporaryPerk(PERK_ABILITY_MONEYMULT1)) {
+            boost += 0.5;
+        }
+
+        return boost;
     }
+
     public double getPrestigeBoost(){
         return (1 + prestige*0.10);
     }
@@ -248,7 +262,7 @@ public class PlayerData {
     public void setRank(String rank){
         this.rank = RankManager.getRank(rank);
         String name = BackpackManager.getBackpackNameR(backpack.getName());
-        setBackpack(BackpackManager.getBackpackName(Objects.requireNonNullElse(name, "back1"), this.rank.extraSlots() + sp.extraSlots()));
+        setBackpack(BackpackManager.getBackpackName(Objects.requireNonNullElse(name, "back1"), (int) (this.rank.extraSlots() + getPerkValue(PERK_BACK_SLOTS1))));
     }
     public void toggleDoubleJump(){
         doubleJump = !doubleJump;
@@ -256,10 +270,25 @@ public class PlayerData {
     public boolean isDoubleJump(){
         return doubleJump;
     }
-    public int getExtraSlots() { return rank.extraSlots() + sp.extraSlots();}
-    public double getExtraDamage(){return rank.extraDamage() * (1+sp.extraDamage()+outspeed);}
+    public int getExtraSlots() { return (int) (rank.extraSlots() + getPerkValue(PERK_BACK_SLOTS1));}
+    public double getExtraDamage() {
+        double baseDamage = rank.extraDamage()
+                + getOutSpeedBonus()
+                + getPerkValue(PERK_STEAL_SPEED1)
+                + getPerkValue(PERK_STEAL_SPEED2)
+                + itemStreakBonus;
 
-    //Player
+        if (hasTemporaryPerk(PERK_ITEM_STREAK1)) {
+            baseDamage += 0.5;
+        }
+
+        return baseDamage;
+    }
+    public int getExtraPvSlots() {
+        return rank.extraSlots();
+    }
+
+//Player
     public Player getPlayer() {
         return player;
     }
@@ -284,16 +313,16 @@ public class PlayerData {
         InventoryManager.giveItem(player, item, 8);
     }
 
-    public void giveSkillPoint(Robbery plugin){
-        InventoryManager.giveItem(player, SkillPointItem.createSkillPointItem(plugin),2);
+    public void giveSkillTree(Robbery plugin){
+        InventoryManager.giveItem(player, SkillTreeItem.createSkillTreeItem(plugin),2);
     }
 
-    //Items Stolen
+//Items Stolen
     public int getItemsStolen() {
         return itemsStolen;
     }
 
-    //Boosters
+//Boosters
     public void setBoosters(String name, Player player) {
         if (!boosters.containsKey(name) || boosters.get(name) == 0) return;
 
@@ -360,7 +389,7 @@ public class PlayerData {
         }.runTaskTimer(Robbery.getInstance(), 20L, 20L);
     }
 
-    public void stopBoosters(Player player) {
+    public void stopBoosters() {
         boostersPaused = true;
         if (boosterTask != null) boosterTask.cancel();
         boostx = 0.0;
@@ -398,9 +427,7 @@ public class PlayerData {
         }
     }
 
-    public void setOutpostBoost(double boost){
-        this.outboost = boost;
-    }
+
 
     public Booster getActiveboost() {
         if (activeBoosters.isEmpty()) {
@@ -408,7 +435,6 @@ public class PlayerData {
         }
         return activeBoosters.peekFirst();
     }
-
 
     public String getActiveBoostString() {
         if (activeBoosters.isEmpty()) return "none";
@@ -420,7 +446,6 @@ public class PlayerData {
         }
         return builder.toString();
     }
-
 
     public void setActiveBooster(String string) {
         activeBoosters.clear();
@@ -456,14 +481,10 @@ public class PlayerData {
             } catch (NumberFormatException ignored) {
             }
         }
-
-        // If boosters are paused, don't start timer
         if (boostersPaused) {
             boostx = 0.0;
             return;
         }
-
-        // Start ticking if any exist
         if (!activeBoosters.isEmpty()) {
             startNextBooster(player);
         } else {
@@ -477,18 +498,11 @@ public class PlayerData {
     }
 
 //Skillpoints & XP
-    public int getSP(){ return skillpoints;}
-    public void addSkillpoint(){
-        this.skillpoints++;
-    }
     public void setSP(String sp){
         if(sp == null)
             this.skillpoints = 0;
         else
             this.skillpoints = Integer.parseInt(sp);
-    }
-    public void addSkillpoint(int sp){
-        this.skillpoints += sp;
     }
     public long getXp() {
         return xp;
@@ -507,9 +521,6 @@ public class PlayerData {
     }
     public int getSkillPoints() {
         return skillpoints;
-    }
-    public void setSkillPoints(int pts) {
-        this.skillpoints = Math.max(0, pts);
     }
 
 //Store Milestones
@@ -573,66 +584,128 @@ public int getStoreItems(String storeId) {
         if (level <= 0) skillTreeLevels.remove(tierId);
         else skillTreeLevels.put(tierId, level);
     }
-    public Map<String,Integer> getAllSkillTreeLevels() { return Collections.unmodifiableMap(skillTreeLevels); }
-//SkillPointShop
-    public SkillPoint getSPShop(){ return sp;}
-    public void setSPShop(SkillPoint spShop) {
-        if (sp.extraSlots() != spShop.extraSlots()) {
-            String currentName = BackpackManager.getBackpackNameR(backpack.getName());
-
-            int totalExtra = this.rank.extraSlots() + spShop.extraSlots();
-
-            setBackpack(BackpackManager.getBackpackName(Objects.requireNonNullElse(currentName, "back1"), totalExtra));
-        }
-        sp = spShop;
+    public Map<String,Integer> getAllSkillTreeLevels() { return skillTreeLevels; }
+    public int getResetSkillTreePoints() {
+        return resetSkillTreePoints;
+    }
+    public void addResetSkillTreePoints(int amount) {
+        this.resetSkillTreePoints = Math.max(0, this.resetSkillTreePoints + amount);
     }
 
-
-    public String getSPShopString(){
-        return sp.doubleItemChance() + "_" + sp.extraDamage() + "_" + sp.extraMoney() + "_" + sp.extraSlots() + "_" + sp.skillpointChance() + "_" + sp.moneypouchChance() + "_" + sp.instastealChance();
+    public boolean consumeResetSkillTreePoint() {
+        if (resetSkillTreePoints <= 0) return false;
+        resetSkillTreePoints--;
+        return true;
     }
-    public void setSPShopString(String sp){
-        StringBuilder total = new StringBuilder();
-        Scanner scanner = new Scanner(sp);
-        scanner.useDelimiter("_");
-        double itemChance = 0.0;
-        double extraDamage = 0.0;
-        double extraMoney = 0.0;
-        double spChance = 0.0;
-        int extraSlots = 0;
-        double moneyChance = 0.0;
-        double instachance = 0.0;
-        while(scanner.hasNext()){
-            itemChance = Double.parseDouble(scanner.next());
-            extraDamage = Double.parseDouble(scanner.next());
-            extraMoney = Double.parseDouble(scanner.next());
-            extraSlots = Integer.parseInt(scanner.next());
-            spChance = Double.parseDouble(scanner.next());
-            moneyChance = Double.parseDouble(scanner.next());
-            instachance = Double.parseDouble(scanner.next());
-        }
-        this.sp = new SkillPoint(itemChance,extraDamage,extraMoney,extraSlots,spChance,moneyChance,instachance);
+    public void setResetSkillTreePoints(int amount){
+        this.resetSkillTreePoints = amount;
     }
 
-    public void setSkillpointChance(int perk2Value) {
-        this.outspchance = (double) perk2Value /100;
+//Outpost Buffs
+    public void setOutSkillpointChance(int value) {
+        setPerkValue(ATTR_SKILLPOINT_CHANCE, value / 100.0);
     }
 
-    public void setBoosterChance(int perk2Value) {
-        this.outboosterchance = (double) perk2Value /100;
+    public void setOutBoosterChance(int value) {
+        setPerkValue(ATTR_BOOSTER_CHANCE, value / 100.0);
     }
 
-    public void setSpeedBonus(int perk2Value) {
-        this.outspeed = (double) perk2Value /100;
+    public void setOutSpeedBonus(int value) {
+        setPerkValue(ATTR_SPEED_BONUS, value / 100.0);
+    }
+
+    public void setOutMooneyMult(double mult){
+        setPerkValue(ATTR_MONEY_MULT, mult);
     }
 
     public double getOutBoosterChance() {
-        return outboosterchance;
+        return getPerkValue(PERK_OUT_BUFF1) == 0 ? getPerkValue(ATTR_BOOSTER_CHANCE) : getPerkValue(ATTR_BOOSTER_CHANCE)*getPerkValue(PERK_OUT_BUFF1);
     }
 
     public double getOutSpChance() {
-        return outspchance;
+        return getPerkValue(PERK_OUT_BUFF1) == 0 ? getPerkValue(ATTR_SKILLPOINT_CHANCE) : getPerkValue(ATTR_SKILLPOINT_CHANCE)*getPerkValue(PERK_OUT_BUFF1);
     }
+
+    public double getOutSpeedBonus(){
+        return getPerkValue(PERK_OUT_BUFF1) == 0 ? getPerkValue(ATTR_SPEED_BONUS) : getPerkValue(ATTR_SPEED_BONUS)*getPerkValue(PERK_OUT_BUFF1);
+    }
+
+    private double getOutMoneyMult() {
+        return getPerkValue(PERK_OUT_BUFF1) == 0 ? getPerkValue(ATTR_MONEY_MULT) : getPerkValue(ATTR_MONEY_MULT)*getPerkValue(PERK_OUT_BUFF1);
+    }
+//Attributes
+public void setPerkValue(String perkId, double value) {
+    if (value == 0) {
+        perkValues.remove(perkId);
+    } else {
+        double finalValue;
+
+        if (PERCENTAGE_PERKS.contains(perkId)) {
+            finalValue = value / 100.0;
+            finalValue = Math.round(finalValue * 100.0) / 100.0;
+        } else {
+            finalValue = Math.round(value * 1000.0) / 1000.0;
+        }
+
+        perkValues.put(perkId, finalValue);
+    }
+}
+
+    public double getPerkValue(String perkId) {
+        return perkValues.getOrDefault(perkId, 0.0);
+    }
+
+    public boolean hasPerk(String perkId) {
+        return getPerkValue(perkId) > 0;
+    }
+    public Map<String,Double> getAllPerkValues() { return perkValues; }
+
+
+    public boolean canBuyPerk(SkillPerk perk) {
+        if (perk.requiredPerks().isEmpty()) return true;
+
+        Set<String> requireMax = Set.of("featherflight", "keyschance", "doublejump");
+
+        for (String req : perk.requiredPerks()) {
+            int level = getSkillTreeLevel(req);
+
+            if (requireMax.contains(perk.id())) {
+                SkillPerk reqPerk = Robbery.getSkillTreeConfig().getTier(req);
+                if (reqPerk != null && level >= reqPerk.maxLevel()) {
+                    return true;
+                }
+            } else {
+                if (level > 0) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+    public void setTemporaryPerk(String perkId, double durationSeconds) {
+        temporaryPerks.put(perkId, System.currentTimeMillis() + (long)(durationSeconds * 1000));
+    }
+
+    public boolean hasTemporaryPerk(String perkId) {
+        Long expire = temporaryPerks.get(perkId);
+        if (expire == null) return false;
+        if (System.currentTimeMillis() > expire) {
+            temporaryPerks.remove(perkId);
+            return false;
+        }
+        return true;
+    }
+
+    public void addItemStreak(double amount) {
+        long now = System.currentTimeMillis();
+        if (now - lastItemStolenTimestamp > 3000) {
+            itemStreakBonus = 0.0;
+        }
+        itemStreakBonus = Math.min(0.35, itemStreakBonus + amount);
+        lastItemStolenTimestamp = now;
+    }
+
 
 }
 

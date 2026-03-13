@@ -68,9 +68,9 @@ public class StoreMasteryManager {
         int currentItems = pd.getStoreItems(storeId);
         int nextMilestone = 1;
         while(nextMilestone <= 10 && currentItems >= main.getMasteryManager().getItemsRequiredForLevel(storeId, nextMilestone)) {
-            nextMilestone++; // player has completed this milestone
+            nextMilestone++;
         }
-        return nextMilestone; // the milestone the player is currently trying to reach
+        return nextMilestone;
     }
 
     public int getLevelFromItems(String storeId, int totalItems) {
@@ -108,10 +108,15 @@ public class StoreMasteryManager {
             Messages.sendFormatted(player, "events.mastery.max", "store", store.getName());
         }
 
-        main.getRewardManager().applyRewards(player, storeId, newLevel);
+        //Apply Rewards TODO
     }
 
     private void unlockRegion(Player player, String regionId) {
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rg addmember " + regionId + " " + player.getName());
+    }
+
+    public String getRewardDisplay(String storeId, int i) {
+        //TODO
+        return "";
     }
 }

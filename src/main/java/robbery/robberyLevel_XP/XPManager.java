@@ -15,8 +15,8 @@ public class XPManager {
 
     private final Robbery main;
 
-    private final int SOFTCAP = 130;
-    private final double BASE_MULT = 120.0;
+    private final int SOFTCAP = 120;
+    private final double BASE_MULT = 1.4;
     private final double EXPONENT = 3.3;
     private final double SOFTCAP_MULT = 1.15;
 

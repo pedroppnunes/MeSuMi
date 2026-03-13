@@ -27,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static robbery.attribute.Attribute.PERK_INSTA_STEAL1;
+
 /**
  * Listens for player interactions with ArmorStands representing items in the world.
  * <p>
@@ -122,12 +124,8 @@ public class ArmorStandInteractionListener implements Listener {
 
                     if (pickingTasks.containsKey(player.getUniqueId())) return;
                     item.togglePickable();
-                    int roll = 0;
-                    if (p.getSPShop().instastealChance() != 0)
-                        roll = random.nextInt((int) (1 / p.getSPShop().instastealChance())) + 1;
-
                     Runnable onFinish = () -> pickingTasks.remove(player.getUniqueId());
-                    PickingTask task = new PickingTask(player, item, stand, tool, main, roll == 1, onFinish);
+                    PickingTask task = new PickingTask(player, item, stand, tool, main, onFinish);
                     pickingTasks.put(player.getUniqueId(), task);
                     task.runTaskTimer(main, 0L, 1L);
                 }

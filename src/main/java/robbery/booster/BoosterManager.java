@@ -3,6 +3,8 @@ package robbery.booster;
 import robbery.player.PlayerData;
 import java.util.Random;
 
+import static robbery.attribute.Attribute.PERK_BOOST1;
+
 /**
  * Manages creation, retrieval, and random generation of boosters in the Robbery plugin.
  * <p>
@@ -129,7 +131,7 @@ public class BoosterManager {
         double t = Math.max(0.0, Math.min(1.0, (store - 1) / 12.0));
         double baseChance = startChance + (endChance - startChance) * t;
 
-        double bonusMultiplier = 1.0 + pd.getOutBoosterChance();
+        double bonusMultiplier = 1.0 + pd.getOutBoosterChance() + pd.getPerkValue(PERK_BOOST1);
         double finalChance = baseChance * bonusMultiplier;
 
         return (int) Math.max(1, Math.round(1.0 / finalChance));

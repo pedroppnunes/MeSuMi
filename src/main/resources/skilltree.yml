@@ -1,23 +1,255 @@
 perks:
-  - id: stealth
-    name: "Stealth"
+  - id: moneymultiplier1
+    name: "Money Multiplier 1"
     required_level: 2
+    max_level: 15
+    costs: [ 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6 ]
+    base_value: 0.025
+    value_increment: 0.025
+    description: "Increases your Money Multiplier by +0.025"
+    requiredPerks: []
+
+  - id: stealspeed1
+    name: "Stealing Speed 1"
+    required_level: 5
+    max_level: 10
+    costs: [1, 1, 2, 2, 3, 3, 4, 4, 5, 5]
+    base_value: 1
+    value_increment: 1
+    description: "Increases your Stealing Speed by +1%"
+    requiredPerks:
+      - xp1
+
+  - id: xp1
+    name: "Robbery XP 1"
+    required_level: 5
+    max_level: 10
+    costs: [1, 2, 2, 2, 3, 3, 3, 4, 4, 5]
+    base_value: 1
+    value_increment: 1
+    description: "Increase your Robbery XP by +1%"
+    requiredPerks:
+      - moneymultiplier1
+
+  - id: outpostbuff1
+    name: "Outpost Buff"
+    required_level: 5
     max_level: 5
-    # cost list per upgrade step (level1 cost, level2 cost, ...)
-    costs: [1, 1, 2, 2, 3]
-    description: "Reduces chance of detection while robbing."
+    costs: [ 1, 2, 3, 4, 5 ]
+    base_value: 1
+    value_increment: 1
+    description: "Increases the outpost buffs by +1%. (Stacks with island members)"
+    requiredPerks:
+      - xp1
 
-  - id: lockpicking
-    name: "Lockpicking"
+  - id: abilityspinquests1
+    name: "Gain Skill Points in Quests 1"
     required_level: 10
-    max_level: 3
-    base_cost: 2
-    increment: 1
-    description: "Faster pick times."
+    max_level: 1
+    costs: [5]
+    base_value: 1
+    value_increment: 0
+    description: "Quests now give Skill Points."
+    requiredPerks:
+      - outpostbuff1
 
-  - id: payout
-    name: "Payout"
-    required_level: 25
-    max_level: 4
-    costs: [2, 3, 4, 5]
-    description: "Increases money gained from robberies."
+  - id: extrabackpackslots1
+    name: "Backpack Slots 1"
+    required_level: 10
+    max_level: 5
+    costs: [2, 2, 3, 4, 5]
+    base_value: 1
+    value_increment: 1
+    description: "Increases your backpack slots."
+    requiredPerks:
+      - stealspeed1
+
+  - id: chanceskillpoint1
+    name: "Skill Point Increase"
+    required_level: 20
+    max_level: 10
+    costs: [ 2, 2, 3, 3, 4, 4, 5, 5, 6, 6 ]
+    base_value: 2
+    value_increment: 2
+    description: "Increases the chance of getting a skillpoint by +2%"
+    requiredPerks:
+      - extrabackpackslots1
+
+  - id: chancemoneymultiplier1
+    name: "+0.5x Money Multiplier"
+    required_level: 20
+    max_level: 1
+    costs: [ 5 ]
+    base_value: 1
+    value_increment: 0
+    description: "5% Chance of getting +0.5x money multiplier for 10 seconds."
+    requiredPerks:
+      - chanceskillpoint1
+
+  - id: chancebooster1
+    name: "Booster Increase"
+    required_level: 20
+    max_level: 10
+    costs: [ 2, 2, 3, 3, 4, 4, 5, 5, 6, 6 ]
+    base_value: 2
+    value_increment: 2
+    description: "Increases the chance of getting a booster by +2%"
+    requiredPerks:
+      - abilityspinquests1
+
+  - id: chancestealspeed1
+    name: "+50% Steal Speed"
+    required_level: 20
+    max_level: 1
+    costs: [ 5 ]
+    base_value: 1
+    value_increment: 0
+    description: "5% Chance of getting +50% steal speed for 10 seconds."
+    requiredPerks:
+      - chancebooster1
+
+  - id: itemstreakspeed1
+    name: "Item Streak Speed"
+    required_level: 35
+    max_level: 5
+    costs: [ 3, 3, 4, 4, 5 ]
+    base_value: 1
+    value_increment: 1
+    description: "For each item that you pick up, resets after 3 seconds without picking, you receive a +1% speed. (Max:35%)"
+    requiredPerks:
+      - chancebooster1
+
+  - id: doubleitemchance1
+    name: "Double Item Chance"
+    required_level: 35
+    max_level: 7
+    costs: [ 3, 4, 4, 5, 5, 6, 7]
+    base_value: 1
+    value_increment: 1
+    description: "Increase the chance of receiving the same item twice by +1%"
+    requiredPerks:
+      - chanceskillpoint1
+
+  - id: avoidbeingcaught
+    name: "Avoid Being Caught"
+    required_level: 35
+    max_level: 5
+    costs: [ 3, 4, 5, 6, 7 ]
+    base_value: 1
+    value_increment: 1
+    description: "Increase the chance of not being caught by +1%"
+    requiredPerks:
+      - doubleitemchance1
+      - itemstreakspeed1
+
+  - id: abilityspinquests2
+    name: "Gain Skill Points in Quests 2"
+    required_level: 50
+    max_level: 1
+    costs: [ 20 ]
+    base_value: 1
+    value_increment: 0
+    description: "Increases the amount of Skill Points quests give by +2."
+    requiredPerks:
+      - avoidbeingcaught
+
+  - id: stealspeed2
+    name: "Stealing Speed 2"
+    required_level: 65
+    max_level: 10
+    costs: [ 3, 3, 3, 4, 4, 4, 5, 5, 5, 6 ]
+    base_value: 2.5
+    value_increment: 2.5
+    description: "Increases your Stealing Speed by +2.5%"
+    requiredPerks:
+      - moneymultiplier2
+
+  - id: moneymultiplier2
+    name: "Money Multiplier 2"
+    required_level: 65
+    max_level: 5
+    costs: [ 5, 5, 6, 6, 7 ]
+    base_value: 0.1
+    value_increment: 0.1
+    description: "Increases your Money Multiplier by +0.10"
+    requiredPerks:
+      - abilityspinquests2
+
+  - id: xp2
+    name: "Robbery XP 2"
+    required_level: 65
+    max_level: 5
+    costs: [ 5, 5, 6, 6, 7 ]
+    base_value: 5
+    value_increment: 5
+    description: "Increase your Robbery XP by +5%"
+    requiredPerks:
+      - moneymultiplier2
+
+  - id: tripleitemchance1
+    name: "Triple Item"
+    required_level: 80
+    max_level: 3
+    costs: [ 7, 8, 9 ]
+    base_value: 1
+    value_increment: 1
+    description: "Increase the chance of receiving the same item thrice by +1%"
+    requiredPerks:
+      - stealspeed2
+
+  - id: instastealchance1
+    name: "Insta Steal"
+    required_level: 80
+    max_level: 5
+    costs: [ 6, 6, 7, 7, 8 ]
+    base_value: 2
+    value_increment: 2
+    description: "Increase the chance of stealing an item instantly by +2%"
+    requiredPerks:
+      - moneymultiplier2
+
+  - id: doubleinventorychance1
+    name: "Double Inventory Chance"
+    required_level: 80
+    max_level: 5
+    costs: [ 6, 6, 7, 7, 8 ]
+    base_value: 0.5
+    value_increment: 0.5
+    description: "Increase the chance when selling to receive double your inventory worth by +0.5%"
+    requiredPerks:
+      - xp2
+
+  - id: doublejump
+    name: "Double Jump"
+    required_level: 100
+    max_level: 1
+    costs: [ 50 ]
+    base_value: 1
+    value_increment: 0
+    description: "Receive the ability to double jump. (Cooldown: 5 seconds)"
+    requiredPerks:
+      - doubleinventorychance1
+
+  - id: keyschance
+    name: "Key Stealer"
+    required_level: 100
+    max_level: 1
+    costs: [ 50 ]
+    base_value: 1
+    value_increment: 0
+    description: "Gain the ability to receive keys while stealing. (Vote, Epic, Legendary, Tags, Booster)"
+    requiredPerks:
+      - tripleitemchance1
+
+  - id: featherflight
+    name: "Feather Flight"
+    required_level: 100
+    max_level: 1
+    costs: [ 50 ]
+    base_value: 1
+    value_increment: 0
+    description: "Receive the Feather Flight effect for 5 seconds. (Cooldown: 3 minutes)"
+    requiredPerks:
+      - instastealchance1
+
+

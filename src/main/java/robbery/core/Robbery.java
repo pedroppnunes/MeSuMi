@@ -29,20 +29,11 @@ import robbery.backpacks.PvCommand;
 import robbery.keys.BuyKey;
 import robbery.keys.Rcrate;
 import robbery.player.PlayerDataManager;
-import robbery.skilltree.SkillCommand;
-import robbery.skilltree.SkillService;
-import robbery.skilltree.SkillTreeConfig;
-import robbery.skilltree.SkillTreeGUI;
-import robbery.storeMastery.RewardManager;
+import robbery.skilltree.*;
 import robbery.storeMastery.StoreMasteryManager;
 import robbery.tool.BuyTool;
 import robbery.chat.ChatColorCommand;
 import robbery.claim.Claim;
-import robbery.core.HelpCommand;
-import robbery.core.Load;
-import robbery.core.LoadBackup;
-import robbery.core.MigrateBackup;
-import robbery.core.RobberyReload;
 import robbery.mechanics.HidePlayers;
 import robbery.mechanics.NightVision;
 import robbery.mechanics.ToggleDoubleJump;
@@ -57,7 +48,6 @@ import robbery.outpost.Outpost;
 import robbery.prestige.Prestige;
 import robbery.ranks.RankUp;
 import robbery.ranks.RankUpdate;
-import robbery.skillpoints.SkillpointBuy;
 import robbery.booster.StopBoosterCommand;
 import robbery.booster.UseBooster;
 import robbery.warnings.WarnCommand;
@@ -68,11 +58,6 @@ import robbery.mechanics.BlockCraftListener;
 import robbery.mechanics.DoubleJumpListener;
 import robbery.mechanics.HideoutListener;
 import robbery.mechanics.InventoryLockListener;
-import robbery.mechanics.InventoryManager;
-import robbery.mechanics.PickingTask;
-import robbery.mechanics.PickupPreventionListener;
-import robbery.core.AutoReloadTask;
-import robbery.core.RewardHolder;
 import robbery.chat.ChatItemReplacer;
 import robbery.claim.ClaimGuiListener;
 import robbery.leaderboard.HourlyLeaderboard;
@@ -89,7 +74,6 @@ import robbery.prestige.PrestigeCountManager;
 import robbery.ranks.RankPaperListener;
 import robbery.robberyLevel_XP.AdminXPCommand;
 import robbery.robberyLevel_XP.XPManager;
-import robbery.skillpoints.SkillPointListener;
 import robbery.votes.VotePartyManager;
 import robbery.warnings.ChatWarningListener;
 import robbery.warnings.WarningManager;
@@ -121,11 +105,14 @@ public class Robbery extends JavaPlugin implements Listener {
     private HourlyLeaderboard hourlyLeaderboard;
     private PlayerEventListener playerEventListener;
     private XPManager xpManager;
-    private RewardManager rewardManager;
     private StoreMasteryManager storeMasteryManager;
+    private static SkillTreeConfig skillTreeConfig;
+    private SkillService skillService;
 
     private FileConfiguration itemConfig;
     private File itemConfigFile;
+
+
 
     @Override
     public void onEnable() {
@@ -158,8 +145,8 @@ public class Robbery extends JavaPlugin implements Listener {
         this.chatStyleManager = new ChatStyleManager(getDataFolder());
         this.playerEventListener = new PlayerEventListener(main);
         this.xpManager = new XPManager(main);
-        this.rewardManager = new RewardManager(main);
         this.storeMasteryManager = new StoreMasteryManager(main);
+
         getServer().getPluginManager().registerEvents(new VoteListener(main), main);
         BlockCraftListener blockCraft = new BlockCraftListener();
         Messages.init(main);
@@ -170,7 +157,6 @@ public class Robbery extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new BoosterItemListener(main), main);
         getServer().getPluginManager().registerEvents(new DoubleJumpListener(main), main);
         getServer().getPluginManager().registerEvents(new HideoutListener(), main);
-        getServer().getPluginManager().registerEvents(new SkillPointListener(main), main);
         getServer().getPluginManager().registerEvents(new ChatItemReplacer(main, muteManager), main);
         getServer().getPluginManager().registerEvents(new CombatManager(main), main);
         getServer().getPluginManager().registerEvents(new ChatWarningListener(main), main);
@@ -179,6 +165,7 @@ public class Robbery extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(rcrate, main);
         getServer().getPluginManager().registerEvents(new RankPaperListener(), main);
         getServer().getPluginManager().registerEvents(new ClaimGuiListener(), main);
+        getServer().getPluginManager().registerEvents(new SkillTreeItem(main), main);
         Objects.requireNonNull(getCommand("additem")).setExecutor(new AddItem(main));
         Objects.requireNonNull(getCommand("removeItem")).setExecutor(new RemoveItem(main));
         Objects.requireNonNull(getCommand("sellrob")).setExecutor(new Sell(main));
@@ -193,7 +180,6 @@ public class Robbery extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("hp")).setExecutor(hidePlayers);
         Objects.requireNonNull(getCommand("mall")).setExecutor(new Mall(main));
         Objects.requireNonNull(getCommand("rankupdate")).setExecutor(new RankUpdate(main));
-        Objects.requireNonNull(getCommand("skillpointbuy")).setExecutor(new SkillpointBuy(main));
         Objects.requireNonNull(getCommand("nv")).setExecutor(new NightVision(main));
         Objects.requireNonNull(getCommand("pv")).setExecutor(new PvCommand());
         Objects.requireNonNull(getCommand("warn")).setExecutor(new WarnCommand(main));
@@ -221,10 +207,10 @@ public class Robbery extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("migrate")).setExecutor(new MigrateBackup(main));
         Objects.requireNonNull(getCommand("stopbooster")).setExecutor(new StopBoosterCommand());
         Objects.requireNonNull(getCommand("adminxp")).setExecutor(new AdminXPCommand(main));
-        SkillTreeConfig cfg = new SkillTreeConfig(main);
-        SkillService svc = new SkillService(main,cfg);
-        SkillTreeGUI gui = new SkillTreeGUI(main,cfg,svc);
-        Objects.requireNonNull(getCommand("skilltree")).setExecutor(new SkillCommand(svc,gui,cfg));
+        skillTreeConfig = new SkillTreeConfig(this);
+        this.skillService = new SkillService(this, skillTreeConfig);
+        Objects.requireNonNull(getCommand("skillbuy")).setExecutor(new SkillPerkBuyCommand(skillService,skillTreeConfig));
+        Objects.requireNonNull(getCommand("resetskilltree")).setExecutor(new SkillTreeResetCommand(main,skillTreeConfig));
         getServer().getMessenger().registerOutgoingPluginChannel(main, "BungeeCord");
         World outpostWorld = Bukkit.getWorld("outpost");
         if (outpostWorld == null) {
@@ -675,45 +661,6 @@ public class Robbery extends JavaPlugin implements Listener {
         return true;
     }
 
-    public static Economy getEconomy() {
-        return econ;
-    }
-
-    public OutpostManager getOutpostManager() {
-        return outpostManager;
-    }
-
-    public WarningManager getWarningManager() {
-        return warningManager;
-    }
-
-    public HidePlayers getHidePlayers() {
-        return hidePlayers;
-    }
-
-    public MuteManager getMuteManager() {
-        return muteManager;
-    }
-
-    public VotePartyManager getVotePartyManager() {
-        return votePartyManager;
-    }
-
-    public ChatStyleManager getChatStyleManager() {
-        return chatStyleManager;
-    }
-
-    public WeeklyLeaderboardTask getWeeklyLeaderboardTask() {
-        return weeklyLeaderboardTask;
-    }
-
-    public FileConfiguration getItemConfig() {
-        return this.itemConfig;
-    }
-
-    public RewardManager getRewardManager(){return this.rewardManager;}
-    public StoreMasteryManager getMasteryManager() {return this.storeMasteryManager;}
-
     private void startItemClearTask() {
         final int clearIntervalSec = 900;
         final List<String> worlds = List.of("SuperiorWorld", "outpost");
@@ -807,6 +754,46 @@ public class Robbery extends JavaPlugin implements Listener {
     public boolean getIsBackup() {
         return isBackingUp;
     }
+//Getters
+    public static Economy getEconomy() {
+        return econ;
+    }
+
+    public OutpostManager getOutpostManager() {
+        return outpostManager;
+    }
+
+    public WarningManager getWarningManager() {
+        return warningManager;
+    }
+
+    public HidePlayers getHidePlayers() {
+        return hidePlayers;
+    }
+
+    public MuteManager getMuteManager() {
+        return muteManager;
+    }
+
+    public VotePartyManager getVotePartyManager() {
+        return votePartyManager;
+    }
+
+    public ChatStyleManager getChatStyleManager() {
+        return chatStyleManager;
+    }
+
+    public WeeklyLeaderboardTask getWeeklyLeaderboardTask() {
+        return weeklyLeaderboardTask;
+    }
+
+    public FileConfiguration getItemConfig() {
+        return this.itemConfig;
+    }
+
+    public StoreMasteryManager getMasteryManager() {return this.storeMasteryManager;}
+    public static SkillTreeConfig getSkillTreeConfig(){return skillTreeConfig;}
+    public SkillService getSkillService(){return this.skillService;}
 
 
 }

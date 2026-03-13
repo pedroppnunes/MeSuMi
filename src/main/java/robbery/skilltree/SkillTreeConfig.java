@@ -39,6 +39,27 @@ public class SkillTreeConfig {
             List<Integer> costs = new ArrayList<>();
             Object costsObj = m.get("costs");
 
+            List<Double> values = new ArrayList<>();
+            Object valuesObj = m.get("values");
+
+            List<String> requiredPerks = new ArrayList<>();
+            Object reqObj = m.get("requiredPerks");
+
+            if (reqObj instanceof List) {
+                for (Object o : (List<?>) reqObj) {
+                    requiredPerks.add(String.valueOf(o));
+                }
+            }
+            if(valuesObj instanceof List){
+                for(Object o : (List<?>) valuesObj)
+                    values.add(getDouble(o));
+            } else {
+                double base = getDouble(m.getOrDefault("base_value", 1));
+                double inc = getDouble(m.getOrDefault("value_increment", 0));
+                for (int i = 0; i < maxLevel; i++) {
+                    values.add(base + (inc * i));
+                }
+            }
             if (costsObj instanceof List) {
                 for (Object o : (List<?>) costsObj) {
                     costs.add(getInt(o));
@@ -55,7 +76,7 @@ public class SkillTreeConfig {
                 costs.add(costs.getLast());
             }
 
-            tiers.put(id, new SkillPerk(id, name, required, maxLevel, costs, desc));
+            tiers.put(id, new SkillPerk(id, name, required, maxLevel, costs, values, desc, requiredPerks));
         }
     }
 
@@ -63,5 +84,8 @@ public class SkillTreeConfig {
     public SkillPerk getTier(String id) { return tiers.get(id); }
     private int getInt(Object o) {
         return (o instanceof Number) ? ((Number) o).intValue() : 0;
+    }
+    private double getDouble(Object o){
+        return (o instanceof Number) ? ((Number) o).doubleValue() : 0;
     }
 }

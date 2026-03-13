@@ -84,7 +84,7 @@ public class Rcrate implements CommandExecutor,Listener {
                 return true;
             }
 
-            PlayerDataManager.getPlayerData(target).addSkillpoint(amount);
+            PlayerDataManager.getPlayerData(target).addSkillPoints(amount);
             Messages.sendFormatted(sender, "command.rcrate.sp-given", Map.of("player", target.getName(), "amount", String.valueOf(amount)));
             return true;
         }

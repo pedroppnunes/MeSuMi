@@ -9,28 +9,28 @@ package robbery.ranks;
 public class RankManager {
 
     /** The highest rank available. */
-    public static final Rank MAFIA_BOSS = new Rank("Mafia Boss", 2.0, 8, 0.6, "rank7");
+    public static final Rank MAFIA_BOSS = new Rank("Mafia Boss", 2.0, 8, 0.6, 0.25,"rank7");
 
-    /** Second highest rank. */
-    public static final Rank KINGPIN = new Rank("Kingpin", 1.75, 7, 0.5, "rank6");
+    /** Second-highest rank. */
+    public static final Rank KINGPIN = new Rank("Kingpin", 1.75, 7, 0.5, 0.20,"rank6");
 
     /** High-level rank for experienced players. */
-    public static final Rank HEISTER = new Rank("Heister", 1.5, 6, 0.4, "rank5");
+    public static final Rank HEISTER = new Rank("Heister", 1.5, 6, 0.4, 0.15,"rank5");
 
     /** Mid-level rank representing an outlaw. */
-    public static final Rank OUTLAW = new Rank("Outlaw", 1.25, 5, 0.3, "rank4");
+    public static final Rank OUTLAW = new Rank("Outlaw", 1.25, 5, 0.3, 0.10,"rank4");
 
     /** Mid-low rank representing a bandit. */
-    public static final Rank BANDIT = new Rank("Bandit", 1.0, 4, 0.2, "rank3");
+    public static final Rank BANDIT = new Rank("Bandit", 1.0, 4, 0.2, 0.075,"rank3");
 
     /** Low-level rank representing a basic robber. */
-    public static final Rank ROBBER = new Rank("Robber", 0.75, 3, 0.15, "rank2");
+    public static final Rank ROBBER = new Rank("Robber", 0.75, 3, 0.15, 0.05,"rank2");
 
     /** Entry-level rank representing a burglar. */
-    public static final Rank BURGLAR = new Rank("Burglar", 0.5, 2, 0.1, "rank1");
+    public static final Rank BURGLAR = new Rank("Burglar", 0.5, 2, 0.1, 0.025,"rank1");
 
     /** Default empty rank for players without a rank. */
-    public static final Rank NONE = new Rank("", 0.0, 0, 0, "rank0");
+    public static final Rank NONE = new Rank("", 0.0, 0, 0, 0,"rank0");
 
     /**
      * Returns the {@link Rank} corresponding to the given identifier string.

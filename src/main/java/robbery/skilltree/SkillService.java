@@ -3,10 +3,12 @@ package robbery.skilltree;
 // package robbery.skilltree;
 
 import org.bukkit.entity.Player;
-import org.bukkit.Bukkit;
 import robbery.core.Robbery;
+import robbery.messages.Messages;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
+
+import java.util.Map;
 
 public class SkillService {
     private final SkillTreeConfig config;
@@ -25,35 +27,41 @@ public class SkillService {
         if (tier == null) return false;
 
         int current = pd.getSkillTreeLevel(tierId);
-        if (current >= tier.getMaxLevel()) return false;
-        if (pd.getLevel() < tier.getRequiredLevel()) return false; // robbery level requirement
+        if (current >= tier.maxLevel()) return false;
+        if (pd.getLevel() < tier.requiredLevel()) return false;
         int cost = tier.costForNext(current);
         return pd.getSkillPoints() >= cost;
     }
 
-    public boolean upgrade(Player player, String tierId) {
+    public void upgrade(Player player, String tierId) {
         PlayerData pd = PlayerDataManager.getPlayerData(player);
-        if (pd == null) return false;
+        if (pd == null) return;
 
-        synchronized (player.getUniqueId().toString().intern()) {
+        synchronized (pd) {
+
             SkillPerk tier = config.getTier(tierId);
-            if (tier == null) return false;
-            int cur = pd.getSkillTreeLevel(tierId);
-            if (cur >= tier.getMaxLevel()) return false;
-            if (pd.getLevel() < tier.getRequiredLevel()) return false;
-            int cost = tier.costForNext(cur);
-            if (pd.getSkillPoints() < cost) return false;
+            if (tier == null) return;
 
-            pd.setSkillTreeLevel(tierId, cur + 1);
+            int cur = pd.getSkillTreeLevel(tierId);
+            if (cur >= tier.maxLevel()) return;
+
+            if (pd.getLevel() < tier.requiredLevel()) return;
+
+            int cost = tier.costForNext(cur);
+            if (pd.getSkillPoints() < cost) return;
+
+            int newLevel = cur + 1;
+
+            pd.setSkillTreeLevel(tierId, newLevel);
             pd.addSkillPoints(-cost);
 
-            // apply effect for the new level (if you have a registry)
-            PerkEffectManager.applyEffect(player, tierId, cur + 1);
+            double value = tier.valueForLevel(newLevel);
+            pd.setPerkValue(tierId, value);
 
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                player.sendMessage("§aSkill purchased: " + tier.getName() + " §7(§e" + (cur+1) + "§7/§e" + tier.getMaxLevel() + "§7)");
-            });
-            return true;
+            Messages.sendFormatted(player,
+                    "events.skilltree.purchased",
+                    Map.of("tiername", tier.name(), "cost", String.valueOf(cost)));
+
         }
     }
 }

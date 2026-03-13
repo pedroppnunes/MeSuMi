@@ -145,6 +145,11 @@ command:
     not-enough-points: "&5&lRobbery &8> &cNot enough skill points! You need %cost% Skillpoints."
     upgraded-slots: "&5&lRobbery &8> &aUpgraded %attribute% to %newvalue% for %cost% Skillpoints!"
     upgraded-percent: "&5&lRobbery &8> &aUpgraded %attribute% to %newvalue%% for %cost% Skillpoints!"
+  skilltreereset:
+    usage: "&5&lRobbery &8> &cUsage: /resetskilltree <player>"
+    no-reset: "&5&lRobbery &8> &cYou don't have any resets."
+    success: "&5&lRobbery &8> &aYour skilltree has been reset."
+    resetpoints-added: "&5&lRobbery &8> &aYou received &c+%amount% reset points"
   spawn:
     teleporting: "&5&lRobbery &8> &aTeleporting to spawn..."
     world-not-found: "&5&lRobbery &8> &cThe spawn world could not be found!"
@@ -207,13 +212,16 @@ events:
     skillpoint_reward_subtitle: "&7You can use it in /skillpoints"
     canceled: "&cPicking Process Canceled"
     progress_bar: "%bar% &e%percent%%"
+    keychance_title: "&5Special Key Chance"
+    keychance_subtitle: "&dYou've Received a Key!"
+    boost_ability_proc: "&aMoney Multiplier activated +0.5x"
+    stealspeed_proc: "&aSteal Speed activated +50%"
   combat:
     logout_broadcast: "&6&lOutpost &8> &c%player% logged out during combat!"
     command_blocked: "&6&lOutpost &8> &cYou cannot use commands while in PvP!"
     tag_timer: "&cCombat Tag: &e%time%s"
     death-message: "&6&lOutpost &8> &c%killed% &fwas killed by &c%killer%"
   robberyxp:
-    # merged level-up entries (both files included similar entry)
     level-up: "&5&lRobbery &8> &bYou have leveled up to &6Level %level%&b!"
   outpost:
     need_island: "&cYou need an hideout to capture the outpost!"
@@ -244,6 +252,11 @@ events:
       - "&6&lOutpost &8> &b%island_name% &has a 20m immunity after capturing the Outpost!"
       - "&b%island_name% &chas a 20m immunity after capturing the Outpost!"
     status-lore-immunity: "&cOwner immunity: &b%time%"
+  skilltree:
+    purchased: "&5&lRobbery &8> &aYou purchased %tiername% for &6%cost% Skillpoints"
+    invalid_usage: "&5&lRobbery &8> &cUsage: &e/skillbuy <player> <perk>"
+    invalid_tier: "&5&lRobbery &8> &cThat skill perk does not exist. &7(&6{tier}&7)"
+    not_enough_skillpoints: "&5&lRobbery &8> &cYou don't have enough &eSkillpoints"
 
 reload:
   player-kick: "&cServer is reloading."

@@ -10,6 +10,8 @@ import robbery.messages.Messages;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 
+import static robbery.attribute.Attribute.PERK_SPECIAL_DOUBLEJUMP;
+
 /**
  * Handles the /doublejump command which allows eligible players to toggle
  * their double jump ability on or off.
@@ -52,7 +54,7 @@ public class ToggleDoubleJump implements CommandExecutor {
         PlayerData p = PlayerDataManager.getPlayerData(player);
 
         // Permission check
-        if (!player.hasPermission("robbery.rank7")) {
+        if (!player.hasPermission("robbery.rank7") || p.getPerkValue(PERK_SPECIAL_DOUBLEJUMP) == 1) {
             Messages.send(player, "command.doublejump.no-permission");
             return true;
         }

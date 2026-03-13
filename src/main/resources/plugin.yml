@@ -102,12 +102,19 @@ commands:
   sellrob:
     usage: /sellrob [player]
     permission: robbery.op
+  skillbuy:
+    description: Buy a skill tree perk
+    usage: /skillbuy <perk> <player>
   skillpointbuy:
     usage: /skillpointbuy <operation> [player]
     permission: robbery.op
   skillpoints:
     description: Opens the skill points menu
     usage: /skillpoints
+  resetskilltree:
+    description: Reset a player's skilltree and refund spent skillpoints (consumes a reset token)
+    usage: /resetskilltree <player>
+    permission: robbery.op
   spawn:
     description: Teleports you to spawn
     usage: /spawn

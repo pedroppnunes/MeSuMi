@@ -15,6 +15,8 @@ import robbery.player.PlayerDataManager;
 
 import java.util.*;
 
+import static robbery.attribute.Attribute.PERK_AVOID_CAUGHT1;
+
 /**
  * Handles the /busted command, which teleports a player to a random
  * "busted" location when caught during a robbery or heist attempt.
@@ -83,9 +85,7 @@ public class Busted implements CommandExecutor {
      * @return true if the command executed successfully
      */
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
-                             @NotNull String label, String[] args) {
-
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         Player player = null;
 
         if (args.length > 0) {
@@ -99,6 +99,7 @@ public class Busted implements CommandExecutor {
             }
         }
 
+        assert player != null;
         UUID uuid = player.getUniqueId();
         long now = System.currentTimeMillis();
 
@@ -117,8 +118,10 @@ public class Busted implements CommandExecutor {
             return true;
 
         String rank = p.getRank();
-        if (rankSaveChances.containsKey(rank)) {
-            int chance = rankSaveChances.get(rank);
+        double attribute = p.getPerkValue(PERK_AVOID_CAUGHT1);
+        int baseChance = rankSaveChances.getOrDefault(rank, 0);
+        if (baseChance > 0 || attribute > 0) {
+            int chance = Math.min(100, (int)(baseChance + attribute));
             int roll = random.nextInt(100) + 1;
             if (roll <= chance) {
                 Messages.sendTitle(player, "command.busted.lucky.title", "command.busted.lucky.subtitle", 10, 60, 10);

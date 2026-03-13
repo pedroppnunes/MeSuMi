@@ -23,6 +23,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static robbery.attribute.Attribute.*;
+
 /**
  * Handles the /sell command, allowing players to sell all items in their
  * backpack
@@ -94,9 +96,9 @@ public class Sell implements CommandExecutor {
         PlayerData p = PlayerDataManager.getPlayerData(player);
         Backpacks backpack = p.getBackpack();
 
-        long totalXp = computeXpFromItems(backpack.getItems());
+        long totalXp = computeXpFromItems(backpack.getItems(),p);
 
-        double chance = p.getSPShop().moneypouchChance();
+        double chance = p.getPerkValue(PERK_DOUBLE_INV1);
         long amountToAdd = p.getBackpack().sell();
         if (amountToAdd == 0)
             return true;
@@ -106,17 +108,14 @@ public class Sell implements CommandExecutor {
 
         boolean lucky = false;
 
-        if (chance != 0) {
-            int denom = (int) Math.max(1, Math.round(1.0 / chance));
-            int roll = random.nextInt(denom) + 1;
-            if (roll == 1) {
+        if (chance > 0 && random.nextDouble() < chance) {
                 lucky = true;
-                long newAmount = (long) (amountToAdd * (1 + chance));
+
+                long newAmount = amountToAdd * 2;
                 econ.depositPlayer(player, newAmount);
 
                 title = "&aYou sold your items for &2" + NumberFormatter.formatDoubleNumber(newAmount) + "$";
                 subtitle = "&6You got Lucky! &e+" + (int) (chance * 100) + "% Bonus!";
-            }
         }
 
         if (!lucky) {
@@ -129,7 +128,7 @@ public class Sell implements CommandExecutor {
 
         Map<String, String> placeholders = Map.of(
                 "amount",
-                NumberFormatter.formatDoubleNumber(lucky ? (long) (amountToAdd * (1 + chance)) : amountToAdd));
+                NumberFormatter.formatDoubleNumber(lucky ? (amountToAdd * 2) : amountToAdd));
 
         Messages.sendFormatted(player, "command.sell.sold", placeholders);
 
@@ -160,7 +159,7 @@ public class Sell implements CommandExecutor {
         return true;
     }
 
-    private long computeXpFromItems(List<Items> items) {
+    private long computeXpFromItems(List<Items> items,PlayerData pd) {
         long total = 0L;
 
         for (Items it : items) {
@@ -170,7 +169,7 @@ public class Sell implements CommandExecutor {
 
             double hp = main.getItemConfig().getDouble("items." + itemId + ".hp", 1.0);
 
-            double xpPerItem = getXpPerItem(itemId, hp);
+            double xpPerItem = getXpPerItem(itemId, hp) * (1 + pd.getXPBoost());
 
             total += (long) xpPerItem;
         }

@@ -1,35 +1,29 @@
 package robbery.skilltree;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.configuration.file.FileConfiguration;
-
 import java.util.*;
-public class SkillPerk {
-        private final String id;
-        private final String name;
-        private final int requiredLevel;
-        private final int maxLevel;
-        private final List<Integer> costs;
-        private final String description;
 
-        public SkillPerk(String id, String name, int requiredLevel, int maxLevel, List<Integer> costs, String description) {
-            this.id = id;
-            this.name = name;
-            this.requiredLevel = requiredLevel;
-            this.maxLevel = maxLevel;
-            this.costs = Collections.unmodifiableList(new ArrayList<>(costs));
-            this.description = description;
-        }
+public record SkillPerk(String id, String name, int requiredLevel, int maxLevel, List<Integer> costs, List<Double> values, String description,List<String> requiredPerks) {
+    public SkillPerk(String id, String name, int requiredLevel, int maxLevel, List<Integer> costs, List<Double> values, String description,List<String> requiredPerks) {
+        this.id = id;
+        this.name = name;
+        this.requiredLevel = requiredLevel;
+        this.maxLevel = maxLevel;
+        this.costs = List.copyOf(costs);
+        this.values = List.copyOf(values);
+        this.description = description;
+        this.requiredPerks = requiredPerks == null ? List.of() : List.copyOf(requiredPerks);
+    }
 
-        public String getId() { return id; }
-        public String getName() { return name; }
-        public int getRequiredLevel() { return requiredLevel; }
-        public int getMaxLevel() { return maxLevel; }
-        public List<Integer> getCosts() { return costs; }
-        public String getDescription() { return description; }
-    
-        public int costForNext(int currentLevel) {
-            if (currentLevel < 0) currentLevel = 0;
-            if (currentLevel >= maxLevel) return Integer.MAX_VALUE; // cannot upgrade
-            return costs.get(Math.min(currentLevel, costs.size() - 1));
-        }
+    public int costForNext(int currentLevel) {
+        if (currentLevel < 0) currentLevel = 0;
+        if (currentLevel >= maxLevel) return Integer.MAX_VALUE; // cannot upgrade
+        return costs.get(Math.min(currentLevel, costs.size() - 1));
+    }
+
+    public double valueForLevel(int level) {
+        if (values == null || values.isEmpty()) return 0;
+        int index = Math.min(level - 1, values.size() - 1);
+        return values.get(index);
+    }
+
+
 }

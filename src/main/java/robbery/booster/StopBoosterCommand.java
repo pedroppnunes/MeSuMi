@@ -33,7 +33,7 @@ public class StopBoosterCommand implements CommandExecutor {
             data.resumeBoosters(player);
             Messages.send(player, "boosters.resumed");
         } else {
-            data.stopBoosters(player);
+            data.stopBoosters();
             Messages.send(player, "boosters.paused");
         }
 

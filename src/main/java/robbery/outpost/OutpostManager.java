@@ -452,16 +452,16 @@ public class OutpostManager {
             Player player = coop.asPlayer();
             if (player != null) {
                 PlayerData pd = PlayerDataManager.getPlayerData(player);
-                pd.setOutpostBoost(moneyMultiplier);
+                pd.setOutMooneyMult(moneyMultiplier);
                 switch (perk2Type) {
                     case "Skillpoint Chance":
-                        pd.setSkillpointChance(perk2Value);
+                        pd.setOutSkillpointChance(perk2Value);
                         break;
                     case "Booster Chance":
-                        pd.setBoosterChance(perk2Value);
+                        pd.setOutBoosterChance(perk2Value);
                         break;
                     case "Speed":
-                        pd.setSpeedBonus(perk2Value);
+                        pd.setOutSpeedBonus(perk2Value);
                         break;
                 }
             }
@@ -480,10 +480,10 @@ public class OutpostManager {
                 Player player = coop.asPlayer();
                 if (player != null) {
                     PlayerData pd = PlayerDataManager.getPlayerData(player);
-                    pd.setOutpostBoost(0.0);
-                    pd.setSkillpointChance(0);
-                    pd.setBoosterChance(0);
-                    pd.setSpeedBonus(0);
+                    pd.setOutMooneyMult(0.0);
+                    pd.setOutSkillpointChance(0);
+                    pd.setOutBoosterChance(0);
+                    pd.setOutSpeedBonus(0);
                 }
             }
         }

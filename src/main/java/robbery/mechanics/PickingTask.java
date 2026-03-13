@@ -1,5 +1,6 @@
 package robbery.mechanics;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
@@ -23,23 +24,23 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static robbery.attribute.Attribute.*;
+
 public class PickingTask extends BukkitRunnable {
     private final Player player;
     private final Items item;
     private final ArmorStand stand;
     private final Tools tool;
-    private final boolean chanceProc;
     private final Robbery main;
     private final Random random = new Random();
     private final Runnable onFinish;
 
-    public PickingTask(Player player, Items item, ArmorStand stand, Tools tool, Robbery main, boolean chanceProc, Runnable onFinish) {
+    public PickingTask(Player player, Items item, ArmorStand stand, Tools tool, Robbery main, Runnable onFinish) {
         this.player = player;
         this.item = item;
         this.stand = stand;
         this.tool = tool;
         this.main = main;
-        this.chanceProc = chanceProc;
         this.onFinish = onFinish;
     }
 
@@ -65,34 +66,83 @@ public class PickingTask extends BukkitRunnable {
                         "value", NumberFormatter.formatDoubleNumber(value) + "$"
                 ));
             }
-            if(p.getSPShop().doubleItemChance() != 0){
-                int roll = random.nextInt((int) (1/p.getSPShop().doubleItemChance())) + 1;
-                if(roll == 1 && !p.getBackpack().isFull()) {
+            double doubleChance = p.getPerkValue(PERK_DOUBLE_ITEM1);
+            double tripleChance = p.getPerkValue(PERK_TRIPLE_ITEM1);
+            if(!p.getBackpack().isFull()){
+
+                if(tripleChance > 0 && random.nextDouble() < tripleChance) {
+                    p.addItemToBackpack(item);
+                    p.addItemToBackpack(item);
+                    Messages.sendActionBarFormatted(player, "events.picking.triple_item", Map.of(
+                            "item", itemName,
+                            "value", NumberFormatter.formatDoubleNumber(value*2) + "$"
+                    ));
+                } else if (doubleChance > 0 && random.nextDouble() < doubleChance){
                     p.addItemToBackpack(item);
                     Messages.sendActionBarFormatted(player, "events.picking.double_item", Map.of(
                             "item", itemName,
                             "value", NumberFormatter.formatDoubleNumber(value) + "$"
                     ));
-
                 }
             }
             int itemStoreNum = extractStoreNumber(item.getId());
+            if(itemStoreNum > 11)
+                itemStoreNum = 12;
             String storeId = getStoreId(itemStoreNum);
             main.getMasteryManager().incrementMastery(player, storeId);
             p.addItemsStolen(1);
+
             Booster booster = BoosterManager.getRandomBoosterWithChance(itemStoreNum,p);
             if(booster != null) {
-                Messages.sendFormatted(player, "events.picking.booster_reward", Map.of(
-                                    "booster", booster.getName()));
+                Messages.sendFormatted(player, "events.picking.booster_reward", Map.of("booster", booster.getName()));
                 p.addBoosters(booster);
             }
-            int roll = random.nextInt(1000) + 1;
-            if(p.getSPShop().skillpointChance() + p.getOutSpChance() != 0)
-                roll = random.nextInt((int) (1000*(1-p.getSPShop().skillpointChance()-p.getOutSpChance()))) + 1;
-            if(roll == 11){
-                player.sendTitle(Messages.get("events.picking.skillpoint_reward_title"), Messages.get("events.picking.skillpoint_reward_subtitle"), 10, 60, 10);
-                p.addSkillpoint();
+
+            double baseChance = 1.0 / 1000.0;
+            double buff = p.getPerkValue(PERK_CHANCE_SP1) + p.getOutSpChance();
+            double finalChance = baseChance * (1 + buff);
+            if (random.nextDouble() < finalChance) {
+                player.sendTitle(
+                        Messages.get("events.picking.skillpoint_reward_title"),
+                        Messages.get("events.picking.skillpoint_reward_subtitle"),
+                        10, 60, 10
+                );
+                p.addSkillPoints(1);
             }
+
+            double abilityChance = p.getPerkValue(PERK_ABILITY_MONEYMULT1);
+            if (abilityChance == 1 && !p.hasTemporaryPerk(PERK_ABILITY_MONEYMULT1)) {
+                if (random.nextDouble() < 0.05) {
+                    p.setTemporaryPerk(PERK_ABILITY_MONEYMULT1, 10.0);
+                    Messages.sendActionBar(player, "events.picking.boost_ability_proc");
+                }
+            }
+
+            double stealSpeedChance = p.getPerkValue(PERK_ABILITY_STEALSPEED1);
+            if (stealSpeedChance == 1 && !p.hasTemporaryPerk(PERK_ABILITY_STEALSPEED1)) {
+                if (random.nextDouble() < 0.05) {
+                    p.setTemporaryPerk(PERK_ABILITY_STEALSPEED1, 10.0); // lasts 10 seconds
+                    Messages.sendActionBar(player, "events.picking.stealspeed_proc");
+                }
+            }
+            double streakIncrement = p.getPerkValue(PERK_ITEM_STREAK1);
+            if (streakIncrement > 0) {
+                p.addItemStreak(streakIncrement /10.0);
+            }
+
+            double keyChance = p.getPerkValue(PERK_SPECIAL_KEYCHANCE);
+            if(keyChance > 0 && random.nextDouble() < keyChance){
+                String[] keyTypes = {"boosters_key", "epic", "vote", "legendary"};
+                String keyType = keyTypes[random.nextInt(keyTypes.length)];
+                player.sendTitle(
+                        Messages.get("events.picking.keychance_title"),
+                        Messages.get("events.picking.keychance_subtitle"),
+                        10, 60, 10
+                );
+                Bukkit.dispatchCommand(player, "crates key give " + player.getName() + " " + keyType);
+            }
+
+
             if (onFinish != null) onFinish.run();
             return;
         }
@@ -105,7 +155,8 @@ public class PickingTask extends BukkitRunnable {
             if (onFinish != null) onFinish.run();
             return;
         }
-        if(chanceProc)
+        double instaSteal = p.getPerkValue(PERK_INSTA_STEAL1);
+        if(instaSteal > 0 && random.nextDouble() < instaSteal)
             item.setHp(0);
         else
             item.setHp(item.getHp() - (tool.getDamage() + tool.getDamage()*p.getExtraDamage()));

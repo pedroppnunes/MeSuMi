@@ -18,11 +18,15 @@ import robbery.player.PlayerDataManager;
 
 import java.util.*;
 
+import static robbery.attribute.Attribute.PERK_SPECIAL_DOUBLEJUMP;
+import static robbery.attribute.Attribute.PERK_SPECIAL_FEATHERFLIGHT;
+
 public class DoubleJumpListener implements Listener {
 
     private final Set<UUID> canDoubleJump = new HashSet<>();
     private final Map<UUID, Long> flyCooldowns = new HashMap<>();
     private final Set<UUID> temporaryFlightPlayers = new HashSet<>();
+    private final Map<UUID, Long> doubleJumpCooldowns = new HashMap<>();
     private final Robbery main;
 
     public DoubleJumpListener(Robbery main) {
@@ -33,6 +37,7 @@ public class DoubleJumpListener implements Listener {
     public void onItemUse(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
+        PlayerData pd = PlayerDataManager.getPlayerData(player);
 
         if (!(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)) return;
 
@@ -43,7 +48,7 @@ public class DoubleJumpListener implements Listener {
         ItemStack item = player.getInventory().getItemInMainHand();
         if (!isFlightItem(item)) return;
 
-        if (!player.hasPermission("robbery.rank7") || !player.getWorld().getName().equals("world")) {
+        if (!player.hasPermission("robbery.rank7") && pd.getPerkValue(PERK_SPECIAL_FEATHERFLIGHT) == 1 || !player.getWorld().getName().equals("world")) {
             Messages.sendActionBar(player,"events.flight.no-permission");
             return;
         }
@@ -59,9 +64,10 @@ public class DoubleJumpListener implements Listener {
         }
 
         int flightDuration = 5;
+        long flightCooldown = player.hasPermission("robbery.rank7") ? 2 : 5;
 
         temporaryFlightPlayers.add(uuid);
-        flyCooldowns.put(uuid, currentTime + 5 * 60 * 1000);
+        flyCooldowns.put(uuid, currentTime + flightCooldown);
 
         player.setAllowFlight(true);
         player.setFlying(true);
@@ -115,7 +121,7 @@ public class DoubleJumpListener implements Listener {
             player.setAllowFlight(true);
         } else {
             if (player.isOnGround() && player.getWorld().getName().equalsIgnoreCase("world")) {
-                if (player.hasPermission("robbery.rank7") && p.isDoubleJump()) {
+                if (player.hasPermission("robbery.rank7") && p.isDoubleJump() || p.getPerkValue(PERK_SPECIAL_FEATHERFLIGHT) == 1 && p.isDoubleJump()) {
                     player.setAllowFlight(true);
                     canDoubleJump.add(uuid);
                 } else {
@@ -141,9 +147,25 @@ public class DoubleJumpListener implements Listener {
         player.setFlying(false);
 
         if (canDoubleJump.contains(uuid)) {
+
+            if (!player.hasPermission("robbery.rank7")) {
+                long now = System.currentTimeMillis();
+                long cooldownEnd = doubleJumpCooldowns.getOrDefault(uuid, 0L);
+
+                if (now < cooldownEnd) {
+                    long seconds = (cooldownEnd - now) / 1000;
+                    Messages.sendActionBarFormatted(player, "events.doublejump.cooldown",
+                            Map.of("seconds", String.valueOf(seconds)));
+                    return;
+                }
+
+                doubleJumpCooldowns.put(uuid, now + 3000);
+            }
+
             Vector direction = player.getLocation().getDirection().normalize();
-            Vector jumpBoost = direction.multiply(1.0).setY(1.0);
+            Vector jumpBoost = direction.multiply(1.2).setY(1.2);
             player.setVelocity(jumpBoost);
+
             canDoubleJump.remove(uuid);
         }
     }
@@ -181,18 +203,21 @@ public class DoubleJumpListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         canDoubleJump.remove(event.getPlayer().getUniqueId());
+        doubleJumpCooldowns.remove(event.getPlayer().getUniqueId());
         temporaryFlightPlayers.remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         canDoubleJump.remove(event.getPlayer().getUniqueId());
+        doubleJumpCooldowns.remove(event.getPlayer().getUniqueId());
         temporaryFlightPlayers.remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         canDoubleJump.remove(event.getPlayer().getUniqueId());
+        doubleJumpCooldowns.remove(event.getPlayer().getUniqueId());
         temporaryFlightPlayers.remove(event.getPlayer().getUniqueId());
     }
 }

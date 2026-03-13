@@ -21,7 +21,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import robbery.core.Robbery;
 import robbery.backpacks.BackpackManager;
@@ -35,8 +34,8 @@ import org.bukkit.Sound;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import static robbery.keys.KeyManager.getStoreName;
 
@@ -52,131 +51,27 @@ public class PlayerEventListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        PlayerData memory = new PlayerData(event.getPlayer());
-        File playerFolder = new File(plugin.getDataFolder(), "player/" + event.getPlayer().getUniqueId());
-        File file = new File(playerFolder, "general.yml");
         Player player = event.getPlayer();
         event.setJoinMessage(null);
 
-        if (player.hasPermission("robbery.rank7") || player.hasPermission("robbery.staff")) {
-            String prefix = getLuckPermsPrefix(player);
-            String color = extractColorFromPrefix(prefix);
+        PlayerData memory = new PlayerData(player);
+        File playerFile = getPlayerFile(player);
 
-            for (Player online : Bukkit.getOnlinePlayers()) {
-                Messages.sendComponentMessageFormatted(online, "join-message",
-                        Map.of("prefix", prefix, "player", color + "&l" + player.getName()));
-            }
-        }
-        SuperiorPlayer superiorPlayer = SuperiorSkyblockAPI.getPlayer(player);
-
-        Island playerIsland = superiorPlayer.getIsland();
-        Island outpostIsland = plugin.getOutpostManager().getCurrentIsland();
-
-        if (playerIsland != null && playerIsland.equals(outpostIsland)) {
-            memory.setOutpostBoost(plugin.getOutpostManager().getPerk1());
-            String perk2 = plugin.getOutpostManager().getPerk2();
-            int value = Integer.parseInt(perk2.split("%")[0]);
-
-            if (perk2.contains("Skillpoint")) {
-                memory.setSkillpointChance(value);
-            } else if (perk2.contains("Booster")) {
-                memory.setBoosterChance(value);
-            } else if (perk2.contains("Speed")) {
-                memory.setSpeedBonus(value);
-            }
-        } else {
-            memory.setOutpostBoost(0);
-            memory.setSkillpointChance(0);
-            memory.setBoosterChance(0);
-            memory.setSpeedBonus(0);
-        }
-
-        if (file.exists()) {
-            FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-            memory.setRank(cfg.getString("stats.rank"));
-            memory.setXp(cfg.getLong("stats.xp", 0L));
-            memory.setLevel(Math.max(1, cfg.getInt("stats.level", 1)));
-            memory.setToolsunlocked(cfg.getString("stats.hastool"));
-            memory.setTool(ToolManager.getToolsName(cfg.getString("stats.tool")));
-            memory.setKeys(cfg.getString("stats.haskeys"));
-            memory.setKey(getStoreName(cfg.getString("stats.key")));
-            memory.setPrestige(Integer.parseInt(cfg.getString("stats.prestige")));
-            memory.setItemsStolen(cfg.getInt("stats.itemsStolen", 0));
-            memory.setItemsStolen(cfg.getInt("stats.itemsStolen", 0));
-            if (cfg.contains("stats.storeItems")) {
-                Map<String, Integer> storeItems = new java.util.HashMap<>();
-                for (String key : cfg.getConfigurationSection("stats.storeItems").getKeys(false)) {
-                    storeItems.put(key, cfg.getInt("stats.storeItems." + key));
-                }
-                memory.setStoreItemsMap(storeItems);
-            }
-            if (cfg.contains("stats.storeMilestones")) {
-                Map<String, Integer> storeMilestones = new java.util.HashMap<>();
-                for (String key : cfg.getConfigurationSection("stats.storeMilestones").getKeys(false)) {
-                    storeMilestones.put(key, cfg.getInt("stats.storeMilestones." + key));
-                }
-                memory.setStoreMilestoneMap(storeMilestones);
-            }
-            memory.setBoostersPaused(cfg.getBoolean("stats.boosterpaused"));
-            memory.setActiveBooster(cfg.getString("stats.booster"));
-            memory.setBoostersFromString(cfg.getString("stats.hasbooster"));
-            memory.setSP(cfg.getString("stats.skillpoints"));
-            memory.setSPShopString(cfg.getString("stats.spshop"));
-            memory.setBackpack(
-                    BackpackManager.toBackpack(cfg.getString("stats.backpack"), cfg.getString("stats.material"),
-                            cfg.getString("stats.itemsbackpack"), cfg.getString("stats.colorbackpack")));
-            memory.setBackpackunlucked(cfg.getString("stats.hasbackpack"));
-            if (cfg.contains("stats.location.world") && cfg.contains("stats.location.x")
-                    && cfg.contains("stats.location.y") && cfg.contains("stats.location.z")
-                    && cfg.contains("stats.location.yaw") && cfg.contains("stats.location.pitch")) {
-                String worldName = cfg.getString("stats.location.world");
-                double x = cfg.getDouble("stats.location.x");
-                double y = cfg.getDouble("stats.location.y");
-                double z = cfg.getDouble("stats.location.z");
-                float yaw = (float) cfg.getDouble("stats.location.yaw");
-                float pitch = (float) cfg.getDouble("stats.location.pitch");
-                World world = Bukkit.getWorld(worldName);
-                if (world != null) {
-                    Location savedLoc = new Location(world, x, y, z, yaw, pitch);
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        if (player.isOnline()) {
-                            player.teleport(savedLoc);
-                        }
-                    }, 5L);
-                }
-            }
-        } else {
-            memory.setRank(getRank(player));
-        }
+        handleJoinMessage(player);
+        applyOutpostPerks(player, memory);
+        loadPlayerDataFromFile(player, memory, playerFile);
 
         if (!player.hasPermission(NOITEMS_PERMISSION)) {
-            memory.giveToolToInv();
-            memory.giveBackpackToInv();
-            memory.giveBooster(plugin);
-            memory.giveSkillPoint(plugin);
-            memory.giveFeather();
-            plugin.getHidePlayers().handleWorldChange(player);
+            giveStartingItems(player, memory);
         }
 
         Rcrate.loadRewards(player.getUniqueId());
-        PlayerDataManager.setPlayerData(event.getPlayer(), memory);
-        PrestigeLeaderboard.updateLeaderboard(event.getPlayer());
-        boolean hasRank = player.hasPermission("robbery.rank1") || player.hasPermission("robbery.rank2")
-                || player.hasPermission("robbery.rank3") || player.hasPermission("robbery.rank4")
-                || player.hasPermission("robbery.rank5") || player.hasPermission("robbery.rank6")
-                || player.hasPermission("robbery.rank7") || player.hasPermission("robbery.staff");
-        plugin.getChatStyleManager().ensurePlayerExists(player, hasRank);
+        PlayerDataManager.setPlayerData(player, memory);
+        PrestigeLeaderboard.updateLeaderboard(player);
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!player.isOnline()) {
-                    this.cancel();
-                    return;
-                }
-                savePlayerData(player, memory);
-            }
-        }.runTaskTimer(plugin, 40L, 6000L);
+        plugin.getChatStyleManager().ensurePlayerExists(player, hasAnyRank(player));
+
+        startAutoSaveTask(player, memory);
     }
 
     @EventHandler
@@ -242,8 +137,12 @@ public class PlayerEventListener implements Listener {
         cfg.set("stats.boosterpaused", memory.isBoostersPaused());
 
         // Skillpoints
-        cfg.set("stats.skillpoints", memory.getSP());
-        cfg.set("stats.spshop", memory.getSPShopString());
+        cfg.set("stats.skillpoints", memory.getSkillPoints());
+
+        //SkillTree & SkillPerks
+        cfg.set("skilltree.levels", memory.getAllSkillTreeLevels());
+        cfg.set("skilltree.perks", memory.getAllPerkValues());
+        cfg.set("skilltree.reset", memory.getResetSkillTreePoints());
 
         // Player location
         Location loc = player.getLocation();
@@ -264,6 +163,159 @@ public class PlayerEventListener implements Listener {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    private File getPlayerFile(Player player) {
+        File folder = new File(plugin.getDataFolder(), "player/" + player.getUniqueId());
+        if (!folder.exists()) folder.mkdirs();
+        return new File(folder, "general.yml");
+    }
+    private void handleJoinMessage(Player player) {
+        if (!player.hasPermission("robbery.rank7") && !player.hasPermission("robbery.staff")) return;
+
+        String prefix = getLuckPermsPrefix(player);
+        String color = extractColorFromPrefix(prefix);
+
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            Messages.sendComponentMessageFormatted(online, "join-message",
+                    Map.of("prefix", prefix, "player", color + "&l" + player.getName()));
+        }
+    }
+    private void applyOutpostPerks(Player player, PlayerData memory) {
+        SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(player);
+        Island playerIsland = sp.getIsland();
+        Island outpostIsland = plugin.getOutpostManager().getCurrentIsland();
+
+        if (playerIsland != null && playerIsland.equals(outpostIsland)) {
+            memory.setOutMooneyMult(plugin.getOutpostManager().getPerk1());
+
+            String perk2 = plugin.getOutpostManager().getPerk2();
+            int value = Integer.parseInt(perk2.split("%")[0]);
+
+            if (perk2.contains("Skillpoint")) memory.setOutSkillpointChance(value);
+            else if (perk2.contains("Booster")) memory.setOutBoosterChance(value);
+            else if (perk2.contains("Speed")) memory.setOutSpeedBonus(value);
+        } else {
+            memory.setOutMooneyMult(0);
+            memory.setOutSkillpointChance(0);
+            memory.setOutBoosterChance(0);
+            memory.setOutSpeedBonus(0);
+        }
+    }
+    private void loadPlayerDataFromFile(Player player, PlayerData memory, File file) {
+        if (!file.exists()) {
+            memory.setRank(getRank(player));
+            return;
+        }
+
+        FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+
+        // Basic stats
+        memory.setRank(cfg.getString("stats.rank"));
+        memory.setXp(cfg.getLong("stats.xp", 0L));
+        memory.setLevel(Math.max(1, cfg.getInt("stats.level", 1)));
+        memory.setPrestige(Integer.parseInt(cfg.getString("stats.prestige")));
+
+        // Tools & keys
+        memory.setToolsunlocked(cfg.getString("stats.hastool"));
+        memory.setTool(ToolManager.getToolsName(cfg.getString("stats.tool")));
+        memory.setKeys(cfg.getString("stats.haskeys"));
+        memory.setKey(getStoreName(cfg.getString("stats.key")));
+
+        //Skillpoints
+        memory.setSP(cfg.getString("stats.skillpoints"));
+
+        // Stats & store
+        memory.setItemsStolen(cfg.getInt("stats.itemsStolen", 0));
+        loadMap(cfg, "stats.storeItems", memory::setStoreItemsMap);
+        loadMap(cfg, "stats.storeMilestones", memory::setStoreMilestoneMap);
+
+        // Skill tree
+        if (cfg.contains("skilltree.levels")) {
+            Map<String, Object> levelsMap = cfg.getConfigurationSection("skilltree.levels").getValues(false);
+            for (Map.Entry<String, Object> entry : levelsMap.entrySet()) {
+                memory.getAllSkillTreeLevels().put(entry.getKey(), (Integer) entry.getValue());
+            }
+        }
+        loadMapDouble(cfg, "skilltree.perks", memory.getAllPerkValues());
+        memory.setResetSkillTreePoints(Integer.parseInt(cfg.getString("skilltree.reset")));
+
+        // Backpack
+        memory.setBackpack(
+                BackpackManager.toBackpack(cfg.getString("stats.backpack"), cfg.getString("stats.material"),
+                        cfg.getString("stats.itemsbackpack"), cfg.getString("stats.colorbackpack"))
+        );
+        memory.setBackpackunlucked(cfg.getString("stats.hasbackpack"));
+
+        // Boosters
+        memory.setBoostersPaused(cfg.getBoolean("stats.boosterpaused"));
+        memory.setActiveBooster(cfg.getString("stats.booster"));
+        memory.setBoostersFromString(cfg.getString("stats.hasbooster"));
+
+        // Location
+        if (cfg.contains("stats.location")) {
+            teleportPlayerFromConfig(player, cfg);
+        }
+    }
+    private void loadMap(FileConfiguration cfg, String path, java.util.function.Consumer<Map<String, Integer>> consumer) {
+        if (!cfg.contains(path)) return;
+        Map<String, Integer> map = new HashMap<>();
+        for (String key : cfg.getConfigurationSection(path).getKeys(false)) {
+            map.put(key, cfg.getInt(path + "." + key));
+        }
+        consumer.accept(map);
+    }
+
+    private void loadMapDouble(FileConfiguration cfg, String path, Map<String, Double> target) {
+        if (!cfg.contains(path)) return;
+        for (Map.Entry<String, Object> e : cfg.getConfigurationSection(path).getValues(false).entrySet()) {
+            target.put(e.getKey(), ((Number) e.getValue()).doubleValue());
+        }
+    }
+
+    private void teleportPlayerFromConfig(Player player, FileConfiguration cfg) {
+        String worldName = cfg.getString("stats.location.world");
+        double x = cfg.getDouble("stats.location.x");
+        double y = cfg.getDouble("stats.location.y");
+        double z = cfg.getDouble("stats.location.z");
+        float yaw = (float) cfg.getDouble("stats.location.yaw");
+        float pitch = (float) cfg.getDouble("stats.location.pitch");
+
+        World world = Bukkit.getWorld(worldName);
+        if (world == null) return;
+
+        Location loc = new Location(world, x, y, z, yaw, pitch);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (player.isOnline()) player.teleport(loc);
+        }, 5L);
+    }
+
+    private void giveStartingItems(Player player, PlayerData memory) {
+        memory.giveToolToInv();
+        memory.giveBackpackToInv();
+        memory.giveBooster(plugin);
+        memory.giveSkillTree(plugin);
+        memory.giveFeather();
+        plugin.getHidePlayers().handleWorldChange(player);
+    }
+
+    private boolean hasAnyRank(Player player) {
+        for (int i = 1; i <= 7; i++) {
+            if (player.hasPermission("robbery.rank" + i)) return true;
+        }
+        return player.hasPermission("robbery.staff");
+    }
+
+    private void startAutoSaveTask(Player player, PlayerData memory) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!player.isOnline()) {
+                    cancel();
+                    return;
+                }
+                savePlayerData(player, memory);
+            }
+        }.runTaskTimer(plugin, 40L, 6000L);
     }
 
     private String getLuckPermsPrefix(Player player) {
