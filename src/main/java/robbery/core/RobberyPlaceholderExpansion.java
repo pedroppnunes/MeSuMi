@@ -87,9 +87,14 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             case "level" -> String.valueOf(pd.getLevel());
             case "xp" -> String.valueOf(pd.getXp());
             case "xptonext" -> String.valueOf(xp.xpRemainingForNextLevel(pd.getXp(), pd.getLevel()));
+            case "extraxp" -> String.valueOf(pd.getXPBoost());
             case "levelcolored" -> xp.colorizeLevel(pd.getLevel());
             case "levelcolor" -> xp.getLevelHexColor(pd.getLevel());
             case "boosterx" -> String.valueOf(pd.getBoost());
+            case "stealspeed" -> String.valueOf(pd.getExtraDamage());
+            case "backpackslots" -> String.valueOf(pd.getExtraSlots());
+            case "backpackunlocked" ->  String.valueOf(pd.getBackpackUnlocked());
+            case "toolunlocked" ->  String.valueOf(pd.getToolsUnlocked());
             case "booster_name" -> pd.getActiveboost().getName();
             case "booster_time" -> String.valueOf(pd.getActiveboost().getSeconds());
             case "booster_paused" -> String.valueOf(pd.isBoostersPaused());

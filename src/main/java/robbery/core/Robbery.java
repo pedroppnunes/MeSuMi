@@ -19,6 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import robbery.booster.BoosterItemListener;
 import robbery.chat.ChatStyleManager;
 import robbery.chunk.LoadChunks;
+import robbery.hotbar.HotbarListener;
 import robbery.items.AddItem;
 import robbery.items.RemoveItem;
 import robbery.economy.Baltop;
@@ -166,6 +167,7 @@ public class Robbery extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new RankPaperListener(), main);
         getServer().getPluginManager().registerEvents(new ClaimGuiListener(), main);
         getServer().getPluginManager().registerEvents(new SkillTreeItem(main), main);
+        getServer().getPluginManager().registerEvents(new HotbarListener(main), main);
         Objects.requireNonNull(getCommand("additem")).setExecutor(new AddItem(main));
         Objects.requireNonNull(getCommand("removeItem")).setExecutor(new RemoveItem(main));
         Objects.requireNonNull(getCommand("sellrob")).setExecutor(new Sell(main));

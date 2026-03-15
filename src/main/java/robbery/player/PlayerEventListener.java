@@ -294,6 +294,7 @@ public class PlayerEventListener implements Listener {
         memory.giveBackpackToInv();
         memory.giveBooster(plugin);
         memory.giveSkillTree(plugin);
+        memory.giveMainmenu(plugin);
         memory.giveFeather();
         plugin.getHidePlayers().handleWorldChange(player);
     }

@@ -39,7 +39,7 @@ public class InventoryManager {
             meta.setDisplayName(hidden ? "§cUnhide Players" : "§aHide Players");
             dye.setItemMeta(meta);
         }
-        player.getInventory().setItem(7, dye);
+        player.getInventory().setItem(6, dye);
         player.updateInventory();
     }
 }

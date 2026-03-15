@@ -13,6 +13,7 @@ import robbery.backpacks.Backpacks;
 import robbery.booster.Booster;
 import robbery.booster.BoosterItem;
 import robbery.booster.BoosterManager;
+import robbery.hotbar.HotbarListener;
 import robbery.mechanics.InventoryManager;
 import robbery.items.Items;
 import robbery.keys.KeyManager;
@@ -56,6 +57,7 @@ public class PlayerData {
     private final Map<String, Long> temporaryPerks = new HashMap<>();
     private double itemStreakBonus = 0.0;
     private long lastItemStolenTimestamp = 0;
+    private boolean godOfRobberyTag = false;
 
     private int resetSkillTreePoints = 0;
     private Rank rank;
@@ -114,6 +116,10 @@ public class PlayerData {
         }
     }
 
+    public int getBackpackUnlocked(){
+        return backpackunlucked.size();
+    }
+
     public void setnewBackpack(Backpacks b) {
         this.backpack.emptyBackpack();
         this.backpack = b;
@@ -156,6 +162,10 @@ public class PlayerData {
         for (String s : toolsunlocked)
             total.append("_").append(s);
         return total.toString();
+    }
+
+    public int getToolsUnlocked(){
+        return toolsunlocked.size();
     }
 
 //Keys
@@ -223,10 +233,6 @@ public class PlayerData {
     public void addItemToBackpack(Items item) {
         backpack.addBackpackItem(item,getBoost());
     }
-    public double getXPBoost() {
-        return getPerkValue(PERK_XP1) + getPerkValue(PERK_XP2) + rank.xpboost();
-    }
-
     public void busted() {
         this.getBackpack().emptyBackpack();
     }
@@ -310,11 +316,15 @@ public class PlayerData {
         meta.setDisplayName("§bFlight");
         meta.setLore(Arrays.asList("§7Right click to fly for 5 seconds", "§c5 minute cooldown"));
         item.setItemMeta(meta);
-        InventoryManager.giveItem(player, item, 8);
+        InventoryManager.giveItem(player, item, 7);
     }
 
     public void giveSkillTree(Robbery plugin){
         InventoryManager.giveItem(player, SkillTreeItem.createSkillTreeItem(plugin),2);
+    }
+
+    public void giveMainmenu(Robbery plugin){
+        InventoryManager.giveItem(player, HotbarListener.createMainMenuItem(plugin), 8);
     }
 
 //Items Stolen
@@ -506,6 +516,9 @@ public class PlayerData {
     }
     public long getXp() {
         return xp;
+    }
+    public double getXPBoost(){
+        return rank.xpboost() + getPerkValue(PERK_XP1) + getPerkValue(PERK_XP2);
     }
     public void setXp(long xp) {
         this.xp = Math.max(0L, xp);
@@ -704,6 +717,14 @@ public void setPerkValue(String perkId, double value) {
         }
         itemStreakBonus = Math.min(0.35, itemStreakBonus + amount);
         lastItemStolenTimestamp = now;
+    }
+//GodOfRobbery
+
+    public boolean hasGodOfRobbery() {
+        return godOfRobberyTag;
+    }
+    public void setGodOfRobbery(boolean value) {
+        godOfRobberyTag = value;
     }
 
 

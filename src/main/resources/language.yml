@@ -199,7 +199,7 @@ events:
     has_items: "&5&lRobbery &8> &cYou cannot use this command while your backpack has items!"
     chest_blocked: "&5&lRobbery &8> &cYou can't use that command here."
   mastery:
-    level-up: "&c&lStore Mastery &8> &aYou've reached &6Milestone %level%&r&a in &r%store%"
+    level-up: "&c&lStore Mastery &8> &aYou've reached &6Milestone %level%&r&a in &6%store%"
     store11-tier1: "&c&lStore Mastery &8> &aYou can now access the second floor of the store!"
     tier2: "&c&lStore Mastery &8> &aYou can now access the higher part of the store!"
     max: "&c&lStore Mastery &8> &6&lMAX MASTERY&r &aYou have mastered the &r%store%&a!"
@@ -257,6 +257,9 @@ events:
     invalid_usage: "&5&lRobbery &8> &cUsage: &e/skillbuy <player> <perk>"
     invalid_tier: "&5&lRobbery &8> &cThat skill perk does not exist. &7(&6{tier}&7)"
     not_enough_skillpoints: "&5&lRobbery &8> &cYou don't have enough &eSkillpoints"
+  secrettag:
+    title: "&4You Completed All Store Masteries"
+    subtitle: "&cReceived Secret Tag: GodOfRobbery"
 
 reload:
   player-kick: "&cServer is reloading."

@@ -1,5 +1,6 @@
 package robbery.storeMastery;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import robbery.core.Robbery;
@@ -17,13 +18,27 @@ public class StoreMasteryManager {
     private final Robbery main;
 
     private final int[][] masteryCurves = {
-            {10, 50, 100, 150, 200, 300, 400, 500, 750, 1000},    // Stores 1-2
-            {15, 100, 175, 225, 300, 425, 550, 700, 900, 1250},   // Stores 3-4
-            {20, 125, 200, 275, 350, 500, 650, 850, 1100, 1500},  // Stores 5-6
-            {25, 150, 250, 350, 450, 700, 900, 1250, 1500, 2000}, // Stores 7-8
-            {30, 175, 300, 450, 550, 800, 1000, 1400, 1750, 2250},// Stores 9-10
-            {35, 200, 425, 575, 750, 1250, 1500, 2000, 2500, 3000}// Stores 11-12
+            {10, 50, 150, 300, 500, 3000, 4000, 5000, 7500, 10000},    // Stores 1-2
+            {150, 300, 600, 1000, 1250, 4250, 5500, 7000, 9000, 12500},   // Stores 3-4
+            {200, 400, 800, 1250, 1500, 5000, 6500, 8500, 11000, 15000},  // Stores 5-6
+            {300, 750, 1250, 1500, 2000, 7000, 9000, 12500, 15000, 20000}, // Stores 7-8
+            {400, 800, 1250, 1750, 2250, 8000, 10000, 14000, 17500, 22500},// Stores 9-10
+            {500, 1000, 1500, 2000, 2500, 12500, 15000, 20000, 25000, 30000}// Stores 11-12
     };
+    private final Map<String, String> storeTagIds = Map.ofEntries(
+            Map.entry("store1", "MarketExpert"),
+            Map.entry("store2", "AFamilyguy"),
+            Map.entry("store3", "GymRat"),
+            Map.entry("store4", "Tetris"),
+            Map.entry("store5", "TheNerd"),
+            Map.entry("store6", "TrueGambler"),
+            Map.entry("store7", "AquaMan"),
+            Map.entry("store8", "Cooked"),
+            Map.entry("store9", "RareGem"),
+            Map.entry("store10", "FashionModel"),
+            Map.entry("store11", "TechGenius"),
+            Map.entry("store12", "BankHeister")
+    );
 
     public StoreMasteryManager(Robbery plugin) {
         this.main = plugin;
@@ -88,35 +103,82 @@ public class StoreMasteryManager {
         PlayerData pd = PlayerDataManager.getPlayerData(player);
         String storeId = store.getId();
         if (pd != null) pd.setStoreMilestone(store.getId(), newLevel);
-        Messages.sendFormatted(player, "events.mastery.level-up", Map.of("store", store.getColorname(), "level", String.valueOf(newLevel)));
+        Messages.sendFormatted(player, "events.mastery.level-up", Map.of("store", store.getName(), "level", String.valueOf(newLevel)));
 
         if (storeId.equalsIgnoreCase("store11")) {
-            if (newLevel == 2) {
+            if (newLevel == 3) {
                 unlockRegion(player, "store11_tier2");
                 Messages.send(player, "events.mastery.store11-tier1");
             }
-            if (newLevel == 4) {
+            if (newLevel == 5) {
                 unlockRegion(player, "store11_tier3");
                 Messages.send(player, "events.mastery.tier2");
             }
-        } else if (newLevel == 4) {
+        } else if (newLevel == 5) {
             unlockRegion(player, storeId + "_tier2");
             Messages.send(player, "events.mastery.tier2");
         }
 
         if (newLevel == 10) {
             Messages.sendFormatted(player, "events.mastery.max", "store", store.getName());
-        }
 
-        //Apply Rewards TODO
+            String tagId = storeTagIds.get(storeId);
+            if (tagId != null) {
+                String permission = "deluxetags.tag." + tagId.toLowerCase();
+
+                Bukkit.dispatchCommand(
+                        Bukkit.getConsoleSender(),
+                        "lp user " + player.getName() + " permission set " + permission + " true"
+                );
+            }
+            boolean allMax = true;
+            for (Keys key : KeyManager.getAllStores()) {
+                assert pd != null;
+                int milestone = pd.getStoreMilestone(key.getId());
+                if (milestone < 10) {
+                    allMax = false;
+                    break;
+                }
+            }
+
+            if (allMax) {
+                assert pd != null;
+                if (!pd.hasGodOfRobbery()) {
+                    pd.setGodOfRobbery(true);
+                    String tag = "deluxetags.tag.godofrobbery";
+                    Bukkit.dispatchCommand(
+                            Bukkit.getConsoleSender(),
+                            "lp user " + player.getName() + " permission set " + tag + " true"
+                    );
+                    player.sendTitle(Messages.get("events.secrettag.title"),Messages.get("events.secrettag.subtitle"));
+                }
+            }
+        }
     }
 
     private void unlockRegion(Player player, String regionId) {
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rg addmember " + regionId + " " + player.getName());
     }
 
-    public String getRewardDisplay(String storeId, int i) {
-        //TODO
+    public String getRewardDisplay(String storeId, int milestone) {
+
+        if (milestone == 5) {
+            return "§aUnlock higher area of " + KeyManager.getStoreN(storeId);
+        }
+
+        if (storeId.equalsIgnoreCase("store11") && milestone == 3) {
+            return "§aUnlock middle area of " + KeyManager.getStoreN(storeId);
+        }
+
+        if (milestone == 10) {
+            String tagId = storeTagIds.get(storeId);
+            if (tagId != null) {
+                String rawPlaceholder = "%deluxetags_tag_" + tagId + "%";
+                String parsed = PlaceholderAPI.setPlaceholders(null, rawPlaceholder);
+                return parsed;
+            }
+        }
+
         return "";
     }
 }

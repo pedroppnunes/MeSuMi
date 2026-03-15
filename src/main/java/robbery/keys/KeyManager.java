@@ -96,4 +96,8 @@ public class KeyManager {
             default -> null;
         };
     }
+
+    public static Keys[] getAllStores() {
+        return new Keys[]{STORE1,STORE2,STORE3,STORE4,STORE5,STORE6,STORE7,STORE8,STORE9,STORE10,STORE11,STORE12};
+    }
 }
