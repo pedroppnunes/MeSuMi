@@ -725,7 +725,7 @@ public class Robbery extends JavaPlugin implements Listener {
 
                 Bukkit.broadcastMessage(Messages.getFormatted("voteparty.reminder", placeholders));
             }
-        }.runTaskTimer(this, 0L, interval);
+        }.runTaskTimer(this, 20L*60, interval);
     }
 
     private int tipIndex = 0;
@@ -750,7 +750,7 @@ public class Robbery extends JavaPlugin implements Listener {
                     tipIndex = 0;
                 }
             }
-        }.runTaskTimer(this, 0L, interval);
+        }.runTaskTimer(this, 20L*120, interval);
     }
 
     public boolean getIsBackup() {

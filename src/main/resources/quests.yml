@@ -1,0 +1,548 @@
+quests:
+  # ---------------- GENERAL XP QUESTS ----------------
+  - id: quest1
+    name: "Quick Fingers"
+    items: 50
+    itemsid: []
+    reward_xp: 400
+    description: "Steal 50 items anywhere."
+
+  - id: quest2
+    name: "Busy Thief"
+    items: 150
+    itemsid: []
+    reward_xp: 900
+    description: "Steal 150 items anywhere."
+
+  - id: quest3
+    name: "Crime Spree"
+    items: 300
+    itemsid: []
+    reward_xp: 1600
+    description: "Steal 300 items across the city."
+
+  - id: quest4
+    name: "Loot Collector"
+    items: 500
+    itemsid: []
+    reward_xp: 2500
+    description: "Steal 500 items."
+
+  - id: quest5
+    name: "Professional Thief"
+    items: 750
+    itemsid: []
+    reward_xp: 3500
+    description: "Steal 750 items."
+
+  - id: quest6
+    name: "Criminal Reputation"
+    items: 1000
+    itemsid: []
+    reward_xp: 5000
+    description: "Steal 1000 items."
+
+  - id: quest7
+    name: "Grand Larceny"
+    items: 1500
+    itemsid: []
+    reward_xp: 8000
+    description: "Steal 1500 items."
+
+  - id: quest8
+    name: "Underworld Activity"
+    items: 2000
+    itemsid: []
+    reward_xp: 12000
+    description: "Steal 2000 items."
+
+  - id: quest9
+    name: "Master Criminal"
+    items: 3000
+    itemsid: []
+    reward_xp: 18000
+    description: "Steal 3000 items."
+
+  - id: quest10
+    name: "Legendary Thief"
+    items: 5000
+    itemsid: []
+    reward_xp: 30000
+    description: "Steal 5000 items."
+  # ---------------- SUPERMARKET ----------------
+  - id: quest11
+    name: "Supermarket Sweep"
+    items: 120
+    itemsid: []
+    reward_xp: 1200
+    description: "Steal 120 items from the Supermarket."
+
+  - id: quest12
+    name: "Fresh Produce Run"
+    items: 80
+    itemsid: ["apple","bread"]
+    reward_store_items:
+      store: store1
+      amount: 40
+    description: "Steal 80 food items from the Supermarket."
+
+  - id: quest13
+    name: "Late Night Groceries"
+    items: 200
+    itemsid: []
+    reward_xp: 2200
+    description: "Steal 200 items from the Supermarket."
+  # ---------------- GRIFFIN'S ----------------
+  - id: quest14
+    name: "Griffin's Heist"
+    items: 90
+    itemsid: []
+    reward_xp: 1300
+    description: "Steal 90 items from The Griffin's."
+
+  - id: quest15
+    name: "Bar Stock Theft"
+    items: 40
+    itemsid: ["wine","whiskey"]
+    reward_store_items:
+      store: store2
+      amount: 35
+    description: "Steal 40 drink items from The Griffin's."
+
+  - id: quest16
+    name: "Restaurant Raid"
+    items: 150
+    itemsid: []
+    reward_xp: 2000
+    description: "Steal 150 items from The Griffin's."
+  # ---------------- GYM ----------------
+  - id: quest17
+    name: "Gym Locker Loot"
+    items: 50
+    itemsid: []
+    reward_xp: 1000
+    description: "Steal 50 items from the Gym."
+
+  - id: quest18
+    name: "Protein Power"
+    items: 30
+    itemsid: ["protein_bar"]
+    reward_store_items:
+      store: store3
+      amount: 25
+    description: "Steal 30 protein bars."
+
+  - id: quest19
+    name: "Workout Robbery"
+    items: 100
+    itemsid: []
+    reward_xp: 1800
+    description: "Steal 100 items from the Gym."
+  # ---------------- ARCADE ----------------
+  - id: quest20
+    name: "Token Grab"
+    items: 120
+    itemsid: ["arcade_token"]
+    reward_xp: 1500
+    description: "Steal 120 tokens from the Arcade."
+
+  - id: quest21
+    name: "Prize Machine Hack"
+    items: 40
+    itemsid: ["prize_ticket"]
+    reward_store_items:
+      store: store4
+      amount: 50
+    description: "Steal 40 prize tickets."
+
+  - id: quest22
+    name: "Arcade Jackpot"
+    items: 200
+    itemsid: []
+    reward_xp: 2500
+    description: "Steal 200 items from the Arcade."
+  # ---------------- SCHOOL ----------------
+  - id: quest23
+    name: "School Supplies"
+    items: 60
+    itemsid: ["book","notebook"]
+    reward_xp: 1200
+    description: "Steal 60 supplies from the School."
+
+  - id: quest24
+    name: "Computer Lab Raid"
+    items: 25
+    itemsid: ["laptop"]
+    reward_store_items:
+      store: store5
+      amount: 40
+    description: "Steal 25 laptops."
+
+  - id: quest25
+    name: "Campus Crime"
+    items: 120
+    itemsid: []
+    reward_xp: 2000
+    description: "Steal 120 items from the School."
+  # ---------------- CASINO ----------------
+  - id: quest26
+    name: "Chip Thief"
+    items: 40
+    itemsid: ["casino_chip"]
+    reward_xp: 2000
+    description: "Steal 40 casino chips."
+
+  - id: quest27
+    name: "High Roller Theft"
+    items: 20
+    itemsid: ["gold_chip"]
+    reward_store_items:
+      store: store6
+      amount: 60
+    description: "Steal 20 high-value chips."
+
+  - id: quest28
+    name: "Casino Robbery"
+    items: 100
+    itemsid: []
+    reward_xp: 3500
+    description: "Steal 100 items from the Casino."
+  # ---------------- OCEANARIUM ----------------
+  - id: quest29
+    name: "Aquarium Souvenirs"
+    items: 80
+    itemsid: ["souvenir"]
+    reward_xp: 2200
+    description: "Steal 80 souvenirs."
+
+  - id: quest30
+    name: "Rare Specimen"
+    items: 5
+    itemsid: ["rare_fish"]
+    reward_store_items:
+      store: store7
+      amount: 45
+    description: "Steal 5 rare specimens."
+
+  - id: quest31
+    name: "Oceanarium Operation"
+    items: 140
+    itemsid: []
+    reward_xp: 3500
+    description: "Steal 140 items from the Oceanarium."
+  # ---------------- STEAKHOUSE ----------------
+  - id: quest32
+    name: "Kitchen Raid"
+    items: 40
+    itemsid: ["steak"]
+    reward_xp: 1800
+    description: "Steal 40 steaks."
+
+  - id: quest33
+    name: "Wine Cellar Theft"
+    items: 20
+    itemsid: ["wine"]
+    reward_store_items:
+      store: store8
+      amount: 40
+    description: "Steal 20 wines."
+
+  - id: quest34
+    name: "Steakhouse Heist"
+    items: 100
+    itemsid: []
+    reward_xp: 3000
+    description: "Steal 100 items from the Steakhouse."
+  # ---------------- DIAMOND STORE ----------------
+  - id: quest35
+    name: "Diamond Grab"
+    items: 10
+    itemsid: ["diamond_ring"]
+    reward_xp: 4000
+    description: "Steal 10 diamond rings."
+
+  - id: quest36
+    name: "Jewelry Run"
+    items: 25
+    itemsid: ["diamond_necklace"]
+    reward_store_items:
+      store: store9
+      amount: 50
+    description: "Steal 25 jewelry items."
+
+  - id: quest37
+    name: "Diamond Store Heist"
+    items: 60
+    itemsid: []
+    reward_xp: 6000
+    description: "Steal 60 items from the Diamond Store."
+  # ---------------- BALENZIAGA ----------------
+  - id: quest38
+    name: "Designer Theft"
+    items: 10
+    itemsid: ["designer_shoes"]
+    reward_xp: 4500
+    description: "Steal 10 designer items."
+
+  - id: quest39
+    name: "Luxury Clothes"
+    items: 25
+    itemsid: ["designer_bag"]
+    reward_store_items:
+      store: store10
+      amount: 60
+    description: "Steal 25 luxury items."
+
+  - id: quest40
+    name: "Fashion Crime"
+    items: 70
+    itemsid: []
+    reward_xp: 7000
+    description: "Steal 70 items from Balenziaga."
+  # ---------------- SAMZUNG ----------------
+  - id: quest41
+    name: "Phone Grab"
+    items: 15
+    itemsid: ["phone"]
+    reward_xp: 5000
+    description: "Steal 15 phones."
+
+  - id: quest42
+    name: "Electronics Shipment"
+    items: 40
+    itemsid: ["tablet"]
+    reward_store_items:
+      store: store11
+      amount: 70
+    description: "Steal 40 electronic items."
+
+  - id: quest43
+    name: "Tech Store Raid"
+    items: 100
+    itemsid: []
+    reward_xp: 8000
+    description: "Steal 100 items from Samzung."
+  # ---------------- BANK ----------------
+  - id: quest44
+    name: "Bank Documents"
+    items: 5
+    itemsid: ["bank_file"]
+    reward_xp: 9000
+    description: "Steal 5 bank documents."
+
+  - id: quest45
+    name: "Vault Package"
+    items: 3
+    itemsid: ["vault_package"]
+    reward_xp: 12000
+    description: "Steal 3 vault packages."
+
+  - id: quest46
+    name: "Bank Operation"
+    items: 20
+    itemsid: []
+    reward_xp: 15000
+    description: "Steal 20 items from The Bank."
+  # ---------------- MULTI-STORE / CREATIVE ----------------
+  - id: quest47
+    name: "Store Hopper"
+    items: 200
+    itemsid: []
+    reward_xp: 3000
+    description: "Steal items from 5 different stores."
+
+  - id: quest48
+    name: "City Sweep"
+    items: 600
+    itemsid: []
+    reward_xp: 7000
+    description: "Steal 600 items from anywhere."
+
+  - id: quest49
+    name: "Luxury Criminal"
+    items: 50
+    itemsid: []
+    reward_xp: 6000
+    description: "Steal items from luxury stores."
+
+  - id: quest50
+    name: "Night Crime"
+    items: 300
+    itemsid: []
+    reward_xp: 4000
+    description: "Steal 300 items during the night."
+  # ---------------- EXTRA QUESTS TO REACH 75 ----------------
+  - id: quest51
+    name: "Quick Grab"
+    items: 70
+    itemsid: []
+    reward_xp: 800
+    description: "Steal 70 items."
+
+  - id: quest52
+    name: "Criminal Activity"
+    items: 180
+    itemsid: []
+    reward_xp: 1500
+    description: "Steal 180 items."
+
+  - id: quest53
+    name: "Loot Hunter"
+    items: 350
+    itemsid: []
+    reward_xp: 2500
+    description: "Steal 350 items."
+
+  - id: quest54
+    name: "Professional Job"
+    items: 900
+    itemsid: []
+    reward_xp: 5000
+    description: "Steal 900 items."
+
+  - id: quest55
+    name: "Citywide Theft"
+    items: 1200
+    itemsid: []
+    reward_xp: 7000
+    description: "Steal 1200 items."
+
+  - id: quest56
+    name: "Mass Robbery"
+    items: 2000
+    itemsid: []
+    reward_xp: 11000
+    description: "Steal 2000 items."
+
+  - id: quest57
+    name: "Underworld Legend"
+    items: 3500
+    itemsid: []
+    reward_xp: 18000
+    description: "Steal 3500 items."
+
+  - id: quest58
+    name: "Elite Criminal"
+    items: 4500
+    itemsid: []
+    reward_xp: 24000
+    description: "Steal 4500 items."
+
+  - id: quest59
+    name: "City Heist"
+    items: 6000
+    itemsid: []
+    reward_xp: 35000
+    description: "Steal 6000 items."
+
+  - id: quest60
+    name: "Ultimate Theft"
+    items: 8000
+    itemsid: []
+    reward_xp: 50000
+    description: "Steal 8000 items."
+
+  - id: quest61
+    name: "Fast Hands"
+    items: 60
+    itemsid: []
+    reward_xp: 700
+    description: "Steal 60 items."
+
+  - id: quest62
+    name: "Hidden Crime"
+    items: 220
+    itemsid: []
+    reward_xp: 1700
+    description: "Steal 220 items."
+
+  - id: quest63
+    name: "City Raider"
+    items: 420
+    itemsid: []
+    reward_xp: 2800
+    description: "Steal 420 items."
+
+  - id: quest64
+    name: "Loot Storm"
+    items: 650
+    itemsid: []
+    reward_xp: 4200
+    description: "Steal 650 items."
+
+  - id: quest65
+    name: "Crime Lord"
+    items: 1500
+    itemsid: []
+    reward_xp: 9500
+    description: "Steal 1500 items."
+
+  - id: quest66
+    name: "Underworld Boss"
+    items: 2500
+    itemsid: []
+    reward_xp: 15000
+    description: "Steal 2500 items."
+
+  - id: quest67
+    name: "Elite Robbery"
+    items: 4000
+    itemsid: []
+    reward_xp: 22000
+    description: "Steal 4000 items."
+
+  - id: quest68
+    name: "Mega Crime"
+    items: 5500
+    itemsid: []
+    reward_xp: 32000
+    description: "Steal 5500 items."
+
+  - id: quest69
+    name: "Massive Operation"
+    items: 7500
+    itemsid: []
+    reward_xp: 42000
+    description: "Steal 7500 items."
+
+  - id: quest70
+    name: "Crime Empire"
+    items: 10000
+    itemsid: []
+    reward_xp: 65000
+    description: "Steal 10000 items."
+
+  - id: quest71
+    name: "City Criminal"
+    items: 110
+    itemsid: []
+    reward_xp: 1000
+    description: "Steal 110 items."
+
+  - id: quest72
+    name: "Loot Run"
+    items: 270
+    itemsid: []
+    reward_xp: 2100
+    description: "Steal 270 items."
+
+  - id: quest73
+    name: "Sneaky Theft"
+    items: 480
+    itemsid: []
+    reward_xp: 3200
+    description: "Steal 480 items."
+
+  - id: quest74
+    name: "Criminal Operation"
+    items: 900
+    itemsid: []
+    reward_xp: 5200
+    description: "Steal 900 items."
+
+  - id: quest75
+    name: "Ultimate Crime"
+    items: 20000
+    itemsid: []
+    reward_xp: 120000
+    description: "Steal 20000 items across the city."
