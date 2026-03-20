@@ -127,7 +127,7 @@ public class PickingTask extends BukkitRunnable {
             }
             double streakIncrement = p.getPerkValue(PERK_ITEM_STREAK1);
             if (streakIncrement > 0) {
-                p.addItemStreak(streakIncrement /10.0);
+                p.addItemStreak(streakIncrement);
             }
 
             double keyChance = p.getPerkValue(PERK_SPECIAL_KEYCHANCE);
@@ -142,7 +142,7 @@ public class PickingTask extends BukkitRunnable {
                 Bukkit.dispatchCommand(player, "crates key give " + player.getName() + " " + keyType);
             }
 
-
+            main.getQuestService().onPlayerStealItem(p,storeId,1);
             if (onFinish != null) onFinish.run();
             return;
         }
@@ -159,7 +159,7 @@ public class PickingTask extends BukkitRunnable {
         if(instaSteal > 0 && random.nextDouble() < instaSteal)
             item.setHp(0);
         else
-            item.setHp(item.getHp() - (tool.getDamage() + tool.getDamage()*p.getExtraDamage()));
+            item.setHp(item.getHp() - (tool.getDamage() + tool.getDamage()*(1+p.getExtraDamage()/100)));
         sendProgressBar(player, item.getHp(), item.getInitialhp());
     }
 

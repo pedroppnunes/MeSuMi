@@ -14,6 +14,8 @@ import robbery.number.NumberFormatter;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 import robbery.player.PrestigeLeaderboard;
+import robbery.quest.Quest;
+import robbery.quest.QuestProgress;
 import robbery.robberyLevel_XP.XPManager;
 import robbery.skilltree.SkillPerk;
 import robbery.skilltree.SkillTreeConfig;
@@ -87,10 +89,10 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             case "level" -> String.valueOf(pd.getLevel());
             case "xp" -> String.valueOf(pd.getXp());
             case "xptonext" -> String.valueOf(xp.xpRemainingForNextLevel(pd.getXp(), pd.getLevel()));
-            case "extraxp" -> String.valueOf(pd.getXPBoost());
+            case "extraxp" -> String.format("%.2f", pd.getXPBoost() * 100);
             case "levelcolored" -> xp.colorizeLevel(pd.getLevel());
             case "levelcolor" -> xp.getLevelHexColor(pd.getLevel());
-            case "boosterx" -> String.valueOf(pd.getBoost());
+            case "boosterx" -> String.format("%.3f",pd.getBoost());
             case "stealspeed" -> String.valueOf(pd.getExtraDamage());
             case "backpackslots" -> String.valueOf(pd.getExtraSlots());
             case "backpackunlocked" ->  String.valueOf(pd.getBackpackUnlocked());
@@ -111,9 +113,17 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             case "total_items_stolen" -> String.valueOf(pd.getItemsStolen());
             case "voteparty_required" -> String.valueOf(main.getVotePartyManager().getDisplayRequiredVotes());
             case "voteparty_current" -> String.valueOf(main.getVotePartyManager().getDisplayCurrentVotes());
+            case "quests_completed" -> String.valueOf(pd.getDailyQuestsCompleted());
+            case "quests_total" -> "3";
+            case "total_rewards" -> getTotalRewards(pd);
+            case "skilltreereset_points" -> String.valueOf(pd.getResetSkillTreePoints());
+            case "skilltreereset_skillpoints" -> String.valueOf(Robbery.getSkillTreeConfig().calculateTotalRefund(pd));
+
             default -> null;
         };
     }
+
+
 
     /**
      * Handles patterns like has_back_1, price_tool_2, store_items_1
@@ -212,7 +222,7 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                     String metric = parts[1];
                     String perkId = parts[2];
 
-                    SkillTreeConfig cfg = main.getSkillTreeConfig();
+                    SkillTreeConfig cfg = Robbery.getSkillTreeConfig();
                     if (cfg == null) return null;
 
 
@@ -252,6 +262,42 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                         default -> null;
                     };
 
+                case "quest":
+                    if (parts.length < 3) return null;
+
+                    int index = Integer.parseInt(parts[1]) - 1;
+                    if (pd.getOfferedDailyQuests().size() <= index) return "";
+
+                    String questId = pd.getOfferedDailyQuests().get(index);
+                    Quest quest = main.getQuestManager().getQuest(questId);
+                    if (quest == null) return "";
+
+                    QuestProgress progress = pd.getQuestProgressMap().get(questId);
+                    int currentProgress = (progress != null) ? progress.getItemsCompleted() : 0;
+
+                    return switch (parts[2]) {
+                        case "name" -> quest.name;
+                        case "required" -> String.valueOf(quest.itemsRequired);
+                        case "progress" -> String.valueOf(currentProgress);
+                        case "rewardxp" -> {
+                            int xpPerItem = main.getQuestService().computeQuestXpPerItem(quest, pd);
+                            long totalXp = (long) xpPerItem * quest.itemsRequired;
+                            yield String.valueOf(totalXp/2);
+                        }
+                        case "rewardstore" -> {
+                            if (quest.rewardStoreItems == null) yield "0";
+                            yield String.valueOf(quest.rewardStoreItems.amount/2);
+                        }
+                        case "rewardsskillpoints" -> String.valueOf(quest.getSkillPointRewards(pd));
+                        case "storename" -> {
+                            if (quest.rewardStoreItems == null) yield "";
+                            yield KeyManager.getStoreN(quest.rewardStoreItems.store);
+                        }
+                        case "description" -> quest.description;
+
+                        default -> null;
+                    };
+
 
                 default: return null;
             }
@@ -280,5 +326,34 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
 
     public static void registerHook() {
         new RobberyPlaceholderExpansion(Robbery.getInstance()).register();
+    }
+    private @NotNull String getTotalRewards(PlayerData pd) {
+        long grandTotalXp = 0;
+        int grandTotalSP = 0;
+        java.util.Map<String, Integer> combinedStoreItems = new java.util.HashMap<>();
+
+        for (String qId : pd.getOfferedDailyQuests()) {
+            Quest q = main.getQuestManager().getQuest(qId);
+            if (q == null) continue;
+
+            int xpPerItem = main.getQuestService().computeQuestXpPerItem(q, pd);
+            grandTotalXp += (long) xpPerItem * q.itemsRequired;
+            grandTotalSP += q.getSkillPointRewards(pd);
+
+            if (q.rewardStoreItems != null) {
+                combinedStoreItems.merge(q.rewardStoreItems.store, q.rewardStoreItems.amount, Integer::sum);
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("§b✨Robbery XP: §f").append(grandTotalXp/2);
+        sb.append("\n§6\uD83D\uDCDASkillPoints: §f").append(grandTotalSP);
+
+        if (!combinedStoreItems.isEmpty()) {
+            sb.append("\n§e\uD83D\uDCE6Store Mastery: ");
+            combinedStoreItems.forEach((store, amount) -> sb.append("§f").append(amount/2).append("x §f").append(KeyManager.getStoreN(store)).append(" ")
+            );
+        }
+        return sb.toString();
     }
 }

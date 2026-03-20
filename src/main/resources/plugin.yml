@@ -7,6 +7,10 @@ softdepend: [PlaceholderAPI,VotingPlugin]
 depend: [Vault]
 
 commands:
+  acceptalldaily:
+    description: Force a player to accept all their daily quests
+    usage: /acceptalldaily <player>
+    permission: robbery.op
   additem:
     description: Spawns item
     usage: /additem <item_name>
@@ -78,6 +82,10 @@ commands:
   pv:
     description: Open your private chest
     usage: /pv [slot]
+  quests:
+    description: Opens quest menu
+    usage: /quests <player>
+    permission: robbery.op
   ranks:
     usage: /ranks
   rankupdate:

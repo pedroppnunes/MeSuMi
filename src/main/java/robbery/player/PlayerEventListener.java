@@ -13,6 +13,7 @@ import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -27,6 +28,7 @@ import robbery.backpacks.BackpackManager;
 import robbery.backpacks.PvCommand;
 import robbery.keys.Rcrate;
 import robbery.messages.Messages;
+import robbery.quest.QuestProgress;
 import robbery.tool.ToolManager;
 import robbery.robberyLevel_XP.RobberyLevelUpEvent;
 import org.bukkit.Sound;
@@ -34,7 +36,9 @@ import org.bukkit.Sound;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import static robbery.keys.KeyManager.getStoreName;
@@ -58,8 +62,8 @@ public class PlayerEventListener implements Listener {
         File playerFile = getPlayerFile(player);
 
         handleJoinMessage(player);
-        applyOutpostPerks(player, memory);
         loadPlayerDataFromFile(player, memory, playerFile);
+        applyOutpostPerks(player, memory);
 
         if (!player.hasPermission(NOITEMS_PERMISSION)) {
             giveStartingItems(player, memory);
@@ -86,7 +90,7 @@ public class PlayerEventListener implements Listener {
 
                 for (Player online : Bukkit.getOnlinePlayers()) {
                     Messages.sendComponentMessageFormatted(online, "quit-message",
-                            Map.of("prefix", prefix, "player", color + "&l" + player.getName()));
+                            Map.of("prefix", prefix, "player", color + player.getName()));
                 }
             }
 
@@ -98,7 +102,6 @@ public class PlayerEventListener implements Listener {
     }
 
     public void savePlayerData(Player player, PlayerData memory) {
-
         File playerFolder = new File(plugin.getDataFolder(), "player/" + player.getUniqueId());
         if (!playerFolder.exists()) playerFolder.mkdirs();
 
@@ -116,18 +119,14 @@ public class PlayerEventListener implements Listener {
         cfg.set("stats.storeItems", memory.getStoreItemsMap());
         cfg.set("stats.storeMilestones", memory.getStoreMilestoneMap());
 
-        // Backpack
+        // Backpack & Tools & Keys
         cfg.set("stats.backpack", memory.getBackpackString());
-        cfg.set("stats.material", memory.getBackpack().getMaterial());
+        cfg.set("stats.material", memory.getBackpack().getMaterial().toString());
         cfg.set("stats.itemsbackpack", memory.getBackpackItemsString());
         cfg.set("stats.colorbackpack", memory.getBackpack().getColorname());
         cfg.set("stats.hasbackpack", memory.getBackpackunlucked());
-
-        // Tools
         cfg.set("stats.hastool", memory.getToolsunlucked());
         cfg.set("stats.tool", memory.getToolString());
-
-        // Keys
         cfg.set("stats.key", memory.getKeyString());
         cfg.set("stats.haskeys", memory.getKeysString());
 
@@ -136,13 +135,31 @@ public class PlayerEventListener implements Listener {
         cfg.set("stats.hasbooster", memory.getBoostersString());
         cfg.set("stats.boosterpaused", memory.isBoostersPaused());
 
-        // Skillpoints
+        // Skillpoints & Tree
         cfg.set("stats.skillpoints", memory.getSkillPoints());
-
-        //SkillTree & SkillPerks
         cfg.set("skilltree.levels", memory.getAllSkillTreeLevels());
         cfg.set("skilltree.perks", memory.getAllPerkValues());
         cfg.set("skilltree.reset", memory.getResetSkillTreePoints());
+
+        // Daily Quests
+        cfg.set("dailyQuests.offered", memory.getOfferedDailyQuests());
+        cfg.set("dailyQuests.accepted", new ArrayList<>(memory.getAcceptedDailyQuests()));
+        cfg.set("dailyQuests.lastPick", memory.getLastDailyQuestPick());
+        cfg.set("dailyQuests.completedCount", memory.getDailyQuestsCompleted());
+        cfg.set("dailyQuests.lastResetDay", memory.getLastResetDay());
+        cfg.set("dailyQuests.talkedToNPC", memory.hasTalkedToQuestNPC());
+
+        // Quest progress
+        Map<String, Map<String, Object>> progressMap = new HashMap<>();
+        for (Map.Entry<String, QuestProgress> entry : memory.getQuestProgressMap().entrySet()) {
+            QuestProgress pr = entry.getValue();
+            Map<String, Object> data = new HashMap<>();
+            data.put("itemsStolen", pr.getItemsCompleted());
+            data.put("halfRewardGiven", pr.isHalfRewardGiven());
+            progressMap.put(entry.getKey(), data);
+        }
+        cfg.set("dailyQuests.progress", progressMap);
+        cfg.set("dailyQuests.active", memory.getActiveQuest());
 
         // Player location
         Location loc = player.getLocation();
@@ -153,17 +170,13 @@ public class PlayerEventListener implements Listener {
         cfg.set("stats.location.yaw", loc.getYaw());
         cfg.set("stats.location.pitch", loc.getPitch());
 
-        // External systems
-        PrestigeLeaderboard.updateLeaderboard(player);
-        PvCommand.saveAllInventories(player.getUniqueId());
-        Rcrate.saveRewards(player.getUniqueId());
-
         try {
             cfg.save(file);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
     private File getPlayerFile(Player player) {
         File folder = new File(plugin.getDataFolder(), "player/" + player.getUniqueId());
         if (!folder.exists()) folder.mkdirs();
@@ -177,7 +190,7 @@ public class PlayerEventListener implements Listener {
 
         for (Player online : Bukkit.getOnlinePlayers()) {
             Messages.sendComponentMessageFormatted(online, "join-message",
-                    Map.of("prefix", prefix, "player", color + "&l" + player.getName()));
+                    Map.of("prefix", prefix, "player", color + player.getName()));
         }
     }
     private void applyOutpostPerks(Player player, PlayerData memory) {
@@ -213,7 +226,7 @@ public class PlayerEventListener implements Listener {
         memory.setRank(cfg.getString("stats.rank"));
         memory.setXp(cfg.getLong("stats.xp", 0L));
         memory.setLevel(Math.max(1, cfg.getInt("stats.level", 1)));
-        memory.setPrestige(Integer.parseInt(cfg.getString("stats.prestige")));
+        memory.setPrestige(cfg.getInt("stats.prestige", 0));
 
         // Tools & keys
         memory.setToolsunlocked(cfg.getString("stats.hastool"));
@@ -231,25 +244,58 @@ public class PlayerEventListener implements Listener {
 
         // Skill tree
         if (cfg.contains("skilltree.levels")) {
-            Map<String, Object> levelsMap = cfg.getConfigurationSection("skilltree.levels").getValues(false);
-            for (Map.Entry<String, Object> entry : levelsMap.entrySet()) {
-                memory.getAllSkillTreeLevels().put(entry.getKey(), (Integer) entry.getValue());
+            ConfigurationSection levelSec = cfg.getConfigurationSection("skilltree.levels");
+            for (String key : levelSec.getKeys(false)) {
+                memory.getAllSkillTreeLevels().put(key, levelSec.getInt(key));
             }
         }
         loadMapDouble(cfg, "skilltree.perks", memory.getAllPerkValues());
-        memory.setResetSkillTreePoints(Integer.parseInt(cfg.getString("skilltree.reset")));
+        memory.setResetSkillTreePoints(cfg.getInt("skilltree.reset", 0));
 
         // Backpack
-        memory.setBackpack(
-                BackpackManager.toBackpack(cfg.getString("stats.backpack"), cfg.getString("stats.material"),
-                        cfg.getString("stats.itemsbackpack"), cfg.getString("stats.colorbackpack"))
-        );
+        memory.setBackpack(BackpackManager.toBackpack(cfg.getString("stats.backpack"), cfg.getString("stats.material"),
+                cfg.getString("stats.itemsbackpack"), cfg.getString("stats.colorbackpack")));
         memory.setBackpackunlucked(cfg.getString("stats.hasbackpack"));
 
         // Boosters
         memory.setBoostersPaused(cfg.getBoolean("stats.boosterpaused"));
         memory.setActiveBooster(cfg.getString("stats.booster"));
         memory.setBoostersFromString(cfg.getString("stats.hasbooster"));
+
+        // Daily Quests
+        if (cfg.contains("dailyQuests.offered"))
+            memory.getOfferedDailyQuests().addAll(cfg.getStringList("dailyQuests.offered"));
+        if (cfg.contains("dailyQuests.accepted"))
+            memory.getAcceptedDailyQuests().addAll(cfg.getStringList("dailyQuests.accepted"));
+        if (cfg.contains("dailyQuests.lastPick"))
+            memory.setLastDailyQuestPick(cfg.getLong("dailyQuests.lastPick"));
+
+        memory.setDailyQuestsCompleted(cfg.getInt("dailyQuests.completedCount", 0));
+        memory.setLastResetDay(cfg.getInt("dailyQuests.lastResetDay", -1));
+        memory.setTalkedToQuestNPC(cfg.getBoolean("dailyQuests.talkedToNPC", false));
+
+        // FIXED: Quest progress (Casting fix)
+        if (cfg.contains("dailyQuests.progress")) {
+            ConfigurationSection progressSec = cfg.getConfigurationSection("dailyQuests.progress");
+            for (String questId : progressSec.getKeys(false)) {
+                // We use ConfigurationSection here, NOT FileConfiguration
+                ConfigurationSection section = progressSec.getConfigurationSection(questId);
+                if (section != null) {
+                    QuestProgress pr = new QuestProgress(questId);
+                    pr.setItemsCompleted(section.getInt("itemsStolen", 0));
+                    pr.setHalfRewardGiven(section.getBoolean("halfRewardGiven", false));
+                    memory.getQuestProgressMap().put(questId, pr);
+                }
+            }
+        }
+
+        // Quest active flags
+        if (cfg.contains("dailyQuests.active")) {
+            ConfigurationSection activeSec = cfg.getConfigurationSection("dailyQuests.active");
+            for (String questId : activeSec.getKeys(false)) {
+                memory.getAcceptedDailyQuests().add(questId);
+            }
+        }
 
         // Location
         if (cfg.contains("stats.location")) {
@@ -376,6 +422,7 @@ public class PlayerEventListener implements Listener {
 
         if (!hasLoaded && player.getWorld().getName().equalsIgnoreCase("world")) {
             hasLoaded = true;
+            Bukkit.getScheduler().runTaskLater(plugin, plugin::updateDailyNPC, 20L);
             Bukkit.getScheduler().runTaskLater(plugin, plugin::loadItems, 40L);
         }
     }
@@ -386,6 +433,7 @@ public class PlayerEventListener implements Listener {
 
         if (!hasLoaded && player.getWorld().getName().equalsIgnoreCase("world")) {
             hasLoaded = true;
+            Bukkit.getScheduler().runTaskLater(plugin, plugin::updateDailyNPC, 20L);
             Bukkit.getScheduler().runTaskLater(plugin, plugin::loadItems, 40L);
         }
     }

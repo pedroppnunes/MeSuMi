@@ -9,19 +9,19 @@ package robbery.ranks;
 public class RankManager {
 
     /** The highest rank available. */
-    public static final Rank MAFIA_BOSS = new Rank("Mafia Boss", 1.25, 8, 0.3, 0.25,"rank7");
+    public static final Rank MAFIA_BOSS = new Rank("Mafia Boss", 1.5, 8, 0.4, 0.25,"rank7");
 
     /** Second-highest rank. */
-    public static final Rank KINGPIN = new Rank("Kingpin", 1.15, 7, 0.275, 0.20,"rank6");
+    public static final Rank KINGPIN = new Rank("Kingpin", 1.20, 7, 0.3, 0.20,"rank6");
 
     /** High-level rank for experienced players. */
-    public static final Rank HEISTER = new Rank("Heister", 1, 6, 0.225, 0.15,"rank5");
+    public static final Rank HEISTER = new Rank("Heister", 1, 6, 0.25, 0.15,"rank5");
 
     /** Mid-level rank representing an outlaw. */
     public static final Rank OUTLAW = new Rank("Outlaw", 0.8, 5, 0.20, 0.10,"rank4");
 
     /** Mid-low rank representing a bandit. */
-    public static final Rank BANDIT = new Rank("Bandit", 0.6, 4, 0.175, 0.075,"rank3");
+    public static final Rank BANDIT = new Rank("Bandit", 0.65, 4, 0.175, 0.075,"rank3");
 
     /** Low-level rank representing a basic robber. */
     public static final Rank ROBBER = new Rank("Robber", 0.5, 3, 0.15, 0.05,"rank2");

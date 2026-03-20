@@ -190,7 +190,7 @@ perks:
     name: "Triple Item"
     required_level: 80
     max_level: 3
-    costs: [ 7, 8, 9 ]
+    costs: [ 10, 11, 13 ]
     base_value: 1
     value_increment: 1
     description: "Increase the chance of receiving the same item thrice by +1%"
@@ -223,7 +223,7 @@ perks:
     name: "Double Jump"
     required_level: 100
     max_level: 1
-    costs: [ 50 ]
+    costs: [ 60 ]
     base_value: 1
     value_increment: 0
     description: "Receive the ability to double jump. (Cooldown: 5 seconds)"
@@ -234,7 +234,7 @@ perks:
     name: "Key Stealer"
     required_level: 100
     max_level: 1
-    costs: [ 50 ]
+    costs: [ 60 ]
     base_value: 1
     value_increment: 0
     description: "Gain the ability to receive keys while stealing. (Vote, Epic, Legendary, Tags, Booster)"
@@ -245,7 +245,7 @@ perks:
     name: "Feather Flight"
     required_level: 100
     max_level: 1
-    costs: [ 50 ]
+    costs: [ 60 ]
     base_value: 1
     value_increment: 0
     description: "Receive the Feather Flight effect for 5 seconds. (Cooldown: 3 minutes)"

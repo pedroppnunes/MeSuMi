@@ -30,6 +30,7 @@ import robbery.backpacks.PvCommand;
 import robbery.keys.BuyKey;
 import robbery.keys.Rcrate;
 import robbery.player.PlayerDataManager;
+import robbery.quest.*;
 import robbery.skilltree.*;
 import robbery.storeMastery.StoreMasteryManager;
 import robbery.tool.BuyTool;
@@ -109,6 +110,8 @@ public class Robbery extends JavaPlugin implements Listener {
     private StoreMasteryManager storeMasteryManager;
     private static SkillTreeConfig skillTreeConfig;
     private SkillService skillService;
+    private QuestManager questManager;
+    private QuestService questService;
 
     private FileConfiguration itemConfig;
     private File itemConfigFile;
@@ -140,6 +143,13 @@ public class Robbery extends JavaPlugin implements Listener {
         }
         this.hidePlayers = new HidePlayers(main);
         this.rcrate = new Rcrate();
+        World outpostWorld = Bukkit.getWorld("outpost");
+        if (outpostWorld == null) {
+            getLogger().severe("World 'outpost' not found!");
+            return;
+        }
+        OutpostRegion region = new OutpostRegion(outpostWorld, -3, 1, -3, 4, 1, 4);
+        outpostManager = new OutpostManager(main, region);
         this.warningManager = new WarningManager(main);
         this.muteManager = new MuteManager(main);
         this.votePartyManager = new VotePartyManager(main);
@@ -209,19 +219,17 @@ public class Robbery extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("migrate")).setExecutor(new MigrateBackup(main));
         Objects.requireNonNull(getCommand("stopbooster")).setExecutor(new StopBoosterCommand());
         Objects.requireNonNull(getCommand("adminxp")).setExecutor(new AdminXPCommand(main));
-        skillTreeConfig = new SkillTreeConfig(this);
-        this.skillService = new SkillService(this, skillTreeConfig);
+        skillTreeConfig = new SkillTreeConfig(main);
+        this.skillService = new SkillService(main, skillTreeConfig);
         Objects.requireNonNull(getCommand("skillbuy")).setExecutor(new SkillPerkBuyCommand(skillService,skillTreeConfig));
-        Objects.requireNonNull(getCommand("resetskilltree")).setExecutor(new SkillTreeResetCommand(main,skillTreeConfig));
+        Objects.requireNonNull(getCommand("resetskilltree")).setExecutor(new SkillTreeResetCommand(main));
+        questManager = new QuestManager(main);
+        questManager.loadFromConfig("quests.yml");
+        questService = new QuestService(questManager,main);
+        Objects.requireNonNull(getCommand("acceptalldaily")).setExecutor(new AcceptAllDailyQuestsCommand(main,questService));
+        Objects.requireNonNull(getCommand("quests")).setExecutor(new QuestsCommand(main));
         getServer().getMessenger().registerOutgoingPluginChannel(main, "BungeeCord");
-        World outpostWorld = Bukkit.getWorld("outpost");
-        if (outpostWorld == null) {
-            getLogger().severe("World 'outpost' not found!");
-            return;
-        }
         PrestigeCountManager.load();
-        OutpostRegion region = new OutpostRegion(outpostWorld, -3, 1, -3, 4, 1, 4);
-        outpostManager = new OutpostManager(main, region);
         blockCraft.removeRecipes();
         addItemstoMap();
 
@@ -246,7 +254,7 @@ public class Robbery extends JavaPlugin implements Listener {
         if (getConfig().getBoolean("leaderboards.hourly.enabled")) {
             String webhookUrl = getConfig().getString("leaderboards.hourly.webhook");
             if (webhookUrl != null && !webhookUrl.isEmpty()) {
-                hourlyLeaderboard = new HourlyLeaderboard(this, webhookUrl);
+                hourlyLeaderboard = new HourlyLeaderboard(main, webhookUrl);
                 getLogger().info("Hourly leaderboard enabled.");
             } else {
                 getLogger().warning("Hourly leaderboard enabled but webhook is missing.");
@@ -257,7 +265,7 @@ public class Robbery extends JavaPlugin implements Listener {
         startVoteReminderTask();
         startTipsTask();
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, this::saveItems, 20L * 60, 20L * 60 * 5);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(main, main::saveItems, 20L * 60, 20L * 60 * 5);
     }
 
     public void addItemstoMap() {
@@ -750,13 +758,58 @@ public class Robbery extends JavaPlugin implements Listener {
                     tipIndex = 0;
                 }
             }
-        }.runTaskTimer(this, 20L*120, interval);
+        }.runTaskTimer(this, 20L*200, interval);
     }
 
+    public void updateDailyNPC() {
+        FileConfiguration config = getConfig();
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        int today = cal.get(Calendar.DAY_OF_YEAR);
+        int lastUpdateDay = config.getInt("npc-rotation.last-day", -1);
+
+        String[] coords = {
+                "20054 101 19936",
+                "20118 101 20028",
+                "20176 104 19990",
+                "20215 101 20051",
+                "20243 100 20130",
+                "20365 101 20093",
+                "20345 101 20197",
+                "20147.5 112 20099.5",
+                "20182 102 20187",
+                "20150 101 20126"
+        };
+
+        String[] skins = {
+                "Quest3.png", "Quest1.png", "Quest2.png", "Quest4.png", "Quest5.png",
+                "Quest7.png", "Quest6.png", "Quest9.png", "Quest8.png", "Quest10.png"
+        };
+
+        if (today != lastUpdateDay) {
+            int currentIndex = config.getInt("npc-rotation.current-index", 0);
+
+            int nextIndex = (currentIndex + 1) % coords.length;
+
+            String newCoords = coords[nextIndex];
+            String newSkin = skins[nextIndex];
+
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "npc select 170");
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "npc skin --file " + newSkin);
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "npc moveto " + newCoords);
+
+            config.set("npc-rotation.last-day", today);
+            config.set("npc-rotation.current-index", nextIndex);
+            saveConfig();
+
+            Bukkit.getLogger().info("[Robbery] NPC rotated to location index: " + nextIndex);
+        }
+    }
+
+//Getters
     public boolean getIsBackup() {
         return isBackingUp;
     }
-//Getters
+
     public static Economy getEconomy() {
         return econ;
     }
@@ -797,5 +850,8 @@ public class Robbery extends JavaPlugin implements Listener {
     public static SkillTreeConfig getSkillTreeConfig(){return skillTreeConfig;}
     public SkillService getSkillService(){return this.skillService;}
 
-
+    public QuestService getQuestService() {
+        return questService;
+    }
+    public QuestManager getQuestManager(){return this.questManager;}
 }

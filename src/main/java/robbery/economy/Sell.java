@@ -147,9 +147,9 @@ public class Sell implements CommandExecutor {
                 long xpIntoLevel = xpNeeded - xpRemaining;
 
                 player.sendActionBar(
-                        Component.text("+" + totalXp + " Robbery XP (" + xpIntoLevel + "/" + xpNeeded + " XP)")
+                        Component.text("+" + NumberFormatter.formatDoubleNumber(totalXp) + " Robbery XP (" + NumberFormatter.formatDoubleNumber(xpIntoLevel) + "/" + NumberFormatter.formatDoubleNumber(xpNeeded) + " XP)")
                                 .color(NamedTextColor.DARK_AQUA));
-                Map<String, String> xpearned = Map.of("xp", String.valueOf(totalXp));
+                Map<String, String> xpearned = Map.of("xp", String.valueOf(NumberFormatter.formatDoubleNumber(totalXp)));
                 Messages.sendFormatted(player, "command.sell.xp-earned", xpearned);
             } catch (Exception ex) {
                 main.getLogger().warning("Failed to award XP on /sell for " + player.getName() + " : " + ex.getMessage());

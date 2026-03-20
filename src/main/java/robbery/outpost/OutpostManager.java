@@ -66,7 +66,7 @@ public class OutpostManager {
         this.boostExpireTask = null;
 
         INCREMENT_PER_PLAYER = 100.0 / (double) CAPTURE_TIME_SECONDS;
-        DECAY_PER_SECOND = INCREMENT_PER_PLAYER; // symmetric decay/capture speed as requested
+        DECAY_PER_SECOND = INCREMENT_PER_PLAYER;
 
         startTasks();
     }
@@ -255,7 +255,6 @@ public class OutpostManager {
     }
 
     private void completeCapture(Island capturingIsland) {
-        // Only complete capture if outpost is currently unclaimed
         if (ownerIsland != null) return;
 
         if (capturingIsland == null) {
@@ -267,6 +266,14 @@ public class OutpostManager {
                 Map.of("island_name", capturingIsland.getName()));
 
         applyPerksToIsland(capturingIsland);
+        List<SuperiorPlayer> members = capturingIsland.getIslandMembers(true);
+        for (SuperiorPlayer sp : members) {
+            Player memberPlayer = sp.asPlayer();
+            if (memberPlayer != null && memberPlayer.isOnline()) {
+                PlayerData pd = PlayerDataManager.getPlayerData(memberPlayer);
+                plugin.getQuestService().onPlayerCaptureOutpost(pd);
+            }
+        }
         lastBoosterIsland = capturingIsland;
         ownerIsland = capturingIsland;
 

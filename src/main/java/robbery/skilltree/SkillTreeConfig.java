@@ -2,6 +2,7 @@ package robbery.skilltree;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import robbery.core.Robbery;
+import robbery.player.PlayerData;
 
 import java.io.File;
 import java.util.*;
@@ -77,6 +78,49 @@ public class SkillTreeConfig {
             }
 
             tiers.put(id, new SkillPerk(id, name, required, maxLevel, costs, values, desc, requiredPerks));
+        }
+    }
+
+    /**
+     * Calculates how many skill points a player should get back.
+     */
+    public int calculateTotalRefund(PlayerData pd) {
+        int totalRefund = 0;
+        Map<String, Integer> levels = pd.getAllSkillTreeLevels();
+
+        for (Map.Entry<String, Integer> entry : levels.entrySet()) {
+            String perkId = entry.getKey();
+            int currentLevel = entry.getValue();
+            if (currentLevel <= 0) continue;
+
+            SkillPerk perk = getTier(perkId); // Uses the method already in SkillTreeConfig
+            if (perk == null) continue;
+
+            for (int lvl = 0; lvl < currentLevel; lvl++) {
+                try {
+                    totalRefund += perk.costForNext(lvl);
+                } catch (Exception ignored) {}
+            }
+        }
+        return totalRefund;
+    }
+
+    /**
+     * Resets all perks to level 0 and updates the player's attribute values.
+     */
+    public void performReset(PlayerData pd) {
+        Map<String, Integer> levels = new HashMap<>(pd.getAllSkillTreeLevels());
+
+        for (String perkId : levels.keySet()) {
+            pd.setSkillTreeLevel(perkId, 0);
+            SkillPerk perk = getTier(perkId);
+
+            try {
+                double defaultValue = (perk != null) ? perk.valueForLevel(0) : 0.0;
+                pd.setPerkValue(perkId, defaultValue);
+            } catch (Exception ignored) {
+                pd.setPerkValue(perkId, 0.0);
+            }
         }
     }
 

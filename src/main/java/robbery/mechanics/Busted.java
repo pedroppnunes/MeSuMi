@@ -31,6 +31,7 @@ public class Busted implements CommandExecutor {
     private static final Random random = new Random();
     private final List<int[]> busted = new ArrayList<>();
     private final Map<UUID, Long> cooldowns = new HashMap<>();
+    private final Robbery main;
 
     /**
      * Mapping of ranks to their chance (percentage) to avoid being busted.
@@ -68,6 +69,7 @@ public class Busted implements CommandExecutor {
         busted.add(new int[]{20074, 106, 19971});
         busted.add(new int[]{20056, 106, 19976});
         busted.add(new int[]{20064, 111, 19960});
+        this.main = main;
     }
 
     /**
@@ -159,11 +161,13 @@ public class Busted implements CommandExecutor {
                 player.teleport(target);
                 Messages.sendTitle(player, "command.busted.busted-title", "", 10, 60, 10);
                 p.busted();
+                main.getQuestService().onPlayerBusted(p);
                 return true;
             }
         }
 
         p.busted();
+        main.getQuestService().onPlayerBusted(p);
         int[] coords = busted.get(getRandomLocation());
         player.teleport(new Location(player.getWorld(), coords[0], coords[1], coords[2]));
         Messages.sendTitle(player, "command.busted.busted-title", "", 10, 60, 10);

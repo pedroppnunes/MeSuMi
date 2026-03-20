@@ -6,6 +6,10 @@ global:
   not-here: "&5&lRobbery &8> &cYou can't use that here."
 
 command:
+  acceptalldaily:
+    usage: "&5&lRobbery &8> &cUsage: /acceptalldaily <player_name>"
+    confirm: "&5&lRobbery &8> &aYou have started your daily quests."
+    already-accepted: "&5&lRobbery &8> &eYou already started your quests."
   additem:
     usage: "&5&lRobbery &8> &cUsage: /additem <item_name>"
     invalid-item: "&5&lRobbery &8> &cInvalid item! Available items: %items%"
@@ -103,6 +107,9 @@ command:
     no-permission-world: "&5&lRobbery &8> &cYou can't use /pv here."
     invalid-usage: "&5&lRobbery &8> &cUsage: /pv [number]"
     invalid-slot: "&5&lRobbery &8> &cSlot must be between 1 and %max%."
+  quests:
+    usage: "&5&lRobbery &8> &cUsage: /quests <player> npc|menu"
+    must-talk-to-npc: "&5&lRobbery &8> &eFirst talk with the Quest Master, he is somewhere in town..."
   rankup:
     highest-store: "&5&lRobbery &8> &aYou already own the highest store!"
     store-locked: "&5&lRobbery &8> &cThis store is locked. Prestige to unlock more!"
@@ -145,11 +152,11 @@ command:
     not-enough-points: "&5&lRobbery &8> &cNot enough skill points! You need %cost% Skillpoints."
     upgraded-slots: "&5&lRobbery &8> &aUpgraded %attribute% to %newvalue% for %cost% Skillpoints!"
     upgraded-percent: "&5&lRobbery &8> &aUpgraded %attribute% to %newvalue%% for %cost% Skillpoints!"
-  skilltreereset:
+  skilltree:
     usage: "&5&lRobbery &8> &cUsage: /resetskilltree <player>"
     no-reset: "&5&lRobbery &8> &cYou don't have any resets."
     success: "&5&lRobbery &8> &aYour skilltree has been reset."
-    resetpoints-added: "&5&lRobbery &8> &aYou received &c+%amount% reset points"
+    resetpoints-added: "&5&lRobbery &8> &aYou received &c+%amount% &4SkillTreeReset Points"
   spawn:
     teleporting: "&5&lRobbery &8> &aTeleporting to spawn..."
     world-not-found: "&5&lRobbery &8> &cThe spawn world could not be found!"
@@ -221,6 +228,9 @@ events:
     command_blocked: "&6&lOutpost &8> &cYou cannot use commands while in PvP!"
     tag_timer: "&cCombat Tag: &e%time%s"
     death-message: "&6&lOutpost &8> &c%killed% &fwas killed by &c%killer%"
+  quests:
+    quest-reward: "&5&lRobbery &8> &aYou completed quest &e%quest%."
+    all-completed: "&5&lRobbery &8> &aYou completed all quests."
   robberyxp:
     level-up: "&5&lRobbery &8> &bYou have leveled up to &6Level %level%&b!"
   outpost:
@@ -231,7 +241,7 @@ events:
     boost_expired_title: "&6&lOutpost &8> &cOutpost boost expired"
     boost_expired_border: "-----------------------------"
     boost_expired_desc: "&6&lOutpost &8> &7The outpost has no one holding it."
-    progress_bar: "%bar% §e%percent%%"
+    progress_bar: "%bar% &e%percent%%"
     status-title-unclaimed: "&cOutpost Unclaimed"
     status-title-controlled: "&eOutpost Controlled by: &b%island%"
     status-lore-time-left: "&7Time remaining: &a%time%"
@@ -246,11 +256,8 @@ events:
     neutralizing_broadcast: "&6&lOutpost &8> &eOutpost being neutralized by &b%island_name%&e!"
     neutralized_broadcast: "&6&lOutpost &8> &eOutpost neutralized by &b%island_name%&e!"
     capturing_broadcast: "&6&lOutpost &8> &cOutpost being captured by &b%island_name%&c!"
-    owner_immunity:
-      - "§cOwner §6%owner% §chas immunity for §e%time%§c — you cannot capture now."
-    immunity_started:
-      - "&6&lOutpost &8> &b%island_name% &has a 20m immunity after capturing the Outpost!"
-      - "&b%island_name% &chas a 20m immunity after capturing the Outpost!"
+    owner_immunity: "&cOwner &6%owner% &ehas immunity for &e%time%&c - you cannot capture now."
+    immunity_started: "&6&lOutpost &8> &b%island_name% &chas a 20m immunity after capturing the Outpost!"
     status-lore-immunity: "&cOwner immunity: &b%time%"
   skilltree:
     purchased: "&5&lRobbery &8> &aYou purchased %tiername% for &6%cost% Skillpoints"

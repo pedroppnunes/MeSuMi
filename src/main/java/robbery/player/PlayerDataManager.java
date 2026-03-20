@@ -54,4 +54,8 @@ public class PlayerDataManager {
     public static String getFolderPath(Player p) {
         return Bukkit.getPluginsFolder().getAbsolutePath() + "/player/" + p.getUniqueId();
     }
+
+    public static Map<String, PlayerData> getAllPlayers(){
+        return playerDataMap;
+    }
 }

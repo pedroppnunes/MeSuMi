@@ -19,6 +19,7 @@ import robbery.items.Items;
 import robbery.keys.KeyManager;
 import robbery.keys.Keys;
 import robbery.messages.Messages;
+import robbery.quest.QuestProgress;
 import robbery.ranks.Rank;
 import robbery.ranks.RankManager;
 import robbery.skilltree.SkillPerk;
@@ -57,8 +58,17 @@ public class PlayerData {
     private final Map<String, Long> temporaryPerks = new HashMap<>();
     private double itemStreakBonus = 0.0;
     private long lastItemStolenTimestamp = 0;
+
+    private final List<String> offeredDailyQuests = new ArrayList<>();
+    private final Set<String> acceptedDailyQuests = new HashSet<>();
+    private int dailyQuestsCompleted = 0;
+    private final Map<String, QuestProgress> questProgress = new HashMap<>();
+    private boolean talkedToQuestNPC = false;
+    private int lastResetDay = -1;
+
     private boolean godOfRobberyTag = false;
 
+    private long lastDailyQuestPick = 0L;
     private int resetSkillTreePoints = 0;
     private Rank rank;
     private final Player player;
@@ -191,6 +201,7 @@ public class PlayerData {
         }
     }
 
+
     public boolean hasKey(String k) {
         return keys.contains(k);
     }
@@ -278,14 +289,14 @@ public class PlayerData {
     }
     public int getExtraSlots() { return (int) (rank.extraSlots() + getPerkValue(PERK_BACK_SLOTS1));}
     public double getExtraDamage() {
-        double baseDamage = rank.extraDamage()
+        double baseDamage = rank.extraDamage()*100
                 + getOutSpeedBonus()
                 + getPerkValue(PERK_STEAL_SPEED1)
                 + getPerkValue(PERK_STEAL_SPEED2)
                 + itemStreakBonus;
 
         if (hasTemporaryPerk(PERK_ITEM_STREAK1)) {
-            baseDamage += 0.5;
+            baseDamage += 50;
         }
 
         return baseDamage;
@@ -624,7 +635,7 @@ public int getStoreItems(String storeId) {
     }
 
     public void setOutSpeedBonus(int value) {
-        setPerkValue(ATTR_SPEED_BONUS, value / 100.0);
+        setPerkValue(ATTR_SPEED_BONUS, value);
     }
 
     public void setOutMooneyMult(double mult){
@@ -632,37 +643,53 @@ public int getStoreItems(String storeId) {
     }
 
     public double getOutBoosterChance() {
-        return getPerkValue(PERK_OUT_BUFF1) == 0 ? getPerkValue(ATTR_BOOSTER_CHANCE) : getPerkValue(ATTR_BOOSTER_CHANCE)*getPerkValue(PERK_OUT_BUFF1);
+        return getPerkValue(PERK_OUT_BUFF1) == 0 ? getPerkValue(ATTR_BOOSTER_CHANCE) : getPerkValue(ATTR_BOOSTER_CHANCE)*(1+getPerkValue(PERK_OUT_BUFF1));
     }
 
     public double getOutSpChance() {
-        return getPerkValue(PERK_OUT_BUFF1) == 0 ? getPerkValue(ATTR_SKILLPOINT_CHANCE) : getPerkValue(ATTR_SKILLPOINT_CHANCE)*getPerkValue(PERK_OUT_BUFF1);
+        return getPerkValue(PERK_OUT_BUFF1) == 0 ? getPerkValue(ATTR_SKILLPOINT_CHANCE) : getPerkValue(ATTR_SKILLPOINT_CHANCE)*(1+getPerkValue(PERK_OUT_BUFF1));
     }
 
     public double getOutSpeedBonus(){
-        return getPerkValue(PERK_OUT_BUFF1) == 0 ? getPerkValue(ATTR_SPEED_BONUS) : getPerkValue(ATTR_SPEED_BONUS)*getPerkValue(PERK_OUT_BUFF1);
+        return getPerkValue(PERK_OUT_BUFF1) == 0 ? getPerkValue(ATTR_SPEED_BONUS) : getPerkValue(ATTR_SPEED_BONUS)*(1+getPerkValue(PERK_OUT_BUFF1));
     }
 
     private double getOutMoneyMult() {
-        return getPerkValue(PERK_OUT_BUFF1) == 0 ? getPerkValue(ATTR_MONEY_MULT) : getPerkValue(ATTR_MONEY_MULT)*getPerkValue(PERK_OUT_BUFF1);
+        return getPerkValue(PERK_OUT_BUFF1) == 0 ? getPerkValue(ATTR_MONEY_MULT) : getPerkValue(ATTR_MONEY_MULT)*(1+getPerkValue(PERK_OUT_BUFF1));
     }
 //Attributes
-public void setPerkValue(String perkId, double value) {
-    if (value == 0) {
-        perkValues.remove(perkId);
-    } else {
-        double finalValue;
-
-        if (PERCENTAGE_PERKS.contains(perkId)) {
-            finalValue = value / 100.0;
-            finalValue = Math.round(finalValue * 100.0) / 100.0;
+    public void setPerkValue(String perkId, double value) {
+        if (value == 0) {
+            perkValues.remove(perkId);
         } else {
-            finalValue = Math.round(value * 1000.0) / 1000.0;
-        }
+            double finalValue;
 
-        perkValues.put(perkId, finalValue);
+            if (PERCENTAGE_PERKS.contains(perkId)) {
+                double decimal = value / 100.0;
+                finalValue = Math.round(decimal * 100000.0) / 100000.0;
+            } else {
+                finalValue = Math.round(value * 1000.0) / 1000.0;
+            }
+
+            perkValues.put(perkId, finalValue);
+        }
+        if (perkId.equals(PERK_BACK_SLOTS1)) {
+            refreshBackpackSlots();
+        }
     }
-}
+
+    public void refreshBackpackSlots() {
+        String baseName = BackpackManager.getBackpackNameR(this.backpack.getName());
+        if (baseName == null) baseName = "back1";
+
+        int totalExtraSlots = getExtraSlots();
+
+        this.setBackpack(BackpackManager.getBackpackName(baseName, totalExtraSlots));
+
+        if (this.player != null && this.player.isOnline()) {
+            giveBackpackToInv();
+        }
+    }
 
     public double getPerkValue(String perkId) {
         return perkValues.getOrDefault(perkId, 0.0);
@@ -715,7 +742,7 @@ public void setPerkValue(String perkId, double value) {
         if (now - lastItemStolenTimestamp > 3000) {
             itemStreakBonus = 0.0;
         }
-        itemStreakBonus = Math.min(0.35, itemStreakBonus + amount);
+        itemStreakBonus = Math.min(35, itemStreakBonus + amount);
         lastItemStolenTimestamp = now;
     }
 //GodOfRobbery
@@ -727,6 +754,43 @@ public void setPerkValue(String perkId, double value) {
         godOfRobberyTag = value;
     }
 
+//Quests
+    public int getHighestOwnedStoreTier() {
+        int max = 0;
+        for (String s : keys) {
+            if (s.toLowerCase().startsWith("store")) {
+                try {
+                    String numPart = s.substring(5); // skips "store"
+                    max = Math.max(max, Integer.parseInt(numPart));
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+        return max;
+    }
 
+    public void setOfferedDailyQuests(List<String> quests) {
+        offeredDailyQuests.clear();
+        offeredDailyQuests.addAll(quests);
+    }
+    public List<String> getOfferedDailyQuests(){ return offeredDailyQuests; }
+    public void acceptDailyQuest(String questId) {
+        if (!offeredDailyQuests.contains(questId)) return;
+        acceptedDailyQuests.add(questId);
+        questProgress.put(questId, new QuestProgress(questId));
+    }
+    public Set<String> getActiveQuest(){return acceptedDailyQuests;}
+    public Map<String, QuestProgress> getQuestProgressMap(){ return questProgress; }
+    public Set<String> getAcceptedDailyQuests() {
+        return acceptedDailyQuests;
+    }
+    public long getLastDailyQuestPick() { return lastDailyQuestPick; }
+    public void setLastDailyQuestPick(long timestamp) { this.lastDailyQuestPick = timestamp; }
+    public int getDailyQuestsCompleted() { return dailyQuestsCompleted; }
+    public void setDailyQuestsCompleted(int count) { this.dailyQuestsCompleted = count; }
+    public void incrementDailyQuestsCompleted() { this.dailyQuestsCompleted++; }
+    public boolean hasTalkedToQuestNPC() { return talkedToQuestNPC; }
+    public void setTalkedToQuestNPC(boolean talked) { this.talkedToQuestNPC = talked; }
+    public int getLastResetDay() { return lastResetDay; }
+    public void setLastResetDay(int lastResetDay) { this.lastResetDay = lastResetDay; }
 }
 
