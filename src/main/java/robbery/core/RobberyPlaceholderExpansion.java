@@ -24,7 +24,7 @@ import robbery.tool.ToolManager;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static robbery.attribute.Attribute.PERCENTAGE_PERKS;
+import static robbery.attribute.Attribute.*;
 
 public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
 
@@ -282,7 +282,7 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                         case "rewardxp" -> {
                             int xpPerItem = main.getQuestService().computeQuestXpPerItem(quest, pd);
                             long totalXp = (long) xpPerItem * quest.itemsRequired;
-                            yield String.valueOf(totalXp/2);
+                            yield NumberFormatter.formatLong( totalXp / 2);
                         }
                         case "rewardstore" -> {
                             if (quest.rewardStoreItems == null) yield "0";
@@ -330,6 +330,10 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
     private @NotNull String getTotalRewards(PlayerData pd) {
         long grandTotalXp = 0;
         int grandTotalSP = 0;
+        if(pd.getPerkValue(PERK_ABILITY_SPQUEST1) > 0)
+            grandTotalSP += 1;
+        if(pd.getPerkValue(PERK_ABILITY_SPQUEST2) > 0)
+            grandTotalSP += 2;
         java.util.Map<String, Integer> combinedStoreItems = new java.util.HashMap<>();
 
         for (String qId : pd.getOfferedDailyQuests()) {
@@ -338,7 +342,6 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
 
             int xpPerItem = main.getQuestService().computeQuestXpPerItem(q, pd);
             grandTotalXp += (long) xpPerItem * q.itemsRequired;
-            grandTotalSP += q.getSkillPointRewards(pd);
 
             if (q.rewardStoreItems != null) {
                 combinedStoreItems.merge(q.rewardStoreItems.store, q.rewardStoreItems.amount, Integer::sum);
@@ -346,11 +349,11 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("§b✨Robbery XP: §f").append(grandTotalXp/2);
+        sb.append("§b✨Robbery XP: §f").append(NumberFormatter.formatLong(grandTotalXp/2));
         sb.append("\n§6\uD83D\uDCDASkillPoints: §f").append(grandTotalSP);
 
         if (!combinedStoreItems.isEmpty()) {
-            sb.append("\n§e\uD83D\uDCE6Store Mastery: ");
+            sb.append("\n§c\uD83D\uDCE6Store Mastery: ");
             combinedStoreItems.forEach((store, amount) -> sb.append("§f").append(amount/2).append("x §f").append(KeyManager.getStoreN(store)).append(" ")
             );
         }

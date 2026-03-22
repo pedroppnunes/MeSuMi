@@ -155,6 +155,7 @@ public class PlayerEventListener implements Listener {
             QuestProgress pr = entry.getValue();
             Map<String, Object> data = new HashMap<>();
             data.put("itemsStolen", pr.getItemsCompleted());
+            data.put("completed", pr.getCompleted());
             data.put("halfRewardGiven", pr.isHalfRewardGiven());
             progressMap.put(entry.getKey(), data);
         }
@@ -284,6 +285,7 @@ public class PlayerEventListener implements Listener {
                     QuestProgress pr = new QuestProgress(questId);
                     pr.setItemsCompleted(section.getInt("itemsStolen", 0));
                     pr.setHalfRewardGiven(section.getBoolean("halfRewardGiven", false));
+                    pr.setCompleted(section.getBoolean("completed", false));
                     memory.getQuestProgressMap().put(questId, pr);
                 }
             }

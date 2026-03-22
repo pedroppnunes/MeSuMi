@@ -17,8 +17,13 @@ public class QuestProgress {
     public void markCompleted(){ this.completed = true; }
     public boolean isHalfRewardGiven(){ return halfRewardGiven; }
     public void setHalfRewardGiven(boolean v){ halfRewardGiven = v; }
+    public boolean getCompleted(){return completed;}
 
     public void setItemsCompleted(int itemsStolen) {
         this.itemsCompleted = itemsStolen;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
     }
 }
