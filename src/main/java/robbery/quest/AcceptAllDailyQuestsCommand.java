@@ -48,7 +48,7 @@ public class AcceptAllDailyQuestsCommand implements CommandExecutor {
         }
 
         if (!pd.getAcceptedDailyQuests().isEmpty()) {
-            Messages.send(sender, "command.acceptalldaily.already-accepted");
+            Messages.send(target, "command.acceptalldaily.already-accepted");
             return true;
         }
 
