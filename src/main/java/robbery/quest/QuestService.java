@@ -1,8 +1,12 @@
 package robbery.quest;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import robbery.core.Robbery;
 import robbery.messages.Messages;
+import robbery.number.NumberFormatter;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 import java.util.*;
@@ -40,8 +44,10 @@ public class QuestService {
     public void pick3DailyQuestsFor(PlayerData pd){
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         int currentDay = cal.get(Calendar.DAY_OF_YEAR);
-        if (pd.getLastResetDay() == currentDay && !pd.getOfferedDailyQuests().isEmpty()) {
-            return;
+        if (pd.getLastResetDay() == currentDay) {
+            if (!pd.getOfferedDailyQuests().isEmpty() || pd.getDailyQuestsCompleted() >= 3) {
+                return;
+            }
         }
 
         pd.getAcceptedDailyQuests().clear();
@@ -81,20 +87,13 @@ public class QuestService {
         }
 
 
-        pd.setDailyQuestsCompleted(0);
         pd.setOfferedDailyQuests(chosen);
         pd.setLastResetDay(currentDay);
     }
 
     /** Player accepts a quest (call from command /menu button) */
     public void playerAcceptQuest(PlayerData pd, String questId){
-        if (!pd.getOfferedDailyQuests().contains(questId)) {
-            pd.getPlayer().sendMessage("§cThis quest is not offered today.");
-            return;
-        }
-
-        if (pd.getAcceptedDailyQuests().contains(questId)) {
-            pd.getPlayer().sendMessage("§eYou already accepted this quest.");
+        if (pd.getDailyQuestsCompleted() >= 3 || !pd.getOfferedDailyQuests().contains(questId) || pd.getAcceptedDailyQuests().contains(questId)) {
             return;
         }
 
@@ -128,7 +127,8 @@ public class QuestService {
     public void onPlayerStealItem(PlayerData pd, String storeId, int amount) {
         for (String questId : new ArrayList<>(pd.getAcceptedDailyQuests())) {
             Quest q = questManager.getQuest(questId);
-            if (q == null || q.type != Quest.QuestType.STEAL) continue;
+            QuestProgress qp = pd.getQuestProgressMap().get(questId);
+            if (q == null || q.type != Quest.QuestType.STEAL ||(qp != null && qp.completed)) continue;
 
             boolean counts = !q.isStoreSpecific() || q.storeIds.stream().anyMatch(sid -> sid.equalsIgnoreCase(storeId));
             if (counts) {
@@ -146,6 +146,7 @@ public class QuestService {
     }
 
     private void giveHalfReward(PlayerData pd, Quest q, QuestProgress pr){
+        Player p  = pd.getPlayer();
         int xpPerItem = computeQuestXpPerItem(q, pd);
         long totalXp = (long) xpPerItem * q.itemsRequired;
         long halfXp = totalXp / 2L;
@@ -154,13 +155,25 @@ public class QuestService {
         int halfItems = storeItemAmount / 2;
 
         if (totalXp > 0) {
-            main.getXpManager().addXP(pd.getPlayer(),halfXp);
+            main.getXpManager().addXP(p,halfXp);
         }
         if (storeItemAmount > 0){
             pd.addStoreItems(q.rewardStoreItems.store,halfItems);
         }
         pr.setHalfRewardGiven(true);
-        Messages.sendFormatted(pd.getPlayer(),"events.quests.quest-reward","quest",q.name);
+        xpMessage(pd, p, totalXp);
+        Messages.sendFormatted(p,"events.quests.quest-reward","quest",q.name);
+    }
+
+    private void xpMessage(PlayerData pd, Player p, long totalXp) {
+        long playerXP = pd.getXp();
+        int level = pd.getLevel();
+        long xpNeeded = main.getXpManager().xpNext(level);
+        long xpRemaining = main.getXpManager().xpRemainingForNextLevel(playerXP, level);
+        long xpIntoLevel = xpNeeded - xpRemaining;
+        p.sendActionBar(
+                Component.text("+" + NumberFormatter.formatDoubleNumber(totalXp) + " Robbery XP (" + NumberFormatter.formatDoubleNumber(xpIntoLevel) + "/" + NumberFormatter.formatDoubleNumber(xpNeeded) + " XP)")
+                        .color(NamedTextColor.DARK_AQUA));
     }
 
     private boolean areAllThreeAcceptedCompleted(PlayerData pd){
@@ -176,6 +189,7 @@ public class QuestService {
 
     private void giveRemainingRewardsForAllThree(PlayerData pd){
         List<String> toRemove = new ArrayList<>(pd.getAcceptedDailyQuests());
+        long totalXpToGive = 0;
         for (String qid : toRemove){
             Quest q = questManager.getQuest(qid);
             QuestProgress pr = pd.getQuestProgressMap().get(qid);
@@ -186,6 +200,7 @@ public class QuestService {
             if (pr.isHalfRewardGiven()) remainder = totalXp - (totalXp / 2L);
 
             if (remainder > 0) main.getXpManager().addXP(pd.getPlayer(),remainder);
+            totalXpToGive += remainder;
 
             if (q.rewardStoreItems != null){
                 int total = q.rewardStoreItems.amount;
@@ -193,20 +208,18 @@ public class QuestService {
                 int give = total - already;
                 if (give > 0) pd.addStoreItems(q.rewardStoreItems.store,give);
             }
-
-            if (pd.getPerkValue(PERK_ABILITY_SPQUEST1) > 0){
-                pd.addSkillPoints(1);
-            }
-            if(pd.getPerkValue(PERK_ABILITY_SPQUEST2) > 0){
-                pd.addSkillPoints(2);
-            }
-
-            pd.getAcceptedDailyQuests().remove(qid);
-            pd.getQuestProgressMap().remove(qid);
-            pd.getActiveQuest().remove(qid);
+            pr.markCompleted();
         }
-
-        pd.getOfferedDailyQuests().clear();
+        if (pd.getPerkValue(PERK_ABILITY_SPQUEST1) > 0){
+            pd.addSkillPoints(1);
+        }
+        if(pd.getPerkValue(PERK_ABILITY_SPQUEST2) > 0){
+            pd.addSkillPoints(2);
+        }
+        Player p  = pd.getPlayer();
+        if(totalXpToGive > 0)
+            xpMessage(pd, p, totalXpToGive);
+        pd.setDailyQuestsCompleted(3);
         Messages.send(pd.getPlayer(),"events.quests.all-completed");
     }
 
