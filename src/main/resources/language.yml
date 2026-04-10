@@ -209,6 +209,7 @@ events:
     level-up: "&c&lStore Mastery &8> &aYou've reached &6Milestone %level%&r&a in &6%store%"
     store11-tier1: "&c&lStore Mastery &8> &aYou can now access the second floor of the store!"
     tier2: "&c&lStore Mastery &8> &aYou can now access the higher part of the store!"
+    vault: "&c&lStore Mastery &8> &aYou can now access The Vault! &7(if you are P3+)"
     max: "&c&lStore Mastery &8> &6&lMAX MASTERY&r &aYou have mastered the &r%store%&a!"
   picking:
     item_stolen: "&aYou've stolen &e%item%&a for &n&2%value%&r"

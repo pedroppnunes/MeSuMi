@@ -113,7 +113,7 @@ public class BuyKey implements CommandExecutor {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                     "rg addmember -w world " + keyName + " " + player.getName());
 
-            if(key.getOrder() == 12 && data.getPrestige() >= 3)
+            if(key.getOrder() == 12 && data.getPrestige() >= 3 && data.getStoreMilestone("store12") >= 5)
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rg addmember -w world store13 " + player.getName());
 
             Map<String, String> ph = new HashMap<>();

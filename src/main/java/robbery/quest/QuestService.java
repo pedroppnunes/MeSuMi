@@ -99,23 +99,22 @@ public class QuestService {
 
         pd.acceptDailyQuest(questId);
     }
-    private void progressQuest(PlayerData pd, Quest.QuestType type, int amount) {
-        for (String questId : new ArrayList<>(pd.getAcceptedDailyQuests())) {
-            Quest q = questManager.getQuest(questId);
-            if (q == null || q.type != type) continue;
 
-            QuestProgress pr = pd.getQuestProgressMap().computeIfAbsent(questId, QuestProgress::new);
-            if (pr.completed) continue;
+    private void progressQuest(PlayerData pd, String questId, int amount) {
+        Quest q = questManager.getQuest(questId);
+        if (q == null) return;
 
-            pr.incrementBy(amount);
+        QuestProgress pr = pd.getQuestProgressMap().computeIfAbsent(questId, QuestProgress::new);
+        if (pr.completed) return;
 
-            if (pr.isCompleted(q.itemsRequired)) {
-                pr.markCompleted();
-                pd.incrementDailyQuestsCompleted();
-                giveHalfReward(pd, q, pr);
-                if (areAllThreeAcceptedCompleted(pd)) {
-                    giveRemainingRewardsForAllThree(pd);
-                }
+        pr.incrementBy(amount);
+
+        if (pr.isCompleted(q.itemsRequired)) {
+            pr.markCompleted();
+            pd.incrementDailyQuestsCompleted();
+            giveHalfReward(pd, q, pr);
+            if (areAllThreeAcceptedCompleted(pd)) {
+                giveRemainingRewardsForAllThree(pd);
             }
         }
     }
@@ -132,17 +131,27 @@ public class QuestService {
 
             boolean counts = !q.isStoreSpecific() || q.storeIds.stream().anyMatch(sid -> sid.equalsIgnoreCase(storeId));
             if (counts) {
-                progressQuest(pd, Quest.QuestType.STEAL, amount);
+                progressQuest(pd, questId, amount);
             }
         }
     }
 
     public void onPlayerBusted(PlayerData pd) {
-        progressQuest(pd, Quest.QuestType.BUSTED, 1);
+        for (String questId : new ArrayList<>(pd.getAcceptedDailyQuests())) {
+            Quest q = questManager.getQuest(questId);
+            if (q != null && q.type == Quest.QuestType.BUSTED) {
+                progressQuest(pd, questId, 1);
+            }
+        }
     }
 
     public void onPlayerCaptureOutpost(PlayerData pd) {
-        progressQuest(pd, Quest.QuestType.OUTPOST, 1);
+        for (String questId : new ArrayList<>(pd.getAcceptedDailyQuests())) {
+            Quest q = questManager.getQuest(questId);
+            if (q != null && q.type == Quest.QuestType.OUTPOST) {
+                progressQuest(pd, questId, 1);
+            }
+        }
     }
 
     private void giveHalfReward(PlayerData pd, Quest q, QuestProgress pr){

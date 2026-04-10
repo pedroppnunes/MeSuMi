@@ -106,13 +106,25 @@ public class StoreMasteryManager {
         Messages.sendFormatted(player, "events.mastery.level-up", Map.of("store", store.getName(), "level", String.valueOf(newLevel)));
 
         if (storeId.equalsIgnoreCase("store11")) {
-            if (newLevel == 3) {
+            if (newLevel == 2) {
                 unlockRegion(player, "store11_tier2");
                 Messages.send(player, "events.mastery.store11-tier1");
             }
             if (newLevel == 5) {
                 unlockRegion(player, "store11_tier3");
                 Messages.send(player, "events.mastery.tier2");
+            }
+        } else if(storeId.equalsIgnoreCase("store12")){
+            if (newLevel == 2) {
+                unlockRegion(player, "store12_tier2");
+                Messages.send(player, "events.mastery.tier2");
+            }
+            if (newLevel == 5) {
+                assert pd != null;
+                if (pd.getPrestige() >= 3) {
+                    unlockRegion(player, "store13");
+                }
+                Messages.send(player, "events.mastery.vault");
             }
         } else if (newLevel == 5) {
             unlockRegion(player, storeId + "_tier2");
@@ -162,11 +174,18 @@ public class StoreMasteryManager {
 
     public String getRewardDisplay(String storeId, int milestone) {
 
+        if(storeId.equalsIgnoreCase("store12")){
+            if(milestone == 2)
+                return "§aUnlock higher area of " + KeyManager.getStoreN(storeId);
+            else if(milestone == 5)
+                return "§aUnlock The Vault";
+        }
+
         if (milestone == 5) {
             return "§aUnlock higher area of " + KeyManager.getStoreN(storeId);
         }
 
-        if (storeId.equalsIgnoreCase("store11") && milestone == 3) {
+        if (storeId.equalsIgnoreCase("store11") && milestone == 2) {
             return "§aUnlock middle area of " + KeyManager.getStoreN(storeId);
         }
 
