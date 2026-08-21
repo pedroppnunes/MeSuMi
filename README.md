@@ -98,12 +98,6 @@ Robbery features a fully interactive GUI Skill Tree (`/skillpoints`):
 
 ## 📸 Gallery & Gameplay Showcase
 
-> [!TIP]
-> **How to add screenshots or videos to your GitHub README**:
-> 1. Take screenshots of your `/skillpoints` tree, `/ranks` GUI, or record a short video/GIF of a server heist.
-> 2. Upload the images inside a `docs/images/` folder inside this repository.
-> 3. Replace the placeholder links below with the relative path (`![Skill Tree](docs/images/skilltree.png)`).
-
 |          👑 The Skill Tree (`/skillpoints`)          |                            🏛️ Daily Quests                             |
 |:----------------------------------------------------:|:-----------------------------------------------------------------------:|
 |  *![Skill Tree](docs/images/skilltree_robbery.png)*  |             *![Daily Quest](docs/images/daily_robbery.png)*             |
