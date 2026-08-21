@@ -1,9 +1,9 @@
 name: MeSuMi-Robbery
-version: '1.0-1.21.4'
+version: '1.0-26.2'
 prefix: 'MeSuMi - Robbery'
 description: 'Official MeSuMi - Robbery custom server plugin featuring heist mechanics, skill trees, outposts, and rank progression.'
 main: robbery.core.Robbery
-api-version: '1.21.4'
+api-version: '26.2'
 authors: [MeSuMi Team]
 
 softdepend: [PlaceholderAPI,VotingPlugin]

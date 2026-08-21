@@ -3,7 +3,6 @@ package robbery.mutes;
 import org.bukkit.configuration.file.YamlConfiguration;
 import robbery.core.Robbery;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -50,7 +49,7 @@ public class MuteManager {
      * @param durationRaw Duration string (e.g., "10m", "2h").
      * @param reason      Optional reason for the mute. If null, defaults to "No reason given".
      */
-    public void mutePlayer(UUID uuid, String issuer, String durationRaw, @Nullable String reason) {
+    public void mutePlayer(UUID uuid, String issuer, String durationRaw, String reason) {
         long now = System.currentTimeMillis();
         File file = getFile(uuid);
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);

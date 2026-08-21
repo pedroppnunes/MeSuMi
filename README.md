@@ -1,12 +1,12 @@
 <div align="center">
 
 # 💎 MeSuMi - Robbery
-### *Robbery Plugin for Minecraft 1.21.4*
+### *Robbery Plugin for Minecraft 26.2*
 ### *Inspired on an old Robbery game*
 
-![Minecraft Version](https://img.shields.io/badge/Minecraft-1.21.4-2E8B57?style=for-the-badge&logo=minecraft&logoColor=white)
+![Minecraft Version](https://img.shields.io/badge/Minecraft-26.2-2E8B57?style=for-the-badge&logo=minecraft&logoColor=white)
 ![API Platform](https://img.shields.io/badge/Platform-PaperMC%20%2F%20Bukkit-008080?style=for-the-badge&logo=server&logoColor=white)
-![Java Version](https://img.shields.io/badge/Java-21%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Java Version](https://img.shields.io/badge/Java-25%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![License Status](https://img.shields.io/badge/License-Proprietary%20%2F%20All%20Rights%20Reserved-8B0000?style=for-the-badge&logo=law&logoColor=white)
 ![Team Status](https://img.shields.io/badge/Studio-MeSuMi%20Team-6A5ACD?style=for-the-badge&logo=discord&logoColor=white)
 
@@ -32,7 +32,7 @@
 
 **MeSuMi - Robbery** from an old inspiration gamemode (Robbery), we decided to re-create that same gamemode with new twists. 
 
-Engineered for **PaperMC 1.21.4**, the plugin combines custom stealing mechanics, outposts, expandable private vaults, custom skill trees, and integrated server moderation.
+Engineered for **PaperMC 26.2**, the plugin combines custom stealing mechanics, outposts, expandable private vaults, custom skill trees, and integrated server moderation.
 
 ---
 
@@ -153,8 +153,8 @@ Coming Soon
 ## 💻 Build & Server Setup Guide
 
 ### Prerequisites
-- **JDK 21 or newer** (Required for PaperMC 1.21.4 compatibility).
-- **PaperMC 1.21.4** server instance.
+- **JDK 25 or newer** (Required for PaperMC 26.2 compatibility).
+- **PaperMC 26.2** server instance.
 - Required Soft/Hard Dependencies: `Vault`, `PlaceholderAPI`, `ProtocolLib`, `VotingPlugin`, `SuperiorSkyblockAPI`, `LuckPerms`.
 
 ### Building with Gradle
@@ -165,11 +165,11 @@ To compile the plugin `.jar` locally on your system:
 ```
 Once compilation completes, the ready-to-deploy artifact will be located at:
 ```text
-build/libs/MeSuMi-Robbery-1.0-1.21.4.jar
+build/libs/MeSuMi-Robbery-1.0-26.2.jar
 ```
 
 ### Installation
-1. Copy `build/libs/MeSuMi-Robbery-1.0-1.21.4.jar` into your PaperMC server's `plugins/` directory.
+1. Copy `build/libs/MeSuMi-Robbery-1.0-26.2.jar` into your PaperMC server's `plugins/` directory.
 2. Ensure `Vault.jar` and an economy provider (like EssentialsX or custom core) are installed.
 3. Restart your server or run `/robbery reload`.
 

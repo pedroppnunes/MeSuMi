@@ -3,7 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/Robbery_jar</output-path>
     <root id="archive" name="Robbery.jar">
       <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/plugin.yml" />
-      <element id="module-output" name="robbery.Robbery.main" />
+      <element id="module-output" name="MeSuMi_-_Robbery.main" />
     </root>
   </artifact>
 </component>
