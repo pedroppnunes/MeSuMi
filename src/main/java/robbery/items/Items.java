@@ -186,10 +186,14 @@ public class Items {
 
 
     public void resetspawn(int delayInSeconds) {
-        if (droppedItem != null && Robbery.getInstance().isEnabled()) {
+        if (Robbery.getInstance().isEnabled()) {
             respawning = true;
-            Location itemLocation = droppedItem.getLocation();
-            droppedItem.remove();
+            Location itemLocation = position != null ? position.clone() : (droppedItem != null ? droppedItem.getLocation() : null);
+            if (itemLocation == null) return;
+            
+            if (droppedItem != null) {
+                droppedItem.remove();
+            }
 
             new BukkitRunnable() {
                 @Override
@@ -198,8 +202,10 @@ public class Items {
                     newItem.setPickupDelay(Integer.MAX_VALUE);
                     newItem.setUnlimitedLifetime(true);
                     newItem.setVelocity(new Vector(0, 0, 0));
+                    newItem.setGravity(false);
                     newItem.setCustomName(uniqueId.toString());
                     droppedItem = newItem;
+                    ensureArmorStandExists();
                     hp = initialhp;
                     isPickable = !isPickable;
                     respawning = false;
@@ -265,15 +271,40 @@ public class Items {
     }
     public String getPlayername(){return playername;}
 
+    private void ensureArmorStandExists() {
+        if (position == null) return;
+        for (org.bukkit.entity.Entity e : position.getWorld().getNearbyEntities(position, 1.5, 1.5, 1.5)) {
+            if (e instanceof org.bukkit.entity.ArmorStand stand) {
+                if (uniqueId.toString().equals(stand.getCustomName())) {
+                    stand.setInvulnerable(false);
+                    return; // Found it, no need to spawn a new one
+                }
+            }
+        }
+        org.bukkit.entity.ArmorStand stand = position.getWorld().spawn(position.clone(), org.bukkit.entity.ArmorStand.class);
+        stand.setInvisible(true);
+        stand.setHealth(20);
+        stand.setArms(false);
+        stand.setBasePlate(false);
+        stand.setSmall(true);
+        stand.setGravity(false);
+        stand.setCustomNameVisible(false);
+        stand.setCustomName(uniqueId.toString());
+        org.bukkit.NamespacedKey key = new org.bukkit.NamespacedKey("robbery", "item_uuid");
+        stand.getPersistentDataContainer().set(key, org.bukkit.persistence.PersistentDataType.STRING, uniqueId.toString());
+    }
+
     public void forceRespawnNow() {
-        if (droppedItem == null && respawning) {
+        if (droppedItem == null) {
             Item newItem = position.getWorld().dropItem(position, skull);
             newItem.setPickupDelay(Integer.MAX_VALUE);
             newItem.setUnlimitedLifetime(true);
             newItem.setVelocity(new Vector(0, 0, 0));
+            newItem.setGravity(false);
             newItem.setCustomName(uniqueId.toString());
             droppedItem = newItem;
         }
+        ensureArmorStandExists();
         hp = initialhp;
         isPickable = true;
         respawning = false;

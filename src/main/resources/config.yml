@@ -5,3 +5,10 @@ voteparty:
 
 tips:
   - ""
+
+database:
+  host: "localhost"
+  port: 3306
+  database: "robbery"
+  username: "robberyuser"
+  password: "your_password_here"

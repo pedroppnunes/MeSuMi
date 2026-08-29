@@ -56,11 +56,18 @@ public class HideoutListener implements Listener {
 
         // Block hideout chest usage in "world"
         if ((message.startsWith("/ho chest") || message.startsWith("/hideout chest") ||
-                message.contains("/ho chest") || message.contains("/hideout chest") ||
-                message.contains("/gkits") || message.contains("/gkit") ||
-                message.startsWith("/gkit") || message.startsWith("/gkits")) &&
+                message.contains("/ho chest") || message.contains("/hideout chest")) &&
                 player.getWorld().getName().equalsIgnoreCase("world")) {
             Messages.send(player, "events.hideout.chest_blocked");
+            event.setCancelled(true);
+            return;
+        }
+
+        // Block gkit in "world"
+        if ((message.contains("/gkits") || message.contains("/gkit") ||
+                message.startsWith("/gkit") || message.startsWith("/gkits")) &&
+                player.getWorld().getName().equalsIgnoreCase("world")) {
+            Messages.send(player, "events.hideout.gkit_blocked");
             event.setCancelled(true);
             return;
         }

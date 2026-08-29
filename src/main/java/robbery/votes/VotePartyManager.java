@@ -5,44 +5,38 @@ import org.bukkit.entity.Player;
 import robbery.core.Robbery;
 import robbery.messages.Messages;
 
+import java.time.LocalDate;
+import java.util.Random;
+
 /**
  * Manages vote party system for the robbery plugin.
  * Tracks player votes and triggers rewards when a certain vote threshold is reached.
  * A vote party is triggered every time the cumulative votes reach a multiple of the required votes.
- *
- * <p>This system:
- * <ul>
- *   <li>Persists vote counts between server restarts</li>
- *   <li>Automatically triggers rewards when threshold is reached</li>
- *   <li>Provides reset functionality for vote counting</li>
- *   <li>Broadcasts messages to all online players</li>
- * </ul>
- *
- * @see Robbery
- * @see Messages
  */
 public class VotePartyManager {
     private final Robbery plugin;
     private int currentVotes = 0;
     private final int requiredVotes = 50;
     private int totalVotes = 0;
+    private String lastResetDate = "";
 
-    /**
-     * Constructs a new VotePartyManager and loads the saved vote count from configuration.
-     *
-     * @param plugin the main plugin instance
-     */
     public VotePartyManager(Robbery plugin) {
         this.plugin = plugin;
         loadVotes();
+        checkDailyReset();
     }
 
-    /**
-     * Handles a new vote by incrementing the vote counter and checking if a vote party should be triggered.
-     * Saves the updated vote count to configuration and triggers a vote party when the required votes threshold is reached.
-     * The vote party is triggered every time the cumulative votes reach a multiple of the required votes.
-     */
+    private void checkDailyReset() {
+        String currentDate = LocalDate.now().toString();
+        if (!currentDate.equals(lastResetDate)) {
+            resetVotes();
+            lastResetDate = currentDate;
+            saveVotes();
+        }
+    }
+
     public void handleVote() {
+        checkDailyReset(); // Check in case the day changes while the server is running
         currentVotes++;
         totalVotes++;
 
@@ -54,65 +48,59 @@ public class VotePartyManager {
         saveVotes();
     }
 
-    /**
-     * Triggers a vote party by broadcasting a message to all players and giving each online player a vote crate key.
-     * Executed via console command to ensure proper permission handling.
-     */
     private void triggerVoteParty() {
         Bukkit.getScheduler().runTask(plugin, () -> {
-
             Bukkit.broadcastMessage(Messages.get("voteparty.reached"));
+            Random random = new Random();
 
             for (Player player : Bukkit.getOnlinePlayers()) {
-                Bukkit.dispatchCommand(
-                        Bukkit.getConsoleSender(),
-                        "crate key give " + player.getName() + " vote 1"
-                );
-            }
+                double chance = random.nextDouble() * 100.0;
+                String command;
 
+                if (chance < 0.5) {
+                    command = "crates key give " + player.getName() + " legendary";
+                } else if (chance < 2.5) { // 0.5 + 2.0 = 2.5%
+                    command = "crates key give " + player.getName() + " epic";
+                } else if (chance < 12.5) { // 2.5 + 10.0 = 12.5%
+                    command = "crates key give " + player.getName() + " vote 2";
+                } else {
+                    command = "crates key give " + player.getName() + " vote 1";
+                }
+
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+            }
         });
     }
 
-    /**
-     * Saves the current vote count to the plugin configuration.
-     * The votes are stored under the "voteparty.votes" path.
-     */
     private void saveVotes() {
         plugin.getConfig().set("voteparty.votes", currentVotes);
         plugin.getConfig().set("voteparty.totalVotes", totalVotes);
+        plugin.getConfig().set("voteparty.lastReset", lastResetDate);
         plugin.saveConfig();
     }
 
-    /**
-     * Loads the vote count from the plugin configuration.
-     * If no votes are found in configuration, defaults to 0.
-     */
     private void loadVotes() {
         currentVotes = plugin.getConfig().getInt("voteparty.votes", 0);
         totalVotes = plugin.getConfig().getInt("voteparty.totalVotes", 0);
+        lastResetDate = plugin.getConfig().getString("voteparty.lastReset", "");
     }
 
-    /**
-     * Resets the vote count to the remainder after dividing by the required votes.
-     * This preserves any votes that have accumulated towards the next vote party while
-     * effectively resetting the counter. Broadcasts a reset message to all players.
-     *
-     * <p>Example: If required votes is 50 and current votes is 125, after reset current votes will be 25.
-     */
     public void resetVotes() {
         currentVotes = currentVotes % requiredVotes;
         totalVotes = currentVotes;
+        lastResetDate = LocalDate.now().toString();
         saveVotes();
         Bukkit.broadcastMessage(Messages.get("voteparty.reset"));
     }
 
     public int getDisplayCurrentVotes() {
+        checkDailyReset();
         return totalVotes;
     }
 
     public int getDisplayRequiredVotes() {
+        checkDailyReset();
         int nextMilestone = ((totalVotes / requiredVotes) + 1) * requiredVotes;
         return nextMilestone;
     }
-
 }

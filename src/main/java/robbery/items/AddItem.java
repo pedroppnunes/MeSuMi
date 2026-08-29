@@ -107,13 +107,16 @@ public class AddItem implements CommandExecutor {
      * @return the spawned Item entity
      */
     public Item spawnFloatingItem(Player player, Items item) {
-        Location blockCenter = player.getLocation().getBlock().getLocation().add(0.5, 0, 0.5);
+        Location spawnLoc = player.getLocation();
+        spawnLoc.setX(spawnLoc.getBlockX() + 0.5);
+        spawnLoc.setZ(spawnLoc.getBlockZ() + 0.5);
+        
         World world = player.getWorld();
 
-        item.setPosition(blockCenter.add(0, 1, 0));
+        item.setPosition(spawnLoc.clone());
         ItemStack skull = item.getSkull();
 
-        ArmorStand stand = world.spawn(blockCenter.add(0, -1, 0), ArmorStand.class);
+        ArmorStand stand = world.spawn(spawnLoc.clone(), ArmorStand.class);
         stand.setInvisible(true);
         stand.setHealth(20);
         stand.setArms(false);
@@ -128,11 +131,12 @@ public class AddItem implements CommandExecutor {
         PersistentDataContainer dataContainer = stand.getPersistentDataContainer();
         dataContainer.set(key, PersistentDataType.STRING, item.getUniqueId().toString());
 
-        Item droppedItem = world.spawn(blockCenter.add(0, 1, 0), Item.class);
+        Item droppedItem = world.spawn(spawnLoc.clone(), Item.class);
         droppedItem.setItemStack(skull);
         droppedItem.setPickupDelay(Integer.MAX_VALUE);
         droppedItem.setUnlimitedLifetime(true);
         droppedItem.setVelocity(new Vector(0, 0, 0));
+        droppedItem.setGravity(false); // Prevents falling/clipping
         droppedItem.setCustomName(item.getUniqueId().toString());
 
         item.setDroppedItem(droppedItem);

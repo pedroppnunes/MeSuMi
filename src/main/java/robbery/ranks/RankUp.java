@@ -97,6 +97,10 @@ public class RankUp implements CommandExecutor {
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                 "rg addmember -w world " + next.getId() + " " + p.getName());
 
+        if (next.getOrder() == 12 && data.getPrestige() >= 3 && data.getStoreMilestone("store12") >= 5) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rg addmember -w world store13 " + p.getName());
+        }
+
         Messages.sendFormatted(p, "command.rankup.success", Map.of("store", next.getName(), "price", priceString));
 
         return true;

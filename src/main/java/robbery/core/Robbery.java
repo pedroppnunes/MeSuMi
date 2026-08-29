@@ -112,11 +112,15 @@ public class Robbery extends JavaPlugin implements Listener {
     private SkillService skillService;
     private QuestManager questManager;
     private QuestService questService;
+    
+    private robbery.database.DatabaseManager databaseManager;
+    private robbery.database.PlayerDataDao playerDataDao;
 
     private FileConfiguration itemConfig;
     private File itemConfigFile;
 
-
+    public robbery.database.DatabaseManager getDatabaseManager() { return databaseManager; }
+    public robbery.database.PlayerDataDao getPlayerDataDao() { return playerDataDao; }
 
     @Override
     public void onEnable() {
@@ -143,6 +147,11 @@ public class Robbery extends JavaPlugin implements Listener {
         }
         this.hidePlayers = new HidePlayers(main);
         this.rcrate = new Rcrate();
+        
+        // Initialize Database
+        this.databaseManager = new robbery.database.DatabaseManager(this);
+        this.playerDataDao = new robbery.database.PlayerDataDao(this.databaseManager);
+
         World outpostWorld = Bukkit.getWorld("outpost");
         if (outpostWorld == null) {
             getLogger().severe("World 'outpost' not found!");
@@ -217,6 +226,7 @@ public class Robbery extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("weeklyleaderboard")).setExecutor(new WeeklyLeaderboardCommand(main));
         Objects.requireNonNull(getCommand("loadbackup")).setExecutor(new LoadBackup(main));
         Objects.requireNonNull(getCommand("migrate")).setExecutor(new MigrateBackup(main));
+        Objects.requireNonNull(getCommand("migrate-to-sql")).setExecutor(new robbery.database.MigrateToSQLCommand(main));
         Objects.requireNonNull(getCommand("stopbooster")).setExecutor(new StopBoosterCommand());
         Objects.requireNonNull(getCommand("adminxp")).setExecutor(new AdminXPCommand(main));
         skillTreeConfig = new SkillTreeConfig(main);
@@ -303,6 +313,9 @@ public class Robbery extends JavaPlugin implements Listener {
         }
         Bukkit.getScheduler().cancelTasks(this);
         saveItems();
+        if (databaseManager != null) {
+            databaseManager.close();
+        }
         getLogger().info("Shutting Down Robbery!");
     }
 
@@ -529,6 +542,7 @@ public class Robbery extends JavaPlugin implements Listener {
                                 String id = stand.getPersistentDataContainer().get(new NamespacedKey(this, "item_uuid"),
                                         PersistentDataType.STRING);
                                 if (id != null && id.equals(key)) {
+                                    stand.setInvulnerable(false);
                                     Items item = new Items(itemData);
                                     item.setPickable(true);
                                     items.add(item);

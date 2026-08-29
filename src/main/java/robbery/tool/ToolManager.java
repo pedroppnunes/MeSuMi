@@ -26,7 +26,7 @@ public class ToolManager {
     public static final Tools TOOL20 = new Tools("Karambit", 7.5, Material.CARROT_ON_A_STICK,3_500_000_000L,"§x§F§F§0§0§0§0§lK§x§E§E§8§0§0§0§la§x§D§D§F§F§0§0§lr§x§8§0§F§F§0§0§la§x§2§2§F§F§0§0§lm§x§0§0§F§F§F§5§lb§x§8§0§8§0§E§C§li§x§F§F§0§0§E§3§lt");
 
     public static Tools getToolFromItem(ItemStack item) {
-        if (item == null || item.getType() == Material.AIR) {
+        if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasCustomModelData()) {
             return null;
         }
 

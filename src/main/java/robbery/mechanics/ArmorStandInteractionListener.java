@@ -51,7 +51,31 @@ public class ArmorStandInteractionListener implements Listener {
      */
     public ArmorStandInteractionListener(Robbery main) {
         this.main = main;
-        this.key = new NamespacedKey(main, "item_uuid");
+        this.key = new NamespacedKey("robbery", "item_uuid");
+    }
+
+    /**
+     * Handles left-click damage events on ArmorStands by players.
+     * <p>
+     * If the ArmorStand represents a pickable item, starts a PickingTask for the player.
+     * Considers instasteal chance from skill points and prevents picking if the backpack is full.
+     * </p>
+     *
+     * @param event The entity damage event.
+     */
+    @EventHandler
+    public void onArmorStandDamage(org.bukkit.event.entity.EntityDamageEvent event) {
+        Entity entity = event.getEntity();
+        if (entity.getType() == EntityType.ARMOR_STAND) {
+            ArmorStand stand = (ArmorStand) entity;
+            if (stand.getPersistentDataContainer().has(key, PersistentDataType.STRING)) {
+                // Cancel all damage to these custom armor stands unless it's a player left-click
+                // Player left-clicks are handled specifically in EntityDamageByEntityEvent below
+                if (!(event instanceof EntityDamageByEntityEvent edbe && edbe.getDamager() instanceof Player)) {
+                    event.setCancelled(true);
+                }
+            }
+        }
     }
 
     /**
@@ -81,7 +105,7 @@ public class ArmorStandInteractionListener implements Listener {
                 UUID itemUUID = UUID.fromString(uuidString);
 
                 Items item = getItemByUUID(itemUUID);
-                Tools tool = ToolManager.getToolFromItem(player.getItemInHand());
+                Tools tool = ToolManager.getToolFromItem(player.getInventory().getItemInMainHand());
                 PlayerData p = PlayerDataManager.getPlayerData(player);
 
                 if (pickingTasks.containsKey(player.getUniqueId())) return;
@@ -92,6 +116,7 @@ public class ArmorStandInteractionListener implements Listener {
                 }
 
                 if (item == null || tool == null) return;
+                
                 String itemId = item.getId();
                 String playerStoreKey = p.getKey().getId();
 
@@ -108,8 +133,9 @@ public class ArmorStandInteractionListener implements Listener {
                 }
                 if (itemStoreNum > 12) {
                     int requiredPrestige = 3;
+                    int requiredMastery = 5;
 
-                    if (playerPrestige < requiredPrestige || p.getKey().getOrder() != 12) {
+                    if (playerPrestige < requiredPrestige || p.getKey().getOrder() != 12 || p.getStoreMilestone("store12") < requiredMastery) {
                         Messages.sendActionBar(player, "events.wrong-store");
                         return;
                     }
@@ -168,6 +194,15 @@ public class ArmorStandInteractionListener implements Listener {
         if (task != null) {
             task.resetAndCancel();
             Messages.sendActionBar(player, "events.picking-canceled");
+        }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(org.bukkit.event.player.PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        PickingTask task = pickingTasks.remove(player.getUniqueId());
+        if (task != null) {
+            task.resetAndCancel();
         }
     }
 

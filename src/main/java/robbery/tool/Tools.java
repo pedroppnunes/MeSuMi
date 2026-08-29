@@ -123,6 +123,7 @@ public class Tools {
         lore.add(ChatColor.GRAY + "Speed: +" + ChatColor.AQUA + (int)(damage * 10));
         meta.setLore(lore);
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        meta.setCustomModelData(1);
 
         item.setItemMeta(meta);
 

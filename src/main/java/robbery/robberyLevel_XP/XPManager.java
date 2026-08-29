@@ -15,7 +15,7 @@ public class XPManager {
 
     private final Robbery main;
 
-    private final int SOFTCAP = 120;
+    private final int SOFTCAP = 121;
     private final double BASE_MULT = 1.4;
     private final double EXPONENT = 3.3;
     private final double SOFTCAP_MULT = 1.15;
@@ -125,16 +125,23 @@ public class XPManager {
         }
     }
 
-    private int skillPointsForLevel(int level) {
-        if (level <= 20)
-            return 1;
-        if (level <= 50)
-            return 2;
-        if (level <= 80)
-            return 3;
-        if (level <= 100)
-            return 4;
-        return 5;
+    public int skillPointsForLevel(int level) {
+        if (level < 20) return 1;
+        if (level < 50) return 2;
+        if (level < 80) return 3;
+        if (level < 100) return 4;
+        if (level < 120) return 5;
+        return 6;
+    }
+
+    public String getLevelColorName(int level) {
+        if (level < 20) return "&7Gray";
+        if (level < 40) return "&fWhite";
+        if (level < 60) return "&aGreen";
+        if (level < 80) return "&eYellow";
+        if (level < 100) return "&6Gold";
+        if (level < 120) return "&cRed";
+        return "&4Dark Red";
     }
 
     public String colorizeLevel(int level) {

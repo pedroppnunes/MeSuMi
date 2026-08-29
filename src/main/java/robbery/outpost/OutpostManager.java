@@ -517,8 +517,7 @@ public class OutpostManager {
 
     public String getStatusLoreLine1() {
         if (ownerIsland == null)
-            return Messages.get("events.outpost.status-lore-time-left")
-                    .replace("%time%", Messages.get("events.outpost.holder-island-name-none"));
+            return "";
 
         if (ownerIsImmune()) {
             long timeLeft = ownerImmunityExpiryMillis - System.currentTimeMillis();

@@ -90,7 +90,22 @@ public class RemoveItem implements CommandExecutor {
             main.removeItem(nearestItem);
             Messages.sendFormatted(player, "command.removeitem.item-removed", "name", nearestItem.getName());
         } else {
-            Messages.send(player, "command.removeitem.no-items-nearby");
+            // Force-clean ghost entities that lost their connection to items.yml
+            boolean cleanedGhost = false;
+            for (Entity entity : player.getNearbyEntities(5, 5, 5)) {
+                if ((entity instanceof ArmorStand || entity instanceof org.bukkit.entity.Item) && entity.getCustomName() != null) {
+                    try {
+                        java.util.UUID.fromString(entity.getCustomName());
+                        entity.remove();
+                        cleanedGhost = true;
+                    } catch (Exception ignored) {}
+                }
+            }
+            if (cleanedGhost) {
+                player.sendMessage("§a[!] Cleaned up broken ghost items nearby!");
+            } else {
+                Messages.send(player, "command.removeitem.no-items-nearby");
+            }
         }
 
         return true;

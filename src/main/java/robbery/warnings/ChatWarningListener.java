@@ -79,6 +79,10 @@ public class ChatWarningListener implements Listener {
             return;
         }
 
+        if (player.hasPermission("robbery.bypass")) {
+            return;
+        }
+
         String msg = ChatColor.stripColor(event.getMessage()).trim().toLowerCase();
 
         Deque<String> history = lastMessages.computeIfAbsent(uuid, k -> new ArrayDeque<>());

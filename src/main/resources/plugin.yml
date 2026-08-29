@@ -8,6 +8,8 @@ authors: [MeSuMi Team]
 
 softdepend: [PlaceholderAPI,VotingPlugin]
 depend: [Vault]
+libraries:
+  - 'com.zaxxer:HikariCP:5.1.0'
 
 commands:
   acceptalldaily:
@@ -68,6 +70,10 @@ commands:
     permission: robbery.mall
   migrate:
     usage: /migrate <subcommand>
+    permission: robbery.op
+  migrate-to-sql:
+    description: Migrate player data from YAML to SQL database
+    usage: /migrate-to-sql
     permission: robbery.op
   mute:
     usage: /mute <player> <time> [reason]

@@ -205,6 +205,7 @@ events:
   hideout:
     has_items: "&5&lRobbery &8> &cYou cannot use this command while your backpack has items!"
     chest_blocked: "&5&lRobbery &8> &cYou can't use that command here."
+    gkit_blocked: "&5&lRobbery &8> &cYou cannot use kits in this world!"
   mastery:
     level-up: "&c&lStore Mastery &8> &aYou've reached &6Milestone %level%&r&a in &6%store%"
     store11-tier1: "&c&lStore Mastery &8> &aYou can now access the second floor of the store!"

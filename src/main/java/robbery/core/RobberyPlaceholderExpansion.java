@@ -45,6 +45,18 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
 
     @Override
     public String onRequest(OfflinePlayer offlinePlayer, @NotNull String identifier) {
+        String id = identifier.toLowerCase();
+
+        // 0. Handle Global (Player-Independent) Placeholders first
+        String[] parts = id.split("_");
+        if (parts.length >= 3 && parts[0].equals("prestige")) {
+            try {
+                int rank = Integer.parseInt(parts[2]);
+                if (parts[1].equals("name")) return PrestigeLeaderboard.getTopPrestigePlayer(rank);
+                if (parts[1].equals("top")) return String.valueOf(PrestigeLeaderboard.getTopPrestige(rank));
+            } catch (NumberFormatException ignored) {}
+        }
+
         if (offlinePlayer == null) return null;
         Player player = offlinePlayer.getPlayer();
         if (player == null) return null;
@@ -52,14 +64,12 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
         PlayerData pd = PlayerDataManager.getPlayerData(player);
         if (pd == null) return null;
 
-        String id = identifier.toLowerCase();
-
         // 1. Try static/exact matches first (Prevents total_items_stolen from breaking)
         String staticMatch = handleStaticIdentifier(pd, id, player);
         if (staticMatch != null) return staticMatch;
 
         // 2. Fallback to Dynamic (Split) Logic
-        String[] parts = id.split("_");
+        parts = id.split("_");
         if (parts.length >= 2) {
             return handleDynamicIdentifier(pd, parts, id);
         }
@@ -88,7 +98,27 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             case "next_store" -> nextStorePercentage(pd, p);
             case "level" -> String.valueOf(pd.getLevel());
             case "xp" -> String.valueOf(pd.getXp());
+            case "xp_formatted" -> robbery.number.NumberFormatter.formatDoubleNumber((double) pd.getXp());
+            case "xp_in_level_formatted" -> robbery.number.NumberFormatter.formatDoubleNumber((double) (pd.getXp() - xp.getCumulativeForLevel(pd.getLevel())));
+            case "level_req_formatted" -> robbery.number.NumberFormatter.formatDoubleNumber((double) xp.xpNext(pd.getLevel()));
+            case "xp_percentage" -> {
+                long currentXpInLevel = pd.getXp() - xp.getCumulativeForLevel(pd.getLevel());
+                long xpNeeded = xp.xpNext(pd.getLevel());
+                double progress = Math.min(100.0, Math.max(0.0, ((double) currentXpInLevel / xpNeeded) * 100.0));
+                yield String.format("%.1f%%", progress);
+            }
             case "xptonext" -> String.valueOf(xp.xpRemainingForNextLevel(pd.getXp(), pd.getLevel()));
+            case "xptonext_formatted" -> robbery.number.NumberFormatter.formatDoubleNumber((double) xp.xpRemainingForNextLevel(pd.getXp(), pd.getLevel()));
+            case "xp_progressbar" -> {
+                long currentXpInLevel = pd.getXp() - xp.getCumulativeForLevel(pd.getLevel());
+                long xpNeeded = xp.xpNext(pd.getLevel());
+                double progress = Math.min(1.0, Math.max(0.0, (double) currentXpInLevel / xpNeeded));
+                int bars = 20;
+                int coloredBars = (int) (progress * bars);
+                yield "&a" + "|".repeat(coloredBars) + "&7" + "|".repeat(bars - coloredBars);
+            }
+            case "reward_sp" -> String.valueOf(xp.skillPointsForLevel(pd.getLevel()));
+            case "reward_color" -> xp.getLevelColorName(pd.getLevel());
             case "extraxp" -> String.format("%.2f", pd.getXPBoost() * 100);
             case "levelcolored" -> xp.colorizeLevel(pd.getLevel());
             case "levelcolor" -> xp.getLevelHexColor(pd.getLevel());
@@ -115,6 +145,7 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             case "voteparty_current" -> String.valueOf(main.getVotePartyManager().getDisplayCurrentVotes());
             case "quests_completed" -> String.valueOf(pd.getDailyQuestsCompleted());
             case "quests_total" -> "3";
+            case "quests_accepted" -> String.valueOf(!pd.getAcceptedDailyQuests().isEmpty());
             case "total_rewards" -> getTotalRewards(pd);
             case "skilltreereset_points" -> String.valueOf(pd.getResetSkillTreePoints());
             case "skilltreereset_skillpoints" -> String.valueOf(Robbery.getSkillTreeConfig().calculateTotalRefund(pd));
@@ -186,6 +217,19 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                         case "milestone" -> String.valueOf(pd.getStoreMilestone(storeId));
                         case "level" -> String.valueOf(main.getMasteryManager().getLevelFromItems(storeId, pd.getStoreItems(storeId)));
                         case "nextmilestone" -> String.valueOf(main.getMasteryManager().getNextStoreMilestone(pd, storeId));
+                        case "nextreward" -> {
+                            int nm = main.getMasteryManager().getNextStoreMilestone(pd, storeId);
+                            yield main.getMasteryManager().getRewardDisplay(storeId, nm);
+                        }
+                        case "nextrequired" -> {
+                            int nm = main.getMasteryManager().getNextStoreMilestone(pd, storeId);
+                            yield String.valueOf(main.getMasteryManager().getItemsRequiredForLevel(storeId, nm));
+                        }
+                        case "nextremaining" -> {
+                            int nm = main.getMasteryManager().getNextStoreMilestone(pd, storeId);
+                            int req = main.getMasteryManager().getItemsRequiredForLevel(storeId, nm);
+                            yield String.valueOf(Math.max(req - pd.getStoreItems(storeId), 0));
+                        }
                         case "reward" -> (parts.length == 4) ? main.getMasteryManager().getRewardDisplay(storeId, Integer.parseInt(parts[3])) : null;
                         case "required" -> (parts.length == 4) ? String.valueOf(main.getMasteryManager().getItemsRequiredForLevel(storeId, Integer.parseInt(parts[3]))) : null;
                         case "remaining" -> {

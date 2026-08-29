@@ -53,16 +53,26 @@ public class PlayerEventListener implements Listener {
         this.plugin = plugin;
     }
 
+    private final Map<java.util.UUID, YamlConfiguration> tempCache = new java.util.concurrent.ConcurrentHashMap<>();
+
+    @org.bukkit.event.EventHandler
+    public void onPreLogin(org.bukkit.event.player.AsyncPlayerPreLoginEvent event) {
+        YamlConfiguration cfg = plugin.getPlayerDataDao().loadPlayerData(event.getUniqueId());
+        if (cfg != null) {
+            tempCache.put(event.getUniqueId(), cfg);
+        }
+    }
+
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         event.setJoinMessage(null);
 
         PlayerData memory = new PlayerData(player);
-        File playerFile = getPlayerFile(player);
+        YamlConfiguration cfg = tempCache.remove(player.getUniqueId());
 
         handleJoinMessage(player);
-        loadPlayerDataFromFile(player, memory, playerFile);
+        loadPlayerDataFromDB(player, memory, cfg);
         applyOutpostPerks(player, memory);
 
         if (!player.hasPermission(NOITEMS_PERMISSION)) {
@@ -102,11 +112,7 @@ public class PlayerEventListener implements Listener {
     }
 
     public void savePlayerData(Player player, PlayerData memory) {
-        File playerFolder = new File(plugin.getDataFolder(), "player/" + player.getUniqueId());
-        if (!playerFolder.exists()) playerFolder.mkdirs();
-
-        File file = new File(playerFolder, "general.yml");
-        FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        YamlConfiguration cfg = new YamlConfiguration();
 
         // Basic stats
         cfg.set("stats.xp", memory.getXp());
@@ -171,18 +177,30 @@ public class PlayerEventListener implements Listener {
         cfg.set("stats.location.yaw", loc.getYaw());
         cfg.set("stats.location.pitch", loc.getPitch());
 
-        try {
-            cfg.save(file);
-        } catch (IOException e) {
-            e.printStackTrace();
+        Runnable saveTask = () -> {
+            try {
+                plugin.getPlayerDataDao().savePlayerData(
+                    player.getUniqueId(),
+                    player.getName(),
+                    memory.getPrestige(),
+                    memory.getRank(),
+                    memory.getSkillPoints(),
+                    memory.getItemsStolen(),
+                    (YamlConfiguration) cfg
+                );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        };
+
+        if (!plugin.isEnabled()) {
+            saveTask.run(); // Run synchronously during shutdown
+        } else {
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, saveTask);
         }
     }
 
-    private File getPlayerFile(Player player) {
-        File folder = new File(plugin.getDataFolder(), "player/" + player.getUniqueId());
-        if (!folder.exists()) folder.mkdirs();
-        return new File(folder, "general.yml");
-    }
+
     private void handleJoinMessage(Player player) {
         if (!player.hasPermission("robbery.rank7") && !player.hasPermission("robbery.staff")) return;
 
@@ -215,13 +233,11 @@ public class PlayerEventListener implements Listener {
             memory.setOutSpeedBonus(0);
         }
     }
-    private void loadPlayerDataFromFile(Player player, PlayerData memory, File file) {
-        if (!file.exists()) {
+    private void loadPlayerDataFromDB(Player player, PlayerData memory, YamlConfiguration cfg) {
+        if (cfg == null) {
             memory.setRank(getRank(player));
             return;
         }
-
-        FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
         // Basic stats
         memory.setRank(cfg.getString("stats.rank"));

@@ -147,7 +147,7 @@ public class PickingTask extends BukkitRunnable {
             return;
         }
 
-        if (!isLookingAtStand(player, stand) || !player.isOnline()) {
+        if (!player.isOnline() || !isLookingAtStand(player, stand)) {
             this.cancel();
             item.setHp(item.getInitialhp());
             item.togglePickable();
