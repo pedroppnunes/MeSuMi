@@ -7,8 +7,8 @@ tips:
   - ""
 
 database:
-  host: "localhost"
+  host: "examplehost"
   port: 3306
-  database: "robbery"
-  username: "robberyuser"
+  database: "exampletable"
+  username: "user"
   password: "your_password_here"
