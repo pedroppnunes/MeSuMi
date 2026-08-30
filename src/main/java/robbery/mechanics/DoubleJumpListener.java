@@ -48,7 +48,10 @@ public class DoubleJumpListener implements Listener {
         ItemStack item = player.getInventory().getItemInMainHand();
         if (!isFlightItem(item)) return;
 
-        if (!player.hasPermission("robbery.rank7") && pd.getPerkValue(PERK_SPECIAL_FEATHERFLIGHT) == 1 || !player.getWorld().getName().equals("world")) {
+        boolean hasRank7 = player.hasPermission("robbery.rank7");
+        boolean hasPerk = pd.getPerkValue(PERK_SPECIAL_FEATHERFLIGHT) == 1;
+
+        if ((!hasRank7 && !hasPerk) || !player.getWorld().getName().equals("world")) {
             Messages.sendActionBar(player,"events.flight.no-permission");
             return;
         }
@@ -64,7 +67,8 @@ public class DoubleJumpListener implements Listener {
         }
 
         int flightDuration = 5;
-        long flightCooldown = player.hasPermission("robbery.rank7") ? 2 : 5;
+        // 2 minutes for rank7, 5 minutes for perk
+        long flightCooldown = hasRank7 ? 120_000L : 300_000L;
 
         temporaryFlightPlayers.add(uuid);
         flyCooldowns.put(uuid, currentTime + flightCooldown);
@@ -121,7 +125,7 @@ public class DoubleJumpListener implements Listener {
             player.setAllowFlight(true);
         } else {
             if (player.isOnGround() && player.getWorld().getName().equalsIgnoreCase("world")) {
-                if (player.hasPermission("robbery.rank7") && p.isDoubleJump() || p.getPerkValue(PERK_SPECIAL_FEATHERFLIGHT) == 1 && p.isDoubleJump()) {
+                if ((player.hasPermission("robbery.rank7") || p.getPerkValue(PERK_SPECIAL_DOUBLEJUMP) == 1) && p.isDoubleJump()) {
                     player.setAllowFlight(true);
                     canDoubleJump.add(uuid);
                 } else {
@@ -136,11 +140,17 @@ public class DoubleJumpListener implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
+        PlayerData p = PlayerDataManager.getPlayerData(player);
+
         if (player.hasPermission("robbery.bypass") || temporaryFlightPlayers.contains(uuid)) {
             event.setCancelled(false);
             return;
         }
-        if (!player.hasPermission("robbery.rank7") || !player.getWorld().getName().equalsIgnoreCase("world")) return;
+        
+        boolean hasRank7 = player.hasPermission("robbery.rank7");
+        boolean hasPerk = p.getPerkValue(PERK_SPECIAL_DOUBLEJUMP) == 1; // Double jump uses DOUBLEJUMP perk
+        
+        if ((!hasRank7 && !hasPerk) || !player.getWorld().getName().equalsIgnoreCase("world")) return;
 
         event.setCancelled(true);
         player.setAllowFlight(false);

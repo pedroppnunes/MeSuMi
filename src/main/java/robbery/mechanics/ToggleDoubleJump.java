@@ -54,7 +54,10 @@ public class ToggleDoubleJump implements CommandExecutor {
         PlayerData p = PlayerDataManager.getPlayerData(player);
 
         // Permission check
-        if (!player.hasPermission("robbery.rank7") || p.getPerkValue(PERK_SPECIAL_DOUBLEJUMP) == 1) {
+        boolean hasRank7 = player.hasPermission("robbery.rank7");
+        boolean hasDoubleJumpPerk = p.getPerkValue(PERK_SPECIAL_DOUBLEJUMP) == 1;
+
+        if (!hasRank7 && !hasDoubleJumpPerk) {
             Messages.send(player, "command.doublejump.no-permission");
             return true;
         }
