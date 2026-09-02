@@ -164,10 +164,12 @@ public class CryptoUpgradeManager {
         setTrackLevel(machine, track, targetLevel);
 
         String trackName = getTrackDisplayName(track);
+        String costFormatted = NumberFormatter.formatDoubleNumber((double) cost);
         Messages.sendFormatted(player, "crypto.upgrade-success", Map.of(
                 "track", trackName,
                 "level", String.valueOf(targetLevel),
-                "cost", NumberFormatter.formatDoubleNumber((double) cost)
+                "cost", costFormatted,
+                "price", costFormatted
         ));
 
         player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.2f);
