@@ -200,8 +200,8 @@ public class ArmorStandInteractionListener implements Listener {
         String baseFormatted = robbery.number.NumberFormatter.formatDoubleNumber(basePrice) + "$";
         String yourFormatted = robbery.number.NumberFormatter.formatDoubleNumber(yourPrice) + "$";
 
-        player.sendMessage(org.bukkit.ChatColor.translateAlternateColorCodes('&',
-                "&7&l" + item.getName() + " &8| &7Price: &a" + baseFormatted + " &8| &7Your Price: &a" + yourFormatted));
+        player.sendActionBar(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand().deserialize(
+                "&7Price: &e" + baseFormatted + " &8| &7Your Price: &a" + yourFormatted));
     }
 
     private double extractStoreNumber(String id) {
