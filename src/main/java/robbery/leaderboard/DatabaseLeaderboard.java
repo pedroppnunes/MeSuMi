@@ -2,6 +2,7 @@ package robbery.leaderboard;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import robbery.core.Robbery;
 import robbery.database.DatabaseManager;
@@ -33,10 +34,10 @@ public class DatabaseLeaderboard {
             public void run() {
                 updateLeaderboards(plugin);
             }
-        }.runTaskTimerAsynchronously(plugin, 100L, 1200L); // Update every 1 minute (1200 ticks)
+        }.runTaskTimerAsynchronously(plugin, 0L, 600L); // Update immediately, then every 30 seconds
     }
 
-    private static void updateLeaderboards(Robbery plugin) {
+    public static void updateLeaderboards(Robbery plugin) {
         DatabaseManager db = plugin.getDatabaseManager();
         if (db == null) return;
 
@@ -56,7 +57,7 @@ public class DatabaseLeaderboard {
 
     private static List<Entry> fetchTop(DatabaseManager db, String column) {
         List<Entry> validEntries = new ArrayList<>();
-        String sql = "SELECT uuid, username, " + column + " FROM player_data ORDER BY " + column + " DESC LIMIT 50";
+        String sql = "SELECT uuid, username, " + column + " FROM player_data ORDER BY " + column + " DESC LIMIT 100";
         
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -71,15 +72,7 @@ public class DatabaseLeaderboard {
                 
                 try {
                     UUID uuid = UUID.fromString(uuidStr);
-                    OfflinePlayer op = Bukkit.getOfflinePlayer(uuid);
-                    if (op.isOp()) continue;
-                    
-                    if (Robbery.getPermissions() != null) {
-                        if (Robbery.getPermissions().playerHas(null, op, "robbery.op") ||
-                            Robbery.getPermissions().playerHas(null, op, "robbery.bypass")) {
-                            continue;
-                        }
-                    }
+                    if (isExempt(uuid, username)) continue;
                     
                     validEntries.add(new Entry(username, value));
                 } catch (IllegalArgumentException ignored) {}
@@ -91,9 +84,48 @@ public class DatabaseLeaderboard {
         return validEntries;
     }
 
+    private static boolean isExempt(UUID uuid, String username) {
+        try {
+            Player online = Bukkit.getPlayer(uuid);
+            if (online != null && online.isOnline()) {
+                if (online.isOp() || online.hasPermission("robbery.op") || online.hasPermission("robbery.bypass")) {
+                    return true;
+                }
+            }
+
+            OfflinePlayer op = Bukkit.getOfflinePlayer(uuid);
+            if (op.isOp()) return true;
+
+            // Check LuckPerms for offline player permissions
+            try {
+                net.luckperms.api.LuckPerms lp = net.luckperms.api.LuckPermsProvider.get();
+                if (lp != null) {
+                    net.luckperms.api.model.user.User user = lp.getUserManager().getUser(uuid);
+                    if (user == null) {
+                        user = lp.getUserManager().loadUser(uuid).join();
+                    }
+                    if (user != null) {
+                        boolean hasOp = user.getCachedData().getPermissionData().checkPermission("robbery.op").asBoolean();
+                        boolean hasBypass = user.getCachedData().getPermissionData().checkPermission("robbery.bypass").asBoolean();
+                        if (hasOp || hasBypass) return true;
+                    }
+                }
+            } catch (Throwable ignored) {}
+
+            // Check Vault permissions
+            if (Robbery.getPermissions() != null) {
+                if (Robbery.getPermissions().playerHas(null, op, "robbery.op") ||
+                    Robbery.getPermissions().playerHas(null, op, "robbery.bypass")) {
+                    return true;
+                }
+            }
+        } catch (Exception ignored) {}
+        return false;
+    }
+
     public static String getTopPrestigeName(int position) {
         synchronized (topPrestige) {
-            if (position < 1 || position > topPrestige.size()) return "Unknown";
+            if (position < 1 || position > topPrestige.size()) return "---";
             return topPrestige.get(position - 1).username;
         }
     }
@@ -107,7 +139,7 @@ public class DatabaseLeaderboard {
     
     public static String getTopItemsStolenName(int position) {
         synchronized (topItemsStolen) {
-            if (position < 1 || position > topItemsStolen.size()) return "Unknown";
+            if (position < 1 || position > topItemsStolen.size()) return "---";
             return topItemsStolen.get(position - 1).username;
         }
     }

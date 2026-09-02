@@ -52,24 +52,24 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
         if (parts.length >= 3 && parts[0].equals("prestige")) {
             try {
                 int rank = Integer.parseInt(parts[2]);
-                if (parts[1].equals("name")) return PrestigeLeaderboard.getTopPrestigePlayer(rank);
-                if (parts[1].equals("top")) return String.valueOf(PrestigeLeaderboard.getTopPrestige(rank));
+                if (parts[1].equals("name")) return robbery.leaderboard.DatabaseLeaderboard.getTopPrestigeName(rank);
+                if (parts[1].equals("top") || parts[1].equals("value")) return robbery.leaderboard.DatabaseLeaderboard.getTopPrestigeValue(rank);
             } catch (NumberFormatException ignored) {}
         }
 
         // %robbery_top_prestige_1_name%, %robbery_top_prestige_1_value%
         // %robbery_top_stolen_1_name%,   %robbery_top_stolen_1_value%
-        if (parts.length >= 4 && parts[0].equals("top")) {
+        if (parts.length >= 3 && parts[0].equals("top")) {
             try {
                 int pos = Integer.parseInt(parts[2]);
-                String field = parts[3]; // name or value
+                String field = (parts.length >= 4) ? parts[3] : "value";
                 if (parts[1].equals("prestige")) {
-                    return field.equals("name")
+                    return field.equalsIgnoreCase("name")
                             ? robbery.leaderboard.DatabaseLeaderboard.getTopPrestigeName(pos)
                             : robbery.leaderboard.DatabaseLeaderboard.getTopPrestigeValue(pos);
                 }
-                if (parts[1].equals("stolen")) {
-                    return field.equals("name")
+                if (parts[1].equals("stolen") || parts[1].equals("itemsstolen")) {
+                    return field.equalsIgnoreCase("name")
                             ? robbery.leaderboard.DatabaseLeaderboard.getTopItemsStolenName(pos)
                             : robbery.leaderboard.DatabaseLeaderboard.getTopItemsStolenValue(pos);
                 }
