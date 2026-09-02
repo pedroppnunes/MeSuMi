@@ -24,7 +24,6 @@ public class XPManager {
     private final int SOFTCAP = 120;
     private final double BASE_MULT = 100.0;
     private final double EXPONENT = 1.7;
-    private final double SOFTCAP_MULT = 1.15;
 
     public XPManager(Robbery plugin) {
         this.main = plugin;
@@ -35,7 +34,7 @@ public class XPManager {
         synchronized (cumulativeCache) {
             cumulativeCache.clear();
             long runningTotal = 0L;
-            cumulativeCache.add(0L); // Level 1 starts at 0 XP
+            cumulativeCache.add(0L); // Level 1 starts at 0 XP (cumulative to reach Level 1)
             for (int level = 1; level < maxLevel; level++) {
                 runningTotal += xpNext(level);
                 cumulativeCache.add(runningTotal);
@@ -49,11 +48,11 @@ public class XPManager {
 
         long rawXp;
         if (level <= SOFTCAP) {
-            rawXp = (long) (BASE_MULT * Math.pow(level, EXPONENT));
+            rawXp = Math.round(BASE_MULT * Math.pow(level, EXPONENT));
         } else {
-            long base = (long) (BASE_MULT * Math.pow(SOFTCAP, EXPONENT));
-            double multiplier = Math.pow(SOFTCAP_MULT, (level - SOFTCAP));
-            rawXp = (long) (base * multiplier);
+            long base = Math.round(BASE_MULT * Math.pow(SOFTCAP, EXPONENT));
+            // Linear scaling above level 120 softcap (+25,000 XP per level above 120) to prevent numeric overflow
+            rawXp = base + (long) (level - SOFTCAP) * 25000L;
         }
 
         return Math.max(100L, rawXp);
@@ -64,13 +63,16 @@ public class XPManager {
             return 0L;
 
         synchronized (cumulativeCache) {
-            // If requested level is beyond cache, expand it
             while (cumulativeCache.size() < targetLevel) {
                 int currentMaxLevel = cumulativeCache.size();
                 long nextTotal = cumulativeCache.get(currentMaxLevel - 1) + xpNext(currentMaxLevel);
                 cumulativeCache.add(nextTotal);
+                if (currentMaxLevel > 10000) break;
             }
-            return cumulativeCache.get(targetLevel - 1);
+            if (targetLevel - 1 < cumulativeCache.size()) {
+                return cumulativeCache.get(targetLevel - 1);
+            }
+            return cumulativeCache.get(cumulativeCache.size() - 1);
         }
     }
 
@@ -79,19 +81,13 @@ public class XPManager {
             return 1;
 
         synchronized (cumulativeCache) {
-            // Ensure cache is large enough to potentially contain this XP
-            // If XP is higher than our last cached level, grow cache until it fits
             while (xp >= cumulativeCache.get(cumulativeCache.size() - 1)) {
                 int currentMaxLevel = cumulativeCache.size();
                 long nextTotal = cumulativeCache.get(currentMaxLevel - 1) + xpNext(currentMaxLevel);
                 cumulativeCache.add(nextTotal);
-
-                // Safety cap to prevent infinite loops if math breaks
-                if (currentMaxLevel > 1000000)
-                    break;
+                if (currentMaxLevel > 10000) break;
             }
 
-            // Binary Search for efficiency
             int low = 0;
             int high = cumulativeCache.size() - 1;
             int level = 1;
@@ -105,7 +101,7 @@ public class XPManager {
                     high = mid - 1;
                 }
             }
-            return level;
+            return Math.max(1, level);
         }
     }
 

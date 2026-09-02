@@ -75,7 +75,31 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
                 return true;
             }
 
-            String category = args[1].toLowerCase();
+            String first = args[1].toLowerCase();
+
+            // Allow /robbery admin <give|set|remove|setlevel|reset> <xp|sp|itemsstolen> <player> <amount>
+            if (first.equals("give") || first.equals("set") || first.equals("remove") || first.equals("setlevel") || first.equals("reset")) {
+                if (args.length < 3) {
+                    sendHelp(sender);
+                    return true;
+                }
+                String cat = args[2].toLowerCase();
+                List<String> subList = new ArrayList<>();
+                subList.add(first);
+                for (int i = 3; i < args.length; i++) {
+                    subList.add(args[i]);
+                }
+                String[] subArgs = subList.toArray(new String[0]);
+                switch (cat) {
+                    case "xp" -> handleXp(sender, subArgs);
+                    case "sp", "skillpoints" -> handleSp(sender, subArgs);
+                    case "itemsstolen", "items_stolen", "stolenitems", "stolen" -> handleItemsStolen(sender, subArgs);
+                    default -> sendHelp(sender);
+                }
+                return true;
+            }
+
+            String category = first;
             String[] subArgs = Arrays.copyOfRange(args, 2, args.length);
 
             switch (category) {
@@ -134,12 +158,25 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
             return;
         }
 
-        if (args.length < 2) {
-            sender.sendMessage(ChatColor.RED + "Usage: /robbery admin xp " + action + " <player> [amount]");
-            return;
+        String targetName;
+        String amountStr = null;
+
+        // Support /robbery admin xp <player> <action> [amount]
+        Player directPlayer = Bukkit.getPlayer(args[0]);
+        if (directPlayer != null && directPlayer.isOnline() && args.length >= 2) {
+            targetName = args[0];
+            action = args[1].toLowerCase();
+            if (args.length >= 3) amountStr = args[2];
+        } else {
+            if (args.length < 2) {
+                sender.sendMessage(ChatColor.RED + "Usage: /robbery admin xp " + action + " <player> [amount]");
+                return;
+            }
+            targetName = args[1];
+            if (args.length >= 3) amountStr = args[2];
         }
 
-        Player target = Bukkit.getPlayer(args[1]);
+        Player target = Bukkit.getPlayer(targetName);
         if (target == null || !target.isOnline()) {
             Messages.send(sender, "global.player-not-found");
             return;
@@ -151,47 +188,47 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
         try {
             switch (action) {
                 case "give" -> {
-                    if (args.length < 3) {
+                    if (amountStr == null) {
                         sender.sendMessage(ChatColor.RED + "Usage: /robbery admin xp give <player> <amount>");
                         return;
                     }
-                    long amount = Long.parseLong(args[2]);
+                    long amount = Long.parseLong(amountStr);
                     xpManager.addXP(target, amount);
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aGiven &e" + amount + " &aXP to &f" + target.getName() + "&a."));
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aGiven &e" + amount + " &aXP to &f" + target.getName() + "&a (Total XP: &e" + pd.getXp() + "&a, Level: &e" + pd.getLevel() + "&a)."));
                 }
                 case "set" -> {
-                    if (args.length < 3) {
+                    if (amountStr == null) {
                         sender.sendMessage(ChatColor.RED + "Usage: /robbery admin xp set <player> <amount>");
                         return;
                     }
-                    long amount = Long.parseLong(args[2]);
+                    long amount = Long.parseLong(amountStr);
                     xpManager.setXP(target, amount);
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aSet &f" + target.getName() + "'s &aXP to &e" + amount + "&a."));
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aSet &f" + target.getName() + "'s &aXP to &e" + amount + "&a (Level: &e" + pd.getLevel() + "&a)."));
                 }
                 case "remove" -> {
-                    if (args.length < 3) {
+                    if (amountStr == null) {
                         sender.sendMessage(ChatColor.RED + "Usage: /robbery admin xp remove <player> <amount>");
                         return;
                     }
-                    long amount = Long.parseLong(args[2]);
+                    long amount = Long.parseLong(amountStr);
                     long newXp = Math.max(0L, pd.getXp() - amount);
                     xpManager.setXP(target, newXp);
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aRemoved &e" + amount + " &aXP from &f" + target.getName() + "&a (New XP: &e" + newXp + "&a)."));
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aRemoved &e" + amount + " &aXP from &f" + target.getName() + "&a (New XP: &e" + newXp + "&a, Level: &e" + pd.getLevel() + "&a)."));
                 }
                 case "setlevel" -> {
-                    if (args.length < 3) {
+                    if (amountStr == null) {
                         sender.sendMessage(ChatColor.RED + "Usage: /robbery admin xp setlevel <player> <level>");
                         return;
                     }
-                    int level = Integer.parseInt(args[2]);
+                    int level = Integer.parseInt(amountStr);
                     xpManager.setLevel(target, level);
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aSet &f" + target.getName() + "'s &aLevel to &e" + level + "&a."));
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aSet &f" + target.getName() + "'s &aLevel to &e" + level + "&a (XP: &e" + pd.getXp() + "&a)."));
                 }
                 case "reset" -> {
                     xpManager.setXP(target, 0L);
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aReset &f" + target.getName() + "'s &aXP and level to default."));
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aReset &f" + target.getName() + "'s &aXP and level to 1 (0 XP)."));
                 }
-                default -> sender.sendMessage(ChatColor.RED + "Unknown xp action: " + action);
+                default -> sender.sendMessage(ChatColor.RED + "Unknown xp action: " + action + " (Available: give, set, remove, setlevel, reset, calculate)");
             }
         } catch (NumberFormatException e) {
             sender.sendMessage(ChatColor.RED + "Invalid number format.");
@@ -200,13 +237,30 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
 
     // --- SP Category ---
     private void handleSp(CommandSender sender, String[] args) {
-        if (args.length < 2) {
+        if (args.length < 1) {
             sender.sendMessage(ChatColor.RED + "Usage: /robbery admin sp <give|set|remove|reset> <player> [amount]");
             return;
         }
 
         String action = args[0].toLowerCase();
-        Player target = Bukkit.getPlayer(args[1]);
+        String targetName;
+        String amountStr = null;
+
+        Player directPlayer = Bukkit.getPlayer(args[0]);
+        if (directPlayer != null && directPlayer.isOnline() && args.length >= 2) {
+            targetName = args[0];
+            action = args[1].toLowerCase();
+            if (args.length >= 3) amountStr = args[2];
+        } else {
+            if (args.length < 2) {
+                sender.sendMessage(ChatColor.RED + "Usage: /robbery admin sp " + action + " <player> [amount]");
+                return;
+            }
+            targetName = args[1];
+            if (args.length >= 3) amountStr = args[2];
+        }
+
+        Player target = Bukkit.getPlayer(targetName);
         if (target == null || !target.isOnline()) {
             Messages.send(sender, "global.player-not-found");
             return;
@@ -218,29 +272,29 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
         try {
             switch (action) {
                 case "give" -> {
-                    if (args.length < 3) {
+                    if (amountStr == null) {
                         sender.sendMessage(ChatColor.RED + "Usage: /robbery admin sp give <player> <amount>");
                         return;
                     }
-                    int amount = Integer.parseInt(args[2]);
+                    int amount = Integer.parseInt(amountStr);
                     pd.addSkillPoints(amount);
                     sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aGiven &e" + amount + " &aSkill Points to &f" + target.getName() + " &7(Total: &e" + pd.getSkillPoints() + "&7)."));
                 }
                 case "set" -> {
-                    if (args.length < 3) {
+                    if (amountStr == null) {
                         sender.sendMessage(ChatColor.RED + "Usage: /robbery admin sp set <player> <amount>");
                         return;
                     }
-                    int amount = Integer.parseInt(args[2]);
+                    int amount = Integer.parseInt(amountStr);
                     pd.setSkillPoints(amount);
                     sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aSet &f" + target.getName() + "'s &aSkill Points to &e" + pd.getSkillPoints() + "&a."));
                 }
                 case "remove" -> {
-                    if (args.length < 3) {
+                    if (amountStr == null) {
                         sender.sendMessage(ChatColor.RED + "Usage: /robbery admin sp remove <player> <amount>");
                         return;
                     }
-                    int amount = Integer.parseInt(args[2]);
+                    int amount = Integer.parseInt(amountStr);
                     int newSp = Math.max(0, pd.getSkillPoints() - amount);
                     pd.setSkillPoints(newSp);
                     sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aRemoved &e" + amount + " &aSkill Points from &f" + target.getName() + " &7(New: &e" + newSp + "&7)."));
@@ -249,7 +303,7 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
                     pd.setSkillPoints(0);
                     sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aReset &f" + target.getName() + "'s &aSkill Points to 0."));
                 }
-                default -> sender.sendMessage(ChatColor.RED + "Unknown sp action: " + action);
+                default -> sender.sendMessage(ChatColor.RED + "Unknown sp action: " + action + " (Available: give, set, remove, reset)");
             }
         } catch (NumberFormatException e) {
             sender.sendMessage(ChatColor.RED + "Invalid number format.");
@@ -258,13 +312,30 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
 
     // --- ItemsStolen Category ---
     private void handleItemsStolen(CommandSender sender, String[] args) {
-        if (args.length < 2) {
+        if (args.length < 1) {
             sender.sendMessage(ChatColor.RED + "Usage: /robbery admin itemsstolen <give|set|remove|reset> <player> [amount]");
             return;
         }
 
         String action = args[0].toLowerCase();
-        Player target = Bukkit.getPlayer(args[1]);
+        String targetName;
+        String amountStr = null;
+
+        Player directPlayer = Bukkit.getPlayer(args[0]);
+        if (directPlayer != null && directPlayer.isOnline() && args.length >= 2) {
+            targetName = args[0];
+            action = args[1].toLowerCase();
+            if (args.length >= 3) amountStr = args[2];
+        } else {
+            if (args.length < 2) {
+                sender.sendMessage(ChatColor.RED + "Usage: /robbery admin itemsstolen " + action + " <player> [amount]");
+                return;
+            }
+            targetName = args[1];
+            if (args.length >= 3) amountStr = args[2];
+        }
+
+        Player target = Bukkit.getPlayer(targetName);
         if (target == null || !target.isOnline()) {
             Messages.send(sender, "global.player-not-found");
             return;
@@ -276,29 +347,29 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
         try {
             switch (action) {
                 case "give" -> {
-                    if (args.length < 3) {
+                    if (amountStr == null) {
                         sender.sendMessage(ChatColor.RED + "Usage: /robbery admin itemsstolen give <player> <amount>");
                         return;
                     }
-                    int amount = Integer.parseInt(args[2]);
+                    int amount = Integer.parseInt(amountStr);
                     pd.addItemsStolen(amount);
                     sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aAdded &e" + amount + " &aItems Stolen to &f" + target.getName() + " &7(Total: &e" + pd.getItemsStolen() + "&7)."));
                 }
                 case "set" -> {
-                    if (args.length < 3) {
+                    if (amountStr == null) {
                         sender.sendMessage(ChatColor.RED + "Usage: /robbery admin itemsstolen set <player> <amount>");
                         return;
                     }
-                    int amount = Integer.parseInt(args[2]);
+                    int amount = Integer.parseInt(amountStr);
                     pd.setItemsStolen(amount);
                     sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aSet &f" + target.getName() + "'s &aItems Stolen to &e" + pd.getItemsStolen() + "&a."));
                 }
                 case "remove" -> {
-                    if (args.length < 3) {
+                    if (amountStr == null) {
                         sender.sendMessage(ChatColor.RED + "Usage: /robbery admin itemsstolen remove <player> <amount>");
                         return;
                     }
-                    int amount = Integer.parseInt(args[2]);
+                    int amount = Integer.parseInt(amountStr);
                     int newStolen = Math.max(0, pd.getItemsStolen() - amount);
                     pd.setItemsStolen(newStolen);
                     sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aRemoved &e" + amount + " &aItems Stolen from &f" + target.getName() + " &7(New: &e" + newStolen + "&7)."));
@@ -307,7 +378,7 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
                     pd.setItemsStolen(0);
                     sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aReset &f" + target.getName() + "'s &aItems Stolen to 0."));
                 }
-                default -> sender.sendMessage(ChatColor.RED + "Unknown itemsstolen action: " + action);
+                default -> sender.sendMessage(ChatColor.RED + "Unknown itemsstolen action: " + action + " (Available: give, set, remove, reset)");
             }
         } catch (NumberFormatException e) {
             sender.sendMessage(ChatColor.RED + "Invalid number format.");
