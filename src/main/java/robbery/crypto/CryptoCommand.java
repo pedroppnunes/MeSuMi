@@ -103,25 +103,17 @@ public class CryptoCommand implements CommandExecutor {
                 return true;
             }
 
-            if (action.equalsIgnoreCase("givemachine")) {
-                if (CryptoItemHelper.playerAlreadyHasMachine(target, plugin) && !target.hasPermission("robbery.op")) {
+            if (action.equalsIgnoreCase("givemachine") || action.equalsIgnoreCase("givereward")) {
+                boolean force = args.length >= 3 && args[2].equalsIgnoreCase("force");
+                if (!force && CryptoItemHelper.playerAlreadyHasMachine(target, plugin)) {
                     Messages.send(sender, "crypto.already-possess");
                     return true;
                 }
                 ItemStack machineItem = CryptoItemHelper.createMachineItem(plugin);
-                target.getInventory().addItem(machineItem);
-                Messages.sendFormatted(sender, "crypto.admin-give-machine", "player", target.getName());
-            } else if (action.equalsIgnoreCase("givereward")) {
-                if (CryptoItemHelper.playerAlreadyHasMachine(target, plugin) && !target.hasPermission("robbery.op")) {
-                    Messages.send(sender, "crypto.already-possess");
-                    return true;
-                }
-                UUID targetUUID = target.getUniqueId();
-                robbery.keys.Rcrate.getPendingItemRewards().computeIfAbsent(targetUUID, k -> new java.util.HashMap<>()).merge(Material.LOOM, 1, Integer::sum);
-                robbery.keys.Rcrate.saveRewards(targetUUID);
-
-                if (target.isOnline()) {
-                    Messages.send(target, "command.rcrate.notify-claim");
+                if (target.getInventory().firstEmpty() != -1) {
+                    target.getInventory().addItem(machineItem);
+                } else {
+                    target.getWorld().dropItemNaturally(target.getLocation(), machineItem);
                 }
                 Messages.sendFormatted(sender, "crypto.admin-give-machine", "player", target.getName());
             } else if (action.equalsIgnoreCase("upgradespeed")) {
