@@ -106,6 +106,7 @@ public class Robbery extends JavaPlugin implements Listener {
     private WeeklyLeaderboardTask weeklyLeaderboardTask;
     private HourlyLeaderboard hourlyLeaderboard;
     private PlayerEventListener playerEventListener;
+    public PlayerEventListener getPlayerEventListener() { return playerEventListener; }
     private XPManager xpManager;
     private StoreMasteryManager storeMasteryManager;
     private static SkillTreeConfig skillTreeConfig;
