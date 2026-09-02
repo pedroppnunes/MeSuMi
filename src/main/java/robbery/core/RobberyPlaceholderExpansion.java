@@ -99,10 +99,10 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             case "level" -> String.valueOf(pd.getLevel());
             case "xp" -> String.valueOf(pd.getXp());
             case "xp_formatted" -> robbery.number.NumberFormatter.formatDoubleNumber((double) pd.getXp());
-            case "xp_in_level_formatted" -> robbery.number.NumberFormatter.formatDoubleNumber((double) (pd.getXp() - xp.getCumulativeForLevel(pd.getLevel())));
+            case "xp_in_level_formatted" -> robbery.number.NumberFormatter.formatDoubleNumber((double) Math.max(0L, pd.getXp() - xp.getCumulativeForLevel(pd.getLevel())));
             case "level_req_formatted" -> robbery.number.NumberFormatter.formatDoubleNumber((double) xp.xpNext(pd.getLevel()));
             case "xp_percentage" -> {
-                long currentXpInLevel = pd.getXp() - xp.getCumulativeForLevel(pd.getLevel());
+                long currentXpInLevel = Math.max(0L, pd.getXp() - xp.getCumulativeForLevel(pd.getLevel()));
                 long xpNeeded = xp.xpNext(pd.getLevel());
                 double progress = Math.min(100.0, Math.max(0.0, ((double) currentXpInLevel / xpNeeded) * 100.0));
                 yield String.format("%.1f%%", progress);
@@ -110,7 +110,7 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             case "xptonext" -> String.valueOf(xp.xpRemainingForNextLevel(pd.getXp(), pd.getLevel()));
             case "xptonext_formatted" -> robbery.number.NumberFormatter.formatDoubleNumber((double) xp.xpRemainingForNextLevel(pd.getXp(), pd.getLevel()));
             case "xp_progressbar" -> {
-                long currentXpInLevel = pd.getXp() - xp.getCumulativeForLevel(pd.getLevel());
+                long currentXpInLevel = Math.max(0L, pd.getXp() - xp.getCumulativeForLevel(pd.getLevel()));
                 long xpNeeded = xp.xpNext(pd.getLevel());
                 double progress = Math.min(1.0, Math.max(0.0, (double) currentXpInLevel / xpNeeded));
                 int bars = 20;

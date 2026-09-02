@@ -243,8 +243,9 @@ public class PlayerEventListener implements Listener {
 
         // Basic stats
         memory.setRank(cfg.getString("stats.rank"));
-        memory.setXp(cfg.getLong("stats.xp", 0L));
-        memory.setLevel(Math.max(1, cfg.getInt("stats.level", 1)));
+        long loadedXp = Math.max(0L, cfg.getLong("stats.xp", 0L));
+        memory.setXp(loadedXp);
+        memory.setLevel(main.getXpManager().getLevelFromXp(loadedXp));
         memory.setPrestige(cfg.getInt("stats.prestige", 0));
 
         // Tools & keys
