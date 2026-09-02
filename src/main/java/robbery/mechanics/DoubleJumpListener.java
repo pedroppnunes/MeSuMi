@@ -111,9 +111,19 @@ public class DoubleJumpListener implements Listener {
     }
 
 
+    private boolean isOpOrCreative(Player player) {
+        return player.isOp() || player.hasPermission("robbery.op") || player.hasPermission("robbery.bypass")
+                || player.getGameMode() == org.bukkit.GameMode.CREATIVE
+                || player.getGameMode() == org.bukkit.GameMode.SPECTATOR;
+    }
+
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
+        if (isOpOrCreative(player)) {
+            return;
+        }
+
         PlayerData p = PlayerDataManager.getPlayerData(player);
         UUID uuid = player.getUniqueId();
 
@@ -121,7 +131,7 @@ public class DoubleJumpListener implements Listener {
             player.setAllowFlight(true);
         } else {
             if (player.isOnGround() && player.getWorld().getName().equalsIgnoreCase("world")) {
-                if ((player.hasPermission("robbery.rank7") || p.getPerkValue(PERK_SPECIAL_DOUBLEJUMP) == 1) && p.isDoubleJump()) {
+                if (p != null && (player.hasPermission("robbery.rank7") || p.getPerkValue(PERK_SPECIAL_DOUBLEJUMP) == 1) && p.isDoubleJump()) {
                     player.setAllowFlight(true);
                     canDoubleJump.add(uuid);
                 } else {
@@ -134,8 +144,11 @@ public class DoubleJumpListener implements Listener {
     @EventHandler
     public void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
         Player player = event.getPlayer();
-        UUID uuid = player.getUniqueId();
+        if (isOpOrCreative(player)) {
+            return;
+        }
 
+        UUID uuid = player.getUniqueId();
         PlayerData p = PlayerDataManager.getPlayerData(player);
 
         if (temporaryFlightPlayers.contains(uuid)) {
@@ -144,7 +157,7 @@ public class DoubleJumpListener implements Listener {
         }
         
         boolean hasRank7 = player.hasPermission("robbery.rank7");
-        boolean hasPerk = p.getPerkValue(PERK_SPECIAL_DOUBLEJUMP) == 1; // Double jump uses DOUBLEJUMP perk
+        boolean hasPerk = p != null && p.getPerkValue(PERK_SPECIAL_DOUBLEJUMP) == 1; // Double jump uses DOUBLEJUMP perk
         
         if ((!hasRank7 && !hasPerk) || !player.getWorld().getName().equalsIgnoreCase("world")) return;
 
