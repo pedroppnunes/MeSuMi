@@ -149,7 +149,11 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             case "total_rewards" -> getTotalRewards(pd);
             case "skilltreereset_points" -> String.valueOf(pd.getResetSkillTreePoints());
             case "skilltreereset_skillpoints" -> String.valueOf(Robbery.getSkillTreeConfig().calculateTotalRefund(pd));
-            case "skillpoint_chance" -> String.format("%.2f", main.getSacrificeManager().getChance(p, "coal") * 100);
+            case "skillpoint_chance" -> {
+                double baseChance = 1000.0;
+                double buff = pd.getPerkValue(robbery.attribute.Attribute.PERK_CHANCE_SP1) + pd.getOutSpChance();
+                yield "1/" + (int)(baseChance / (1.0 + buff));
+            }
 
             case "crypto_status" -> {
                 robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
