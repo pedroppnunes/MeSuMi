@@ -198,6 +198,43 @@ public class CryptoListener implements Listener {
         }
     }
     
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onChunkLoad(org.bukkit.event.world.ChunkLoadEvent event) {
+        for (CryptoMachine machine : plugin.getCryptoManager().getActiveMachines().values()) {
+            if (machine != null && machine.isPlaced()) {
+                org.bukkit.Location loc = machine.getLocation();
+                if (loc != null && loc.getWorld() != null && loc.getWorld().equals(event.getWorld())) {
+                    if ((loc.getBlockX() >> 4) == event.getChunk().getX() && (loc.getBlockZ() >> 4) == event.getChunk().getZ()) {
+                        machine.updateHologram();
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onChunkUnload(org.bukkit.event.world.ChunkUnloadEvent event) {
+        for (CryptoMachine machine : plugin.getCryptoManager().getActiveMachines().values()) {
+            if (machine != null && machine.isPlaced()) {
+                org.bukkit.Location loc = machine.getLocation();
+                if (loc != null && loc.getWorld() != null && loc.getWorld().equals(event.getWorld())) {
+                    if ((loc.getBlockX() >> 4) == event.getChunk().getX() && (loc.getBlockZ() >> 4) == event.getChunk().getZ()) {
+                        machine.removeHologram();
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onWorldChange(org.bukkit.event.player.PlayerChangedWorldEvent event) {
+        Player p = event.getPlayer();
+        CryptoMachine machine = plugin.getCryptoManager().getMachine(p.getUniqueId());
+        if (machine != null && machine.isPlaced()) {
+            org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, machine::updateHologram, 20L);
+        }
+    }
+
     private boolean isHeadBlock(Block block) {
         if (block == null) return false;
         Material mat = block.getType();

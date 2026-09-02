@@ -240,13 +240,16 @@ public class CryptoMachine {
         // Prevent loading chunks just to update the hologram
         if (!loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) return;
         
-        // Aggressively clean up any old/ghost holograms every update tick just in case
-        for (org.bukkit.entity.Entity entity : loc.getWorld().getNearbyEntities(loc, 1.0, 3.0, 1.0)) {
-            if (entity instanceof org.bukkit.entity.ArmorStand && entity != holoLine1 && entity != holoLine2) {
-                org.bukkit.entity.ArmorStand as = (org.bukkit.entity.ArmorStand) entity;
-                boolean isGhost = false;
+        Location centerLoc = loc.clone().add(0.5, 1.25, 0.5);
+        
+        // Aggressively clean up ANY ghost / duplicate armor stands in the area
+        for (org.bukkit.entity.Entity entity : loc.getWorld().getNearbyEntities(centerLoc, 2.0, 3.0, 2.0)) {
+            if (entity instanceof org.bukkit.entity.ArmorStand as) {
+                if (as == holoLine1 || as == holoLine2) continue;
                 
-                if (as.getPersistentDataContainer().has(new org.bukkit.NamespacedKey("robbery", "crypto_holo"), org.bukkit.persistence.PersistentDataType.BYTE)) {
+                boolean isGhost = false;
+                if (as.getPersistentDataContainer().has(new org.bukkit.NamespacedKey("robbery", "crypto_holo"), org.bukkit.persistence.PersistentDataType.BYTE)
+                        || as.getPersistentDataContainer().has(new org.bukkit.NamespacedKey("robbery", "crypto_holo"), org.bukkit.persistence.PersistentDataType.STRING)) {
                     isGhost = true;
                 } else if (as.getCustomName() != null) {
                     String cleanName = org.bukkit.ChatColor.stripColor(as.getCustomName());
@@ -261,23 +264,28 @@ public class CryptoMachine {
             }
         }
 
-        if (holoLine1 == null || !holoLine1.isValid()) {
-            holoLine1 = loc.getWorld().spawn(loc.clone().add(0.5, 1.35, 0.5), org.bukkit.entity.ArmorStand.class, as -> {
+        if (holoLine1 == null || !holoLine1.isValid() || holoLine1.isDead()) {
+            Location line1Loc = loc.clone().add(0.5, 1.35, 0.5);
+            holoLine1 = loc.getWorld().spawn(line1Loc, org.bukkit.entity.ArmorStand.class, as -> {
                 as.setPersistent(false);
                 as.setInvisible(true);
                 as.setMarker(true);
                 as.setCustomNameVisible(true);
                 as.setGravity(false);
+                as.setRemoveWhenFarAway(true);
                 as.getPersistentDataContainer().set(new org.bukkit.NamespacedKey("robbery", "crypto_holo"), org.bukkit.persistence.PersistentDataType.BYTE, (byte) 1);
             });
         }
-        if (holoLine2 == null || !holoLine2.isValid()) {
-            holoLine2 = loc.getWorld().spawn(loc.clone().add(0.5, 1.1, 0.5), org.bukkit.entity.ArmorStand.class, as -> {
+        
+        if (holoLine2 == null || !holoLine2.isValid() || holoLine2.isDead()) {
+            Location line2Loc = loc.clone().add(0.5, 1.1, 0.5);
+            holoLine2 = loc.getWorld().spawn(line2Loc, org.bukkit.entity.ArmorStand.class, as -> {
                 as.setPersistent(false);
                 as.setInvisible(true);
                 as.setMarker(true);
                 as.setCustomNameVisible(true);
                 as.setGravity(false);
+                as.setRemoveWhenFarAway(true);
                 as.getPersistentDataContainer().set(new org.bukkit.NamespacedKey("robbery", "crypto_holo"), org.bukkit.persistence.PersistentDataType.BYTE, (byte) 1);
             });
         }
@@ -287,24 +295,32 @@ public class CryptoMachine {
         
         String moneyStr = robbery.number.NumberFormatter.formatDoubleNumber((double) unclaimedMoney);
         
-        holoLine1.setCustomName(org.bukkit.ChatColor.translateAlternateColorCodes('&', "&7Owner: &6" + ownerName));
-        holoLine2.setCustomName(org.bukkit.ChatColor.translateAlternateColorCodes('&', "&fCurrent Money: &a$" + moneyStr));
+        if (holoLine1 != null && holoLine1.isValid()) {
+            holoLine1.setCustomName(org.bukkit.ChatColor.translateAlternateColorCodes('&', "&7Owner: &6" + ownerName));
+        }
+        if (holoLine2 != null && holoLine2.isValid()) {
+            holoLine2.setCustomName(org.bukkit.ChatColor.translateAlternateColorCodes('&', "&fCurrent Money: &a$" + moneyStr));
+        }
     }
     
     public void removeHologram() {
-        if (holoLine1 != null && holoLine1.isValid()) holoLine1.remove();
-        if (holoLine2 != null && holoLine2.isValid()) holoLine2.remove();
-        holoLine1 = null;
-        holoLine2 = null;
+        if (holoLine1 != null) {
+            holoLine1.remove();
+            holoLine1 = null;
+        }
+        if (holoLine2 != null) {
+            holoLine2.remove();
+            holoLine2 = null;
+        }
         
         Location loc = getLocation();
         if (loc != null && loc.getWorld() != null && loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
-            for (org.bukkit.entity.Entity entity : loc.getWorld().getNearbyEntities(loc, 1.0, 3.0, 1.0)) {
-                if (entity instanceof org.bukkit.entity.ArmorStand) {
-                    org.bukkit.entity.ArmorStand as = (org.bukkit.entity.ArmorStand) entity;
+            Location centerLoc = loc.clone().add(0.5, 1.25, 0.5);
+            for (org.bukkit.entity.Entity entity : loc.getWorld().getNearbyEntities(centerLoc, 2.5, 3.5, 2.5)) {
+                if (entity instanceof org.bukkit.entity.ArmorStand as) {
                     boolean isGhost = false;
-                    
-                    if (as.getPersistentDataContainer().has(new org.bukkit.NamespacedKey("robbery", "crypto_holo"), org.bukkit.persistence.PersistentDataType.BYTE)) {
+                    if (as.getPersistentDataContainer().has(new org.bukkit.NamespacedKey("robbery", "crypto_holo"), org.bukkit.persistence.PersistentDataType.BYTE)
+                            || as.getPersistentDataContainer().has(new org.bukkit.NamespacedKey("robbery", "crypto_holo"), org.bukkit.persistence.PersistentDataType.STRING)) {
                         isGhost = true;
                     } else if (as.getCustomName() != null) {
                         String cleanName = org.bukkit.ChatColor.stripColor(as.getCustomName());
