@@ -406,10 +406,18 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                     if (parts.length < 3 || !parts[1].equals("tool")) return null;
                     return String.valueOf(ToolManager.getToolsName("tool" + parts[2]).getMaterial());
 
+                case "mastery":
                 case "store":
                     if (parts.length < 3) return null;
-                    String stat = parts[1];
-                    String storeId = "store" + parts[2];
+                    String stat = parts[1].toLowerCase();
+                    String rawStore = parts[2].toLowerCase().replace("store", "");
+                    String storeId = "store" + rawStore;
+
+                    // Support format: %robbery_store_<store>_reward_<milestone>%
+                    if (rawStore.matches("\\d+") && parts.length >= 4 && parts[2].matches("\\d+") && !stat.equals("reward")) {
+                        // handled by standard switch below
+                    }
+
                     return switch (stat) {
                         case "items" -> String.valueOf(pd.getStoreItems(storeId));
                         case "milestone" -> String.valueOf(pd.getStoreMilestone(storeId));
@@ -428,14 +436,51 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                             int req = main.getMasteryManager().getItemsRequiredForLevel(storeId, nm);
                             yield String.valueOf(Math.max(req - pd.getStoreItems(storeId), 0));
                         }
-                        case "reward" -> (parts.length == 4) ? main.getMasteryManager().getRewardDisplay(storeId, Integer.parseInt(parts[3])) : null;
-                        case "required" -> (parts.length == 4) ? String.valueOf(main.getMasteryManager().getItemsRequiredForLevel(storeId, Integer.parseInt(parts[3]))) : null;
+                        case "reward" -> {
+                            if (parts.length < 4) yield null;
+                            try {
+                                int milestone = Integer.parseInt(parts[3]);
+                                yield main.getMasteryManager().getRewardDisplay(storeId, milestone);
+                            } catch (NumberFormatException e) {
+                                yield null;
+                            }
+                        }
+                        case "required" -> {
+                            if (parts.length < 4) yield null;
+                            try {
+                                int milestone = Integer.parseInt(parts[3]);
+                                yield String.valueOf(main.getMasteryManager().getItemsRequiredForLevel(storeId, milestone));
+                            } catch (NumberFormatException e) {
+                                yield null;
+                            }
+                        }
                         case "remaining" -> {
                             if (parts.length < 4) yield null;
-                            int req = main.getMasteryManager().getItemsRequiredForLevel(storeId, Integer.parseInt(parts[3]));
-                            yield String.valueOf(Math.max(req - pd.getStoreItems(storeId), 0));
+                            try {
+                                int milestone = Integer.parseInt(parts[3]);
+                                int req = main.getMasteryManager().getItemsRequiredForLevel(storeId, milestone);
+                                yield String.valueOf(Math.max(req - pd.getStoreItems(storeId), 0));
+                            } catch (NumberFormatException e) {
+                                yield null;
+                            }
                         }
-                        default -> null;
+                        case "bonus_money", "money_bonus" -> "+" + (int)(pd.getStoreMasteryMoneyMultiplier(storeId) * 100) + "%";
+                        case "bonus_speed", "speed_bonus" -> "+" + (int)pd.getStoreMasteryStealSpeed(storeId) + "%";
+                        case "bonus_xp", "xp_bonus" -> "+" + (int)(pd.getStoreMasteryRobberyXp(storeId) * 100) + "%";
+                        case "bonus_sp", "sp_bonus" -> "+" + (int)(pd.getStoreMasterySkillPointChance(storeId) * 100) + "%";
+                        case "bonus_double", "double_bonus" -> "+" + (int)(pd.getStoreMasteryDoubleItemChance(storeId) * 100) + "%";
+                        case "bonus_instasteal", "instasteal_bonus" -> "+" + (int)(pd.getStoreMasteryInstaStealChance(storeId) * 100) + "%";
+                        default -> {
+                            // If structured as %robbery_store_1_reward_2%
+                            if (parts.length >= 4 && parts[1].matches("\\d+") && parts[2].equalsIgnoreCase("reward")) {
+                                String sId = "store" + parts[1];
+                                try {
+                                    int ms = Integer.parseInt(parts[3]);
+                                    yield main.getMasteryManager().getRewardDisplay(sId, ms);
+                                } catch (NumberFormatException ignored) {}
+                            }
+                            yield null;
+                        }
                     };
 
                 case "booster":

@@ -173,31 +173,46 @@ public class StoreMasteryManager {
     }
 
     public String getRewardDisplay(String storeId, int milestone) {
+        String storeName = KeyManager.getStoreN(storeId);
+        if (storeName == null) storeName = storeId;
 
-        if(storeId.equalsIgnoreCase("store12")){
-            if(milestone == 2)
-                return "§aUnlock higher area of " + KeyManager.getStoreN(storeId);
-            else if(milestone == 5)
-                return "§aUnlock The Vault";
-        }
-
-        if (milestone == 5) {
-            return "§aUnlock higher area of " + KeyManager.getStoreN(storeId);
-        }
-
-        if (storeId.equalsIgnoreCase("store11") && milestone == 2) {
-            return "§aUnlock middle area of " + KeyManager.getStoreN(storeId);
-        }
-
-        if (milestone == 10) {
-            String tagId = storeTagIds.get(storeId);
-            if (tagId != null) {
-                String rawPlaceholder = "%deluxetags_tag_" + tagId + "%";
-                String parsed = PlaceholderAPI.setPlaceholders(null, rawPlaceholder);
-                return parsed;
+        return switch (milestone) {
+            case 1 -> "§a+10% Money Multiplier";
+            case 2 -> {
+                if (storeId.equalsIgnoreCase("store11")) {
+                    yield "§aUnlock middle area of " + storeName;
+                } else if (storeId.equalsIgnoreCase("store12")) {
+                    yield "§aUnlock higher area of " + storeName;
+                } else {
+                    yield "§a+10% Steal Speed";
+                }
             }
-        }
-
-        return "";
+            case 3 -> "§a+5% Robbery XP";
+            case 4 -> "§a+1% Skill Point Chance";
+            case 5 -> {
+                if (storeId.equalsIgnoreCase("store12")) {
+                    yield "§aUnlock The Vault";
+                } else {
+                    yield "§aUnlock higher area of " + storeName;
+                }
+            }
+            case 6 -> "§a+15% Money Multiplier (+25% Total)";
+            case 7 -> "§a+15% Steal Speed (+25% Total)";
+            case 8 -> "§a+1% Double Item Chance";
+            case 9 -> "§a+1% Insta-Steal Chance";
+            case 10 -> {
+                String tagId = storeTagIds.get(storeId);
+                if (tagId != null) {
+                    String rawPlaceholder = "%deluxetags_tag_" + tagId + "%";
+                    String parsed = PlaceholderAPI.setPlaceholders(null, rawPlaceholder);
+                    if (parsed != null && !parsed.isEmpty() && !parsed.equals(rawPlaceholder)) {
+                        yield parsed;
+                    }
+                    yield "§d[" + tagId + "] Vanity Tag";
+                }
+                yield "§dExclusive Vanity Tag";
+            }
+            default -> "";
+        };
     }
 }
