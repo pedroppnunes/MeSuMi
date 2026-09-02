@@ -243,23 +243,18 @@ public class QuestService {
         }
 
         int tier = pd.getHighestOwnedStoreTier();
-        // Clamp tier to 1-12 range
-        tier = Math.max(1, Math.min(12, tier));
-
-        // Prestige bonus: P1=+25%, P2=+50%, P3+=+75%
-        int prestige = pd.getPrestige();
-        double prestigeBonus = Math.min(prestige * 0.25, 0.75);
+        // Clamp tier to 1-13 range
+        tier = Math.max(1, Math.min(13, tier));
 
         if (q.type == Quest.QuestType.BUSTED) {
-            // Base 1000 XP, scales with store tier (x1.0 at tier 1, up to x2.0 at tier 12)
-            double storeScale = 1.0 + ((tier - 1) / 11.0); // 1.0 to 2.0
-            return (int) Math.round(1000 * storeScale * (1 + prestigeBonus));
+            // Busted quests: Scales from 1,500 XP per busted at Store 1 up to ~18,000 XP per busted at Store 12/13
+            // (e.g. A 5-busted quest yields 7,500 XP early game and ~90,000 XP late game; 25-busted yields ~450,000 XP)
+            return 1500 + (tier - 1) * 1400;
         }
 
         if (!q.isStoreSpecific()) {
-            // PICKUP/other non-store quests: use highest store XP + prestige scaling
-            int baseXp = questManager.getStoreXp("store" + Math.max(1, tier));
-            return (int) Math.round(baseXp * (1 + prestigeBonus));
+            // General steal/pickup quests: XP per item directly matches the player's highest store XP (e.g. S1=20, S10=425, S12=500, S13=550)
+            return questManager.getStoreXp("store" + tier);
         }
 
         int best = 0;

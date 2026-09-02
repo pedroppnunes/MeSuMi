@@ -33,6 +33,7 @@ public class QuestManager {
         storeXp.put("store10", 425);
         storeXp.put("store11", 450);
         storeXp.put("store12", 500);
+        storeXp.put("store13", 550);
     }
 
     public void loadFromConfig(String fileName) {
