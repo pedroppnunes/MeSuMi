@@ -153,16 +153,16 @@ public class CryptoManager {
             case 1: return 1;           // Store 1 (Supermarket)
             case 2: return 1;           // Store 2 (The Griffin's)
             case 3: return 1;           // Store 3 (Gym)
-            case 4: return 1;           // Store 4 (Arcade)      -> $3,600 / hr (0.72% of School)
-            case 5: return 7;           // Store 5 (School)      -> $25,200 / hr (0.84% of Casino)
-            case 6: return 45;          // Store 6 (Casino)      -> $162,000 / hr (0.81% of Oceanarium)
-            case 7: return 180;         // Store 7 (Oceanarium)  -> $648,000 / hr (0.81% of Steakhouse)
-            case 8: return 670;         // Store 8 (Steakhouse)  -> $2.41M / hr (0.80% of Diamond Store)
-            case 9: return 1100;        // Store 9 (Diamond)     -> $3.96M / hr (0.79% of Balenziaga)
-            case 10: return 1800;       // Store 10 (Balenziaga) -> $6.48M / hr (0.81% of Samzung)
-            case 11: return 3800;       // Store 11 (Samzung)    -> $13.68M / hr (0.80% of The Bank)
-            case 12: return 4500;       // Store 12 (The Bank)   -> $16.2M / hr (0.95% of The Bank)
-            case 13: return 6000;       // Store 13 (The Vault)  -> $21.6M / hr
+            case 4: return 1;           // Store 4 (Arcade)      
+            case 5: return 8;           // Store 5 (School)      
+            case 6: return 55;          // Store 6 (Casino)      
+            case 7: return 220;         // Store 7 (Oceanarium)  
+            case 8: return 820;         // Store 8 (Steakhouse)  
+            case 9: return 1350;        // Store 9 (Diamond)     
+            case 10: return 2200;       // Store 10 (Balenziaga) 
+            case 11: return 4650;       // Store 11 (Samzung)    
+            case 12: return 5500;       // Store 12 (The Bank)   
+            case 13: return 7300;       // Store 13 (The Vault)  
             default: return 1;
         }
     }
