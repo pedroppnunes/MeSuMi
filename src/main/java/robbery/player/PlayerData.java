@@ -64,6 +64,15 @@ public class PlayerData {
     private int dailyQuestsCompleted = 0;
     private final Map<String, QuestProgress> questProgress = new HashMap<>();
     private boolean talkedToQuestNPC = false;
+    private boolean talkedToCryptoNPC = false;
+
+    public boolean hasTalkedToCryptoNPC() {
+        return talkedToCryptoNPC;
+    }
+
+    public void setTalkedToCryptoNPC(boolean talked) {
+        this.talkedToCryptoNPC = talked;
+    }
     private int lastResetDay = -1;
 
     private boolean godOfRobberyTag = false;
