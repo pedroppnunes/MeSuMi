@@ -324,8 +324,8 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                 if (machine == null) yield "0";
                 yield String.valueOf(robbery.crypto.CryptoUpgradeManager.getRequiredPrestige(machine.getRewardLevel() + 1));
             }
-            case "crypto_dealer_talked", "crypto_talked_npc" -> String.valueOf(pd.hasTalkedToCryptoNPC());
-            case "crypto_battery_talked", "crypto_talked_battery_npc" -> String.valueOf(pd.hasTalkedToCryptoBatteryNPC());
+            case "crypto_dealer_talked", "crypto_talked_npc", "crypto_talked_dealer", "crypto_dealer_unlocked", "has_talked_crypto_dealer" -> String.valueOf(pd.hasTalkedToCryptoNPC());
+            case "crypto_battery_talked", "crypto_talked_battery_npc", "crypto_talked_battery", "crypto_battery_unlocked", "has_talked_crypto_battery" -> String.valueOf(pd.hasTalkedToCryptoBatteryNPC());
 
             default -> null;
         };

@@ -107,30 +107,45 @@ public class CryptoNPCListener implements Listener {
         // --- NPC 2: Crypto Battery (Sacrifice NPC) ---
         if (isBatteryNPC(normalizedName)) {
             if (!pd.hasTalkedToCryptoNPC()) {
-                Messages.send(p, "crypto-dealer.talk-first");
+                Messages.send(p, "crypto-battery.talk-first");
                 return;
             }
 
-            if (!pd.hasTalkedToCryptoBatteryNPC()) {
-                pd.setTalkedToCryptoBatteryNPC(true);
-                plugin.getPlayerEventListener().savePlayerData(p, pd);
-                Messages.send(p, "crypto-battery.line1");
-                org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    Messages.send(p, "crypto-battery.line2");
-                }, 40L);
-                org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    Messages.send(p, "crypto-battery.line3");
-                }, 80L);
-                org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    Messages.send(p, "crypto-battery.line4");
-                }, 120L);
-                org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    Messages.send(p, "crypto-battery.line5");
-                }, 160L);
+            if (pd.hasTalkedToCryptoBatteryNPC()) {
+                plugin.getCryptoSacrificeGUI().open(p);
                 return;
             }
 
-            plugin.getCryptoSacrificeGUI().open(p);
+            if (talkingPlayers.contains(uuid)) return;
+
+            talkingPlayers.add(uuid);
+            Messages.send(p, "crypto-battery.line1");
+
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (p.isOnline()) Messages.send(p, "crypto-battery.line2");
+            }, 3 * 20L);
+
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (p.isOnline()) Messages.send(p, "crypto-battery.line3");
+            }, 6 * 20L);
+
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (p.isOnline()) Messages.send(p, "crypto-battery.line4");
+            }, 9 * 20L);
+
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (p.isOnline()) Messages.send(p, "crypto-battery.line5");
+            }, 12 * 20L);
+
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                talkingPlayers.remove(uuid);
+                if (p.isOnline()) {
+                    Messages.send(p, "crypto-battery.line6");
+                    pd.setTalkedToCryptoBatteryNPC(true);
+                    plugin.getPlayerEventListener().savePlayerData(p, pd);
+                    plugin.getCryptoSacrificeGUI().open(p);
+                }
+            }, 15 * 20L);
             return;
         }
 
