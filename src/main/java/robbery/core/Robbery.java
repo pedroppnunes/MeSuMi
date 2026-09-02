@@ -92,6 +92,7 @@ public class Robbery extends JavaPlugin implements Listener {
     private static final Map<String, Items> itemsMap = new HashMap<>();
 
     private static Economy econ = null;
+    private static net.milkbowl.vault.permission.Permission perms = null;
     private final List<Items> items = new ArrayList<>();
     private static Robbery main;
     private boolean isBackingUp = false;
@@ -143,7 +144,7 @@ public class Robbery extends JavaPlugin implements Listener {
     public void onEnable() {
         getLogger().info("Starting");
         main = this;
-        if (!setupEconomy()) {
+        if (!setupEconomy() || !setupPermissions()) {
             getLogger().severe("Disabled due to no Vault dependency found!");
             getServer().getPluginManager().disablePlugin(this);
             return;
@@ -722,6 +723,18 @@ public class Robbery extends JavaPlugin implements Listener {
         return true;
     }
 
+    private boolean setupPermissions() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<net.milkbowl.vault.permission.Permission> rsp = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+        if (rsp == null) {
+            return false;
+        }
+        perms = rsp.getProvider();
+        return perms != null;
+    }
+
     private void startItemClearTask() {
         final int clearIntervalSec = 900;
         final List<String> worlds = List.of("SuperiorWorld", "outpost");
@@ -863,6 +876,10 @@ public class Robbery extends JavaPlugin implements Listener {
 
     public static Economy getEconomy() {
         return econ;
+    }
+
+    public static net.milkbowl.vault.permission.Permission getPermissions() {
+        return perms;
     }
 
     public OutpostManager getOutpostManager() {
