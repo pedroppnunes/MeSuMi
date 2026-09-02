@@ -240,7 +240,7 @@ public class Robbery extends JavaPlugin implements Listener {
         this.fuelRouletteGUI = new robbery.crypto.FuelRouletteGUI(this);
         this.cryptoSacrificeGUI = new robbery.crypto.CryptoSacrificeGUI(this);
         this.cryptoBatteryStorageGUI = new robbery.crypto.CryptoBatteryStorageGUI(this);
-        this.sacrificeManager = new robbery.crypto.SacrificeManager(this);
+        this.sacrificeManager = new robbery.crypto.SacrificeManager();
         this.backpackGUI = new robbery.backpacks.BackpackGUI(this);
 
         getServer().getPluginManager().registerEvents(cryptoDealerGUI, this);
