@@ -898,15 +898,25 @@ public int getStoreItems(String storeId) {
 //Quests
     public int getHighestOwnedStoreTier() {
         int max = 0;
-        for (String s : keys) {
-            if (s.toLowerCase().startsWith("store")) {
-                try {
-                    String numPart = s.substring(5); // skips "store"
-                    max = Math.max(max, Integer.parseInt(numPart));
-                } catch (NumberFormatException ignored) {}
+        if (keys != null) {
+            for (String s : keys) {
+                if (s.toLowerCase().startsWith("store")) {
+                    try {
+                        String numPart = s.substring(5); // skips "store"
+                        max = Math.max(max, Integer.parseInt(numPart));
+                    } catch (NumberFormatException ignored) {}
+                }
             }
         }
-        return max;
+        // Prestige scaling: P1 = Balenziaga (10), P2 = Samzung (11), P3+ = The Bank (12)
+        if (prestige >= 3) {
+            max = Math.max(max, 12);
+        } else if (prestige == 2) {
+            max = Math.max(max, 11);
+        } else if (prestige == 1) {
+            max = Math.max(max, 10);
+        }
+        return Math.max(1, max);
     }
 
     public void setOfferedDailyQuests(List<String> quests) {
