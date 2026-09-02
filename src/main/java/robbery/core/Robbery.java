@@ -188,6 +188,7 @@ public class Robbery extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new VoteListener(main), main);
         BlockCraftListener blockCraft = new BlockCraftListener();
         Messages.init(main);
+        addItemstoMap();
         new AutoReloadTask(this).runTaskTimerAsynchronously(this, 0L, 20L);
         getServer().getPluginManager().registerEvents(new InventoryLockListener(), main);
         getServer().getPluginManager().registerEvents(new ArmorStandInteractionListener(main), main);
@@ -253,7 +254,11 @@ public class Robbery extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new robbery.crypto.CryptoNPCListener(this), this);
 
         Objects.requireNonNull(getCommand("crypto")).setExecutor(new robbery.crypto.CryptoCommand(this));
-        Objects.requireNonNull(getCommand("backpacks")).setExecutor(new robbery.backpacks.BackpackCommand(this));
+        if (getCommand("backpack") != null) {
+            getCommand("backpack").setExecutor(new robbery.backpacks.BackpackCommand(this));
+        } else if (getCommand("backpacks") != null) {
+            getCommand("backpacks").setExecutor(new robbery.backpacks.BackpackCommand(this));
+        }
         Objects.requireNonNull(getCommand("ho")).setExecutor(new robbery.core.HideoutAliasCommand());
         Objects.requireNonNull(getCommand("s")).setExecutor(s);
         Objects.requireNonNull(getCommand("ct")).setExecutor(new ChatColorCommand(main));
@@ -278,7 +283,6 @@ public class Robbery extends JavaPlugin implements Listener {
         getServer().getMessenger().registerOutgoingPluginChannel(main, "BungeeCord");
         PrestigeCountManager.load();
         blockCraft.removeRecipes();
-        addItemstoMap();
 
         long ticksPerDay = 24 * 60 * 60 * 20L;
         long now = System.currentTimeMillis();

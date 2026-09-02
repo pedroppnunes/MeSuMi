@@ -48,120 +48,218 @@ public class BackpackManager {
      * @param color the color code string
      * @return a new {@link Backpacks} instance, or {@link #BACK1} if invalid
      */
-    public static Backpacks toBackpack(String b, String material, String items, String color){
-        if(b == null || color == null){
+    /**
+     * Converts serialized backpack data into a {@link Backpacks} object.
+     *
+     * @param b the backpack name and slots in the format "name_slots_price"
+     * @param material the material name for the backpack chestplate
+     * @param items serialized items as semicolon-separated "itemId:value" or legacy "value"
+     * @param color the color code string
+     * @return a new {@link Backpacks} instance, or {@link #BACK1} if invalid
+     */
+    public static Backpacks toBackpack(String b, String material, String items, String color) {
+        if (b == null || color == null) {
             return BACK1;
         }
-        Scanner scanner = new Scanner(b);
-        scanner.useDelimiter("_");
+
         List<Items> it = new ArrayList<>();
         if (items != null && !items.trim().isEmpty()) {
             String[] tokens = items.split(";");
             for (String token : tokens) {
                 token = token.trim();
-
                 if (token.isEmpty()) continue;
-                Items item = new Items(0.0,Integer.parseInt(token),"","",0,"");
-                it.add(item);
+
+                String itemId = "";
+                long val = 0;
+
+                if (token.contains(":")) {
+                    String[] parts = token.split(":", 2);
+                    itemId = parts[0].trim();
+                    try {
+                        val = Long.parseLong(parts[1].trim());
+                    } catch (NumberFormatException e) {
+                        try {
+                            val = (long) Double.parseDouble(parts[1].trim());
+                        } catch (Exception ignored) {}
+                    }
+                } else {
+                    try {
+                        val = Long.parseLong(token);
+                    } catch (NumberFormatException e) {
+                        try {
+                            val = (long) Double.parseDouble(token);
+                        } catch (Exception ignored) {}
+                    }
+                }
+
+                Items template = null;
+                if (!itemId.isEmpty() && Robbery.getItemsMap() != null) {
+                    template = Robbery.getItemsMap().get(itemId.toLowerCase());
+                }
+
+                if (template != null) {
+                    // Reconstruct with full texture, display name, time, hp, and saved value
+                    Items reconstructed = new Items(
+                            template.getInitialhp(),
+                            (int) Math.min(Integer.MAX_VALUE, Math.max(0, val)),
+                            template.getName(),
+                            template.getPlayername(),
+                            template.getTime(),
+                            template.getId()
+                    );
+                    it.add(reconstructed);
+                } else {
+                    Items item = new Items(
+                            0.0,
+                            (int) Math.min(Integer.MAX_VALUE, Math.max(0, val)),
+                            itemId.isEmpty() ? "Item" : itemId,
+                            "",
+                            0,
+                            itemId
+                    );
+                    it.add(item);
+                }
             }
         }
 
-        return new Backpacks(scanner.next(),Integer.parseInt(scanner.next()),it,Material.getMaterial(material),Integer.parseInt(scanner.next()),color);
+        try {
+            Scanner scanner = new Scanner(b);
+            scanner.useDelimiter("_");
+            String packName = scanner.hasNext() ? scanner.next() : "Getaway Pack";
+            int packCapacity = scanner.hasNext() ? Integer.parseInt(scanner.next()) : 5;
+            long packPrice = 0L;
+            if (scanner.hasNext()) {
+                try {
+                    packPrice = Long.parseLong(scanner.next());
+                } catch (NumberFormatException e) {
+                    packPrice = 0L;
+                }
+            }
+
+            Material mat = null;
+            if (material != null) {
+                try {
+                    mat = Material.getMaterial(material);
+                } catch (Exception ignored) {}
+            }
+            if (mat == null) mat = Material.LEATHER_CHESTPLATE;
+
+            return new Backpacks(packName, packCapacity, it, mat, packPrice, color);
+        } catch (Exception e) {
+            return new Backpacks(BACK1.getName(), BACK1.getcapacity(), it, BACK1.getMaterialType(), BACK1.getPrice(), color);
+        }
     }
 
     /**
-     * Retrieves a predefined backpack by its internal ID and adds extra slots.
+     * Normalizes a backpack query string (removes symbols, spaces, case).
+     */
+    private static String normalize(String input) {
+        if (input == null) return "";
+        return input.toLowerCase()
+                .replace(" ", "")
+                .replace("_", "")
+                .replace("-", "")
+                .replace("’", "'")
+                .replace("'", "")
+                .trim();
+    }
+
+    /**
+     * Retrieves a predefined backpack by its internal ID or name and adds extra slots.
      *
-     * @param n the backpack ID string (e.g., "back1")
+     * @param n the backpack ID or name string (e.g., "back15", "Jackal Pack", "15")
      * @param extraslots number of extra slots to add
      * @return a new {@link Backpacks} instance with the specified extra slots, or null if invalid ID
      */
-    public static Backpacks getBackpackName(String n, int extraslots){
-        return switch (n) {
-            case "back1" -> new Backpacks(BACK1,extraslots);
-            case "back2" -> new Backpacks(BACK2,extraslots);
-            case "back3" -> new Backpacks(BACK3,extraslots);
-            case "back4" -> new Backpacks(BACK4,extraslots);
-            case "back5" -> new Backpacks(BACK5,extraslots);
-            case "back6" -> new Backpacks(BACK6,extraslots);
-            case "back7" -> new Backpacks(BACK7,extraslots);
-            case "back8" -> new Backpacks(BACK8,extraslots);
-            case "back9" -> new Backpacks(BACK9,extraslots);
-            case "back10" -> new Backpacks(BACK10,extraslots);
-            case "back11" -> new Backpacks(BACK11,extraslots);
-            case "back12" -> new Backpacks(BACK12,extraslots);
-            case "back13" -> new Backpacks(BACK13,extraslots);
-            case "back14" -> new Backpacks(BACK14,extraslots);
-            case "back15" -> new Backpacks(BACK15,extraslots);
-            case "back16" -> new Backpacks(BACK16,extraslots);
-            case "back17" -> new Backpacks(BACK17,extraslots);
-            case "back18" -> new Backpacks(BACK18,extraslots);
-            case "back19" -> new Backpacks(BACK19,extraslots);
-            case "back20" -> new Backpacks(BACK20,extraslots);
+    public static Backpacks getBackpackName(String n, int extraslots) {
+        String key = normalize(n);
+        return switch (key) {
+            case "back1", "1", "getawaypack", "getaway" -> new Backpacks(BACK1, extraslots);
+            case "back2", "2", "loothaulerpack", "loothauler" -> new Backpacks(BACK2, extraslots);
+            case "back3", "3", "quickgrabpack", "quickgrab" -> new Backpacks(BACK3, extraslots);
+            case "back4", "4", "shadowheistpack", "shadowheist" -> new Backpacks(BACK4, extraslots);
+            case "back5", "5", "silentsnatchpack", "silentsnatch" -> new Backpacks(BACK5, extraslots);
+            case "back6", "6", "blackoutpack", "blackout" -> new Backpacks(BACK6, extraslots);
+            case "back7", "7", "vaultcrackerpack", "vaultcracker" -> new Backpacks(BACK7, extraslots);
+            case "back8", "8", "smugglerstashpack", "smugglerstash" -> new Backpacks(BACK8, extraslots);
+            case "back9", "9", "breakinpack", "breakin" -> new Backpacks(BACK9, extraslots);
+            case "back10", "10", "hotgoodspack", "hotgoods" -> new Backpacks(BACK10, extraslots);
+            case "back11", "11", "phantomgrabpack", "phantomgrab" -> new Backpacks(BACK11, extraslots);
+            case "back12", "12", "nightcrawlerpack", "nightcrawler" -> new Backpacks(BACK12, extraslots);
+            case "back13", "13", "spiderstashpack", "spiderstash" -> new Backpacks(BACK13, extraslots);
+            case "back14", "14", "ghostprotocolpack", "ghostprotocol" -> new Backpacks(BACK14, extraslots);
+            case "back15", "15", "jackalpack", "jackal" -> new Backpacks(BACK15, extraslots);
+            case "back16", "16", "greenfnpack", "greenfn" -> new Backpacks(BACK16, extraslots);
+            case "back17", "17", "hunterscloakpack", "hunterscloak" -> new Backpacks(BACK17, extraslots);
+            case "back18", "18", "wraithpack", "wraith" -> new Backpacks(BACK18, extraslots);
+            case "back19", "19", "kratospack", "kratos" -> new Backpacks(BACK19, extraslots);
+            case "back20", "20", "matrixuploadpack", "matrixupload" -> new Backpacks(BACK20, extraslots);
             default -> null;
         };
     }
 
     /**
-     * Retrieves the internal ID of a backpack by its display name.
+     * Retrieves the internal ID of a backpack by its display name or variation.
      *
-     * @param n the display name of the backpack
+     * @param n the display name or alias of the backpack
      * @return the internal ID (e.g., "back1") or null if not found
      */
-    public static String getBackpackNameR(String n){
-        return switch (n) {
-            case "Getaway Pack" -> "back1";
-            case "Loot Hauler Pack" -> "back2";
-            case "Quick Grab Pack" -> "back3";
-            case "Shadow Heist Pack" -> "back4";
-            case "Silent Snatch Pack" -> "back5";
-            case "Blackout Pack" -> "back6";
-            case "Vault Cracker Pack" -> "back7";
-            case "Smuggler Stash Pack" -> "back8";
-            case "Break-In Pack" -> "back9";
-            case "Hot Goods Pack" -> "back10";
-            case "Phantom Grab Pack" -> "back11";
-            case "Night Crawler Pack" -> "back12";
-            case "Spider Stash Pack" -> "back13";
-            case "Ghost Protocol Pack" -> "back14";
-            case "The Mandapack" -> "back15";
-            case "Green FN Pack" -> "back16";
-            case "Hunter’s Cloak Pack" -> "back17";
-            case "Wraith Pack" -> "back18";
-            case "Kratos Pack" -> "back19";
-            case "Matrix Upload Pack" -> "back20";
+    public static String getBackpackNameR(String n) {
+        String key = normalize(n);
+        return switch (key) {
+            case "back1", "1", "getawaypack", "getaway" -> "back1";
+            case "back2", "2", "loothaulerpack", "loothauler" -> "back2";
+            case "back3", "3", "quickgrabpack", "quickgrab" -> "back3";
+            case "back4", "4", "shadowheistpack", "shadowheist" -> "back4";
+            case "back5", "5", "silentsnatchpack", "silentsnatch" -> "back5";
+            case "back6", "6", "blackoutpack", "blackout" -> "back6";
+            case "back7", "7", "vaultcrackerpack", "vaultcracker" -> "back7";
+            case "back8", "8", "smugglerstashpack", "smugglerstash" -> "back8";
+            case "back9", "9", "breakinpack", "breakin" -> "back9";
+            case "back10", "10", "hotgoodspack", "hotgoods" -> "back10";
+            case "back11", "11", "phantomgrabpack", "phantomgrab" -> "back11";
+            case "back12", "12", "nightcrawlerpack", "nightcrawler" -> "back12";
+            case "back13", "13", "spiderstashpack", "spiderstash" -> "back13";
+            case "back14", "14", "ghostprotocolpack", "ghostprotocol" -> "back14";
+            case "back15", "15", "jackalpack", "jackal" -> "back15";
+            case "back16", "16", "greenfnpack", "greenfn" -> "back16";
+            case "back17", "17", "hunterscloakpack", "hunterscloak" -> "back17";
+            case "back18", "18", "wraithpack", "wraith" -> "back18";
+            case "back19", "19", "kratospack", "kratos" -> "back19";
+            case "back20", "20", "matrixuploadpack", "matrixupload" -> "back20";
             default -> null;
         };
     }
 
     /**
-     * Retrieves the display name of a backpack by its internal ID.
+     * Retrieves the display name of a backpack by its internal ID or variation.
      *
      * @param id the internal ID of the backpack (e.g., "back1")
      * @return the display name, or null if not found
      */
-    public static String getBackPackN(String id){
-        return switch (id) {
-            case "back1" -> "Getaway Pack";
-            case "back2" -> "Loot Hauler Pack";
-            case "back3" -> "Quick Grab Pack";
-            case "back4" -> "Shadow Heist Pack";
-            case "back5" -> "Silent Snatch Pack";
-            case "back6" -> "Blackout Pack";
-            case "back7" -> "Vault Cracker Pack";
-            case "back8" -> "Smuggler Stash Pack";
-            case "back9" -> "Break-In Pack";
-            case "back10" -> "Hot Goods Pack";
-            case "back11" -> "Phantom Grab Pack";
-            case "back12" -> "Night Crawler Pack";
-            case "back13" -> "Spider Stash Pack";
-            case "back14" -> "Ghost Protocol Pack";
-            case "back15" -> "The Mandapack";
-            case "back16" -> "Green FN Pack";
-            case "back17" -> "Hunter’s Cloak Pack";
-            case "back18" -> "Wraith Pack";
-            case "back19" -> "Kratos Pack";
-            case "back20" -> "Matrix Upload Pack";
+    public static String getBackPackN(String id) {
+        String key = normalize(id);
+        return switch (key) {
+            case "back1", "1", "getawaypack", "getaway" -> "Getaway Pack";
+            case "back2", "2", "loothaulerpack", "loothauler" -> "Loot Hauler Pack";
+            case "back3", "3", "quickgrabpack", "quickgrab" -> "Quick Grab Pack";
+            case "back4", "4", "shadowheistpack", "shadowheist" -> "Shadow Heist Pack";
+            case "back5", "5", "silentsnatchpack", "silentsnatch" -> "Silent Snatch Pack";
+            case "back6", "6", "blackoutpack", "blackout" -> "Blackout Pack";
+            case "back7", "7", "vaultcrackerpack", "vaultcracker" -> "Vault Cracker Pack";
+            case "back8", "8", "smugglerstashpack", "smugglerstash" -> "Smuggler Stash Pack";
+            case "back9", "9", "breakinpack", "breakin" -> "Break-In Pack";
+            case "back10", "10", "hotgoodspack", "hotgoods" -> "Hot Goods Pack";
+            case "back11", "11", "phantomgrabpack", "phantomgrab" -> "Phantom Grab Pack";
+            case "back12", "12", "nightcrawlerpack", "nightcrawler" -> "Night Crawler Pack";
+            case "back13", "13", "spiderstashpack", "spiderstash" -> "Spider Stash Pack";
+            case "back14", "14", "ghostprotocolpack", "ghostprotocol" -> "Ghost Protocol Pack";
+            case "back15", "15", "jackalpack", "jackal" -> "Jackal Pack";
+            case "back16", "16", "greenfnpack", "greenfn" -> "Green FN Pack";
+            case "back17", "17", "hunterscloakpack", "hunterscloak" -> "Hunter’s Cloak Pack";
+            case "back18", "18", "wraithpack", "wraith" -> "Wraith Pack";
+            case "back19", "19", "kratospack", "kratos" -> "Kratos Pack";
+            case "back20", "20", "matrixuploadpack", "matrixupload" -> "Matrix Upload Pack";
             default -> null;
         };
     }

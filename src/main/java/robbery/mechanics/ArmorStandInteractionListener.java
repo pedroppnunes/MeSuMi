@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -157,6 +158,50 @@ public class ArmorStandInteractionListener implements Listener {
                 }
             }
         }
+    }
+
+    /**
+     * Handles right-click on an item armor stand to show base price and player's sell price.
+     */
+    @EventHandler
+    public void onArmorStandRightClick(PlayerInteractEntityEvent event) {
+        if (!(event.getRightClicked() instanceof ArmorStand stand)) return;
+        Player player = event.getPlayer();
+
+        PersistentDataContainer pdc = stand.getPersistentDataContainer();
+        if (!pdc.has(key, PersistentDataType.STRING)) return;
+
+        event.setCancelled(true);
+
+        String uuidStr = pdc.get(key, PersistentDataType.STRING);
+        if (uuidStr == null) return;
+
+        Items item;
+        try {
+            item = getItemByUUID(UUID.fromString(uuidStr));
+        } catch (IllegalArgumentException e) {
+            return;
+        }
+        if (item == null) return;
+
+        PlayerData pd = PlayerDataManager.getPlayerData(player);
+        if (pd == null) return;
+
+        double basePrice = item.getValue();
+        // "Your Price" includes booster and mastery money multiplier
+        String storeId = "store1";
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\d+").matcher(item.getId());
+        if (m.find()) {
+            storeId = "store" + m.group();
+        }
+
+        double yourPrice = basePrice * pd.getBoost() * (1.0 + pd.getStoreMasteryMoneyMultiplier(storeId));
+
+        String baseFormatted = robbery.number.NumberFormatter.formatDoubleNumber(basePrice) + "$";
+        String yourFormatted = robbery.number.NumberFormatter.formatDoubleNumber(yourPrice) + "$";
+
+        player.sendMessage(org.bukkit.ChatColor.translateAlternateColorCodes('&',
+                "&7&l" + item.getName() + " &8| &7Price: &a" + baseFormatted + " &8| &7Your Price: &a" + yourFormatted));
     }
 
     private double extractStoreNumber(String id) {

@@ -175,7 +175,7 @@ public class XPManager {
         }
     }
 
-    private int skillPointsForLevel(int level) {
+    public int skillPointsForLevel(int level) {
         if (level <= 20)
             return 1;
         if (level <= 50)

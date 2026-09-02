@@ -33,8 +33,8 @@ public class OutpostManager {
     private double progress; // 0..100 percent
     private Island ownerIsland = null; // current owner
 
-    // Immunity for owner after capture (20 minutes)
-    private static final long OWNER_IMMUNITY_MILLIS = 20 * 60 * 1000L;
+    // Immunity for owner after capture (10 minutes)
+    private static final long OWNER_IMMUNITY_MILLIS = 10 * 60 * 1000L;
     private long ownerImmunityExpiryMillis = 0L;
 
     // Boost management

@@ -100,17 +100,19 @@ public class Backpacks {
     }
 
     /**
-     * Serializes the backpack contents into an underscore-separated string.
+     * Serializes the backpack contents into a semicolon-separated string of itemId:value.
      *
-     * @return serialized string of item names
+     * @return serialized string of items (itemId:value;)
      */
     @Override
     public String toString() {
-        String back = "";
+        StringBuilder sb = new StringBuilder();
         for (Items i : backpack) {
-            back = back.concat(i.getValue() + ";");
+            if (i == null) continue;
+            String id = (i.getId() != null && !i.getId().trim().isEmpty()) ? i.getId().trim() : "item";
+            sb.append(id).append(":").append(i.getValue()).append(";");
         }
-        return back;
+        return sb.toString();
     }
 
     public List<Items> getItems(){
@@ -198,7 +200,12 @@ public class Backpacks {
 
     /** @return the material name of the backpack as a string. */
     public String getMaterial() {
-        return material.toString();
+        return material != null ? material.toString() : "LEATHER_CHESTPLATE";
+    }
+
+    /** @return the Bukkit Material enum. */
+    public Material getMaterialType() {
+        return material != null ? material : Material.LEATHER_CHESTPLATE;
     }
 
 

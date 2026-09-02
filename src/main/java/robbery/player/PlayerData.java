@@ -296,8 +296,7 @@ public class PlayerData {
     }
     public void setRank(String rank){
         this.rank = RankManager.getRank(rank);
-        String name = BackpackManager.getBackpackNameR(backpack.getName());
-        setBackpack(BackpackManager.getBackpackName(Objects.requireNonNullElse(name, "back1"), (int) (this.rank.extraSlots() + getPerkValue(PERK_BACK_SLOTS1))));
+        refreshBackpackSlots();
     }
     public void toggleDoubleJump(){
         doubleJump = !doubleJump;
@@ -643,14 +642,71 @@ public int getStoreItems(String storeId) {
         return getStoreItems(storeId);
     }
 
-    public double getStoreMasteryStealSpeed(String storeId) {
-        int level = robbery.core.Robbery.getInstance().getMasteryManager().getLevelFromItems(storeId, getStoreItems(storeId));
-        return level * 5.0;
+    /** Returns the store mastery milestone level (0-10) for this store. */
+    public int getStoreMasteryLevel(String storeId) {
+        return robbery.core.Robbery.getInstance().getMasteryManager().getLevelFromItems(storeId, getStoreItems(storeId));
     }
 
+    /**
+     * M1 = +10% money multiplier, M6 = +25% total (extra +15%)
+     * Applied only when selling/earning in the specific store.
+     */
+    public double getStoreMasteryMoneyMultiplier(String storeId) {
+        int level = getStoreMasteryLevel(storeId);
+        if (level >= 6) return 0.25;
+        if (level >= 1) return 0.10;
+        return 0.0;
+    }
+
+    /**
+     * M2 = +10% steal speed, M7 = +25% total (extra +15%)
+     * Applied only when stealing in the specific store.
+     */
+    public double getStoreMasteryStealSpeed(String storeId) {
+        int level = getStoreMasteryLevel(storeId);
+        if (level >= 7) return 25.0;
+        if (level >= 2) return 10.0;
+        return 0.0;
+    }
+
+    /**
+     * M3 = +5% Robbery XP gain
+     * Applied only when earning XP from items stolen in the specific store.
+     */
     public double getStoreMasteryRobberyXp(String storeId) {
-        int level = robbery.core.Robbery.getInstance().getMasteryManager().getLevelFromItems(storeId, getStoreItems(storeId));
-        return level * 0.05;
+        int level = getStoreMasteryLevel(storeId);
+        if (level >= 3) return 0.05;
+        return 0.0;
+    }
+
+    /**
+     * M4 = +1% chance to gain a bonus Skill Point on sell
+     * Applied only in the specific store context.
+     */
+    public double getStoreMasterySkillPointChance(String storeId) {
+        int level = getStoreMasteryLevel(storeId);
+        if (level >= 4) return 0.01;
+        return 0.0;
+    }
+
+    /**
+     * M8 = +1% chance to get a doubled item count when stealing
+     * Applied only in the specific store context.
+     */
+    public double getStoreMasteryDoubleItemChance(String storeId) {
+        int level = getStoreMasteryLevel(storeId);
+        if (level >= 8) return 0.01;
+        return 0.0;
+    }
+
+    /**
+     * M9 = +1% chance to instantly steal (skip progress bar)
+     * Applied only in the specific store context.
+     */
+    public double getStoreMasteryInstaStealChance(String storeId) {
+        int level = getStoreMasteryLevel(storeId);
+        if (level >= 9) return 0.01;
+        return 0.0;
     }
 
 //SkillTree
@@ -732,12 +788,21 @@ public int getStoreItems(String storeId) {
     }
 
     public void refreshBackpackSlots() {
-        String baseName = BackpackManager.getBackpackNameR(this.backpack.getName());
+        String baseName = this.backpack != null ? BackpackManager.getBackpackNameR(this.backpack.getName()) : "back1";
         if (baseName == null) baseName = "back1";
 
         int totalExtraSlots = getExtraSlots();
-
-        this.setBackpack(BackpackManager.getBackpackName(baseName, totalExtraSlots));
+        Backpacks newPack = BackpackManager.getBackpackName(baseName, totalExtraSlots);
+        if (newPack != null) {
+            if (this.backpack != null) {
+                for (robbery.items.Items it : this.backpack.getItems()) {
+                    if (!newPack.isFull()) {
+                        newPack.getItems().add(it);
+                    }
+                }
+            }
+            this.setBackpack(newPack);
+        }
 
         if (this.player != null && this.player.isOnline()) {
             giveBackpackToInv();

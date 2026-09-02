@@ -57,7 +57,7 @@ public class BuyBackpack implements CommandExecutor {
             return true;
         }
 
-        String backName = args[0].toLowerCase();
+        String rawName = args[0];
         Player player = Bukkit.getPlayer(args[1]);
 
         if (player == null || !player.isOnline()) {
@@ -66,19 +66,23 @@ public class BuyBackpack implements CommandExecutor {
         }
 
         PlayerData data = PlayerDataManager.getPlayerData(player);
-        Backpacks backpack = BackpackManager.getBackpackName(backName, data.getExtraSlots());
+        if (data == null) return true;
 
-        Economy econ = Robbery.getEconomy();
-
-        if (backpack == null){
+        Backpacks backpack = BackpackManager.getBackpackName(rawName, data.getExtraSlots());
+        if (backpack == null) {
             Messages.send(sender, "command.buyback.invalid-backpack");
             return true;
         }
 
+        String canonicalId = BackpackManager.getBackpackNameR(rawName);
+        if (canonicalId == null) canonicalId = rawName.toLowerCase().replace(" ", "");
+
+        Economy econ = Robbery.getEconomy();
+
         // Determine required prestige for specific backpacks
         int prestige = data.getPrestige();
-        int requiredPrestige = (backName.equalsIgnoreCase("back17") || backName.equalsIgnoreCase("back18")) ? 1
-                : (backName.equalsIgnoreCase("back19") || backName.equalsIgnoreCase("back20")) ? 2
+        int requiredPrestige = (canonicalId.equalsIgnoreCase("back17") || canonicalId.equalsIgnoreCase("back18")) ? 1
+                : (canonicalId.equalsIgnoreCase("back19") || canonicalId.equalsIgnoreCase("back20")) ? 2
                 : 0;
 
         if (prestige < requiredPrestige) {
@@ -89,22 +93,40 @@ public class BuyBackpack implements CommandExecutor {
         }
 
         // If player already owns backpack, just give it to inventory
-        if (data.hasBackpackName(backName)) {
+        if (data.hasBackpackName(canonicalId)) {
+            // Preserve existing items
+            if (data.getBackpack() != null) {
+                for (robbery.items.Items it : data.getBackpack().getItems()) {
+                    if (!backpack.isFull()) {
+                        backpack.getItems().add(it);
+                    }
+                }
+            }
             data.setnewBackpack(backpack);
             data.giveBackpackToInv();
             Messages.send(player, "command.buyback.already-owned");
             return true;
         }
 
-        double price = backpack.getPrice();
-        if (econ.getBalance(player) >= price) {
+        double price = (double) backpack.getPrice();
+        if (econ != null && econ.getBalance(player) >= price) {
             econ.withdrawPlayer(player, price);
+
+            // Transfer items to newly purchased backpack
+            if (data.getBackpack() != null) {
+                for (robbery.items.Items it : data.getBackpack().getItems()) {
+                    if (!backpack.isFull()) {
+                        backpack.getItems().add(it);
+                    }
+                }
+            }
+
             data.setBackpack(backpack);
-            data.addBackpackName(backName);
+            data.addBackpackName(canonicalId);
             data.giveBackpackToInv();
 
             Map<String, String> ph = new HashMap<>();
-            ph.put("backpack", BackpackManager.getBackPackN(backName));
+            ph.put("backpack", BackpackManager.getBackPackN(canonicalId));
             ph.put("price", backpack.getPriceformatted());
             Messages.sendFormatted(player, "command.buyback.success", ph);
         } else {

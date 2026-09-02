@@ -142,13 +142,19 @@ public class Items {
     }
 
     public static ItemStack getPlayerHead(String value) {
-        ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1, (short)3);
+        ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1, (short) 3);
+        if (value == null || value.trim().isEmpty()) {
+            return head;
+        }
         SkullMeta meta = (SkullMeta) head.getItemMeta();
-        PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
-        profile.setProperty(new ProfileProperty("textures", value));
-        meta.setPlayerProfile(profile);
-        head.setItemMeta(meta);
-
+        if (meta != null) {
+            try {
+                PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
+                profile.setProperty(new ProfileProperty("textures", value.trim()));
+                meta.setPlayerProfile(profile);
+                head.setItemMeta(meta);
+            } catch (Exception ignored) {}
+        }
         return head;
     }
 

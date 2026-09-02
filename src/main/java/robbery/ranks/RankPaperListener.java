@@ -48,6 +48,10 @@ public class RankPaperListener implements Listener {
 
         if (isBetterOrEqual(currentRank, rankToken)) {
             Messages.send(p, "rank.already_have");
+            // Dupe detection warning
+            String nice = RankPaper.getDisplayName(rankToken);
+            p.sendMessage(org.bukkit.ChatColor.RED + "⚠ Warning: This rank voucher appears to be duplicated or already used. You already have rank " + currentRank + " and tried to use a '" + nice + "' voucher.");
+            Bukkit.getLogger().warning("[RankPaper] Possible dupe detected: " + p.getName() + " (current rank: " + currentRank + ") tried to use a " + nice + " (" + rankToken + ") voucher!");
             return;
         }
 

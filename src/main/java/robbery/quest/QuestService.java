@@ -235,17 +235,31 @@ public class QuestService {
     /**
      * computeQuestXpPerItem: chooses the XP-per-item used for quest-level calculation.
      * Strategy: take the highest store XP among quest.storeIds (if any).
+     * BUSTED quests scale with player's highest store tier and prestige.
      */
     public int computeQuestXpPerItem(Quest q, PlayerData pd) {
-        if (q.type == Quest.QuestType.BUSTED) {
-            return 1000;
-        } else if(q.type == Quest.QuestType.OUTPOST){
+        if (q.type == Quest.QuestType.OUTPOST) {
             return 25000;
         }
 
+        int tier = pd.getHighestOwnedStoreTier();
+        // Clamp tier to 1-12 range
+        tier = Math.max(1, Math.min(12, tier));
+
+        // Prestige bonus: P1=+25%, P2=+50%, P3+=+75%
+        int prestige = pd.getPrestige();
+        double prestigeBonus = Math.min(prestige * 0.25, 0.75);
+
+        if (q.type == Quest.QuestType.BUSTED) {
+            // Base 1000 XP, scales with store tier (x1.0 at tier 1, up to x2.0 at tier 12)
+            double storeScale = 1.0 + ((tier - 1) / 11.0); // 1.0 to 2.0
+            return (int) Math.round(1000 * storeScale * (1 + prestigeBonus));
+        }
+
         if (!q.isStoreSpecific()) {
-            int tier = pd.getHighestOwnedStoreTier();
-            return questManager.getStoreXp("store" + Math.max(1, tier));
+            // PICKUP/other non-store quests: use highest store XP + prestige scaling
+            int baseXp = questManager.getStoreXp("store" + Math.max(1, tier));
+            return (int) Math.round(baseXp * (1 + prestigeBonus));
         }
 
         int best = 0;

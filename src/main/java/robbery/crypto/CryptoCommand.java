@@ -33,6 +33,16 @@ public class CryptoCommand implements CommandExecutor {
         if (args.length == 0) {
             if (sender instanceof Player p) {
                 PlayerData pd = PlayerDataManager.getPlayerData(p);
+
+                // Require Arcade (Store 4+) or Prestige 1+
+                boolean hasKnowledge = pd != null && (pd.getPrestige() >= 1
+                        || pd.getHighestOwnedStoreTier() >= 4);
+
+                if (!hasKnowledge) {
+                    Messages.send(p, "crypto-dealer.not-enough-knowledge");
+                    return true;
+                }
+
                 if (pd != null && !pd.hasTalkedToCryptoNPC()) {
                     Messages.send(p, "crypto.must-talk-npc");
                     return true;

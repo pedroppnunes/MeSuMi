@@ -57,6 +57,25 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             } catch (NumberFormatException ignored) {}
         }
 
+        // %robbery_top_prestige_1_name%, %robbery_top_prestige_1_value%
+        // %robbery_top_stolen_1_name%,   %robbery_top_stolen_1_value%
+        if (parts.length >= 4 && parts[0].equals("top")) {
+            try {
+                int pos = Integer.parseInt(parts[2]);
+                String field = parts[3]; // name or value
+                if (parts[1].equals("prestige")) {
+                    return field.equals("name")
+                            ? robbery.leaderboard.DatabaseLeaderboard.getTopPrestigeName(pos)
+                            : robbery.leaderboard.DatabaseLeaderboard.getTopPrestigeValue(pos);
+                }
+                if (parts[1].equals("stolen")) {
+                    return field.equals("name")
+                            ? robbery.leaderboard.DatabaseLeaderboard.getTopItemsStolenName(pos)
+                            : robbery.leaderboard.DatabaseLeaderboard.getTopItemsStolenValue(pos);
+                }
+            } catch (NumberFormatException ignored) {}
+        }
+
         if (offlinePlayer == null) return null;
         Player player = offlinePlayer.getPlayer();
         if (player == null) return null;
@@ -427,15 +446,6 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                         case "name" -> b.getName();
                         case "time" -> String.valueOf(b.getSeconds() / 60);
                         case "priority" -> String.valueOf(b.getPriority());
-                        default -> null;
-                    };
-
-                case "prestige":
-                    if (parts.length < 3) return null;
-                    int rank = Integer.parseInt(parts[2]);
-                    return switch (parts[1]) {
-                        case "name" -> PrestigeLeaderboard.getTopPrestigePlayer(rank);
-                        case "top" -> String.valueOf(PrestigeLeaderboard.getTopPrestige(rank));
                         default -> null;
                     };
 

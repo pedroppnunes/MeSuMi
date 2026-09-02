@@ -41,18 +41,14 @@ public class DoubleJumpListener implements Listener {
 
         if (!(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)) return;
 
-        if (player.hasPermission("robbery.bypass")) {
-            player.setAllowFlight(true);
-            return;
-        }
         ItemStack item = player.getInventory().getItemInMainHand();
         if (!isFlightItem(item)) return;
 
         boolean hasRank7 = player.hasPermission("robbery.rank7");
-        boolean hasPerk = pd.getPerkValue(PERK_SPECIAL_FEATHERFLIGHT) == 1;
+        boolean hasPerk = pd != null && pd.getPerkValue(PERK_SPECIAL_FEATHERFLIGHT) == 1;
 
         if ((!hasRank7 && !hasPerk) || !player.getWorld().getName().equals("world")) {
-            Messages.sendActionBar(player,"events.flight.no-permission");
+            Messages.sendActionBar(player, "events.flight.no-permission");
             return;
         }
 
@@ -121,7 +117,7 @@ public class DoubleJumpListener implements Listener {
         PlayerData p = PlayerDataManager.getPlayerData(player);
         UUID uuid = player.getUniqueId();
 
-        if (player.hasPermission("robbery.bypass") || temporaryFlightPlayers.contains(uuid)) {
+        if (temporaryFlightPlayers.contains(uuid)) {
             player.setAllowFlight(true);
         } else {
             if (player.isOnGround() && player.getWorld().getName().equalsIgnoreCase("world")) {
@@ -142,7 +138,7 @@ public class DoubleJumpListener implements Listener {
 
         PlayerData p = PlayerDataManager.getPlayerData(player);
 
-        if (player.hasPermission("robbery.bypass") || temporaryFlightPlayers.contains(uuid)) {
+        if (temporaryFlightPlayers.contains(uuid)) {
             event.setCancelled(false);
             return;
         }
