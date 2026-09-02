@@ -159,7 +159,7 @@ public class PickingTask extends BukkitRunnable {
         if(instaSteal > 0 && random.nextDouble() < instaSteal)
             item.setHp(0);
         else
-            item.setHp(item.getHp() - (tool.getDamage() + tool.getDamage()*(1+p.getExtraDamage()/100)));
+            item.setHp(item.getHp() - (tool.getDamage() * (1 + p.getExtraDamage() / 100)));
         sendProgressBar(player, item.getHp(), item.getInitialhp());
     }
 
