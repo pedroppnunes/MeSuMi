@@ -200,4 +200,13 @@ permissions:
   robbery.staff:
     default: false
   robbery.noitems:
-    default: false
+    default: false  crypto:
+    description: Open the crypto menu
+    usage: /crypto
+  backpacks:
+    description: View your backpacks
+    usage: /backpacks
+  ho:
+    description: Alias for hideout
+    usage: /ho
+

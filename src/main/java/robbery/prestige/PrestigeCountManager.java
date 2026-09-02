@@ -37,6 +37,7 @@ public class PrestigeCountManager {
     }
 
     public static void save() {
+        if (config == null) return;
         config.set("PrestigeCounts", null);
 
         for (Map.Entry<Integer, Integer> entry : prestigeCounts.entrySet()) {
