@@ -59,21 +59,23 @@ public class PickingTask extends BukkitRunnable {
             double masteryDoubleChance = p.getStoreMasteryDoubleItemChance(storeId);
             boolean masteryDoubled = !p.getBackpack().isFull() && masteryDoubleChance > 0 && random.nextDouble() < masteryDoubleChance;
 
-            p.addItemToBackpack(item);
+            double effectiveBoost = p.getBoost(storeId);
+            p.addItemToBackpack(item, storeId);
 
             String itemName = item.getName().substring(0,1).toUpperCase() + item.getName().substring(1);
-            double value = item.getValue();
-            double bonus = (value * p.getBoost()) - value;
-            if (p.getBoost() != 1.0) {
+            double baseValue = item.getValue();
+            double totalValue = baseValue * effectiveBoost;
+            double bonus = totalValue - baseValue;
+            if (effectiveBoost != 1.0) {
                 Messages.sendActionBarFormatted(player, "events.picking.item_stolen_with_boost", Map.of(
                         "item", itemName,
-                        "value", NumberFormatter.formatDoubleNumber(value) + "$",
+                        "value", NumberFormatter.formatDoubleNumber(totalValue) + "$",
                         "bonus", NumberFormatter.formatDoubleNumber(bonus) + "$"
                 ));
             } else {
                 Messages.sendActionBarFormatted(player, "events.picking.item_stolen", Map.of(
                         "item", itemName,
-                        "value", NumberFormatter.formatDoubleNumber(value) + "$"
+                        "value", NumberFormatter.formatDoubleNumber(totalValue) + "$"
                 ));
             }
 
@@ -81,24 +83,24 @@ public class PickingTask extends BukkitRunnable {
             double tripleChance = p.getPerkValue(PERK_TRIPLE_ITEM1);
             if (!p.getBackpack().isFull()) {
                 if (tripleChance > 0 && random.nextDouble() < tripleChance) {
-                    p.addItemToBackpack(item);
-                    p.addItemToBackpack(item);
+                    p.addItemToBackpack(item, storeId);
+                    p.addItemToBackpack(item, storeId);
                     Messages.sendActionBarFormatted(player, "events.picking.triple_item", Map.of(
                             "item", itemName,
-                            "value", NumberFormatter.formatDoubleNumber(value*2) + "$"
+                            "value", NumberFormatter.formatDoubleNumber(totalValue * 2) + "$"
                     ));
                 } else if (doubleChance > 0 && random.nextDouble() < doubleChance) {
-                    p.addItemToBackpack(item);
+                    p.addItemToBackpack(item, storeId);
                     Messages.sendActionBarFormatted(player, "events.picking.double_item", Map.of(
                             "item", itemName,
-                            "value", NumberFormatter.formatDoubleNumber(value) + "$"
+                            "value", NumberFormatter.formatDoubleNumber(totalValue) + "$"
                     ));
                 } else if (masteryDoubled) {
                     // M8: mastery double item
-                    p.addItemToBackpack(item);
+                    p.addItemToBackpack(item, storeId);
                     Messages.sendActionBarFormatted(player, "events.picking.double_item", Map.of(
                             "item", itemName,
-                            "value", NumberFormatter.formatDoubleNumber(value) + "$"
+                            "value", NumberFormatter.formatDoubleNumber(totalValue) + "$"
                     ));
                 }
             }
@@ -182,7 +184,7 @@ public class PickingTask extends BukkitRunnable {
                 (masteryInstaSteal > 0 && random.nextDouble() < masteryInstaSteal))
             item.setHp(0);
         else
-            item.setHp(item.getHp() - (tool.getDamage() * (1 + p.getExtraDamage(storeIdPick) / 100) * (1 + p.getStoreMasteryStealSpeed(storeIdPick) / 100)));
+            item.setHp(item.getHp() - (tool.getDamage() * (1.0 + p.getExtraDamage(storeIdPick) / 100.0)));
         sendProgressBar(player, item.getHp(), item.getInitialhp());
 
     }

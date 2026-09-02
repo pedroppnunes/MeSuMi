@@ -260,8 +260,20 @@ public class PlayerData {
     }
 
     public void addItemToBackpack(Items item) {
-        backpack.addBackpackItem(item,getBoost());
+        String storeId = "store1";
+        if (item != null && item.getId() != null) {
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\d+").matcher(item.getId());
+            if (m.find()) {
+                storeId = "store" + m.group();
+            }
+        }
+        addItemToBackpack(item, storeId);
     }
+
+    public void addItemToBackpack(Items item, String storeId) {
+        backpack.addBackpackItem(item, getBoost(storeId));
+    }
+
     public void busted() {
         this.getBackpack().emptyBackpack();
     }
@@ -272,13 +284,18 @@ public class PlayerData {
 
 
     public double getBoost() {
+        return getBoost("store1");
+    }
+
+    public double getBoost(String storeId) {
         double boost = 1
                 + prestige * 0.10
                 + rank.boost()
                 + boostx
                 + getOutMoneyMult()
                 + getPerkValue(PERK_MONEY_MULT1)
-                + getPerkValue(PERK_MONEY_MULT2);
+                + getPerkValue(PERK_MONEY_MULT2)
+                + getStoreMasteryMoneyMultiplier(storeId);
 
         if (hasTemporaryPerk(PERK_ABILITY_MONEYMULT1)) {
             boost += 0.5;
