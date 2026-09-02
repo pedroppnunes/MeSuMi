@@ -314,12 +314,8 @@ public class PlayerData {
                 + getOutSpeedBonus()
                 + getPerkValue(PERK_STEAL_SPEED1)
                 + getPerkValue(PERK_STEAL_SPEED2)
-                + itemStreakBonus
+                + getItemStreakBonus()
                 + getStoreMasteryStealSpeed(storeId);
-
-        if (hasTemporaryPerk(PERK_ITEM_STREAK1)) {
-            baseDamage += 50;
-        }
 
         if (hasTemporaryPerk(PERK_ABILITY_STEALSPEED1)) {
             baseDamage += 50;
@@ -584,6 +580,9 @@ public class PlayerData {
     }
     public void addSkillPoints(int n) {
         this.skillpoints += n;
+    }
+    public void setSkillPoints(int n) {
+        this.skillpoints = Math.max(0, n);
     }
     public int getSkillPoints() {
         return skillpoints;
@@ -855,12 +854,19 @@ public int getStoreItems(String storeId) {
         return true;
     }
 
-    public void addItemStreak(double amount) {
-        long now = System.currentTimeMillis();
-        if (now - lastItemStolenTimestamp > 3000) {
+    public double getItemStreakBonus() {
+        if (System.currentTimeMillis() - lastItemStolenTimestamp > 5000) {
             itemStreakBonus = 0.0;
         }
-        itemStreakBonus = Math.min(35, itemStreakBonus + amount);
+        return itemStreakBonus;
+    }
+
+    public void addItemStreak(double amount) {
+        long now = System.currentTimeMillis();
+        if (now - lastItemStolenTimestamp > 5000) {
+            itemStreakBonus = 0.0;
+        }
+        itemStreakBonus = Math.min(35.0, itemStreakBonus + amount);
         lastItemStolenTimestamp = now;
     }
 //GodOfRobbery

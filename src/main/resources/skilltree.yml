@@ -115,7 +115,7 @@ perks:
     costs: [ 3, 3, 4, 4, 5 ]
     base_value: 1
     value_increment: 1
-    description: "For each item that you pick up, resets after 3 seconds without picking, you receive a +1% speed. (Max:35%)"
+    description: "For each item that you pick up, resets after 5 seconds without picking, you receive a +1% speed. (Max:35%)"
     requiredPerks:
       - chancebooster1
 
