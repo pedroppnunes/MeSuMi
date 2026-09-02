@@ -69,13 +69,13 @@ public class PickingTask extends BukkitRunnable {
             if (effectiveBoost != 1.0) {
                 Messages.sendActionBarFormatted(player, "events.picking.item_stolen_with_boost", Map.of(
                         "item", itemName,
-                        "value", NumberFormatter.formatDoubleNumber(totalValue) + "$",
+                        "value", NumberFormatter.formatDoubleNumber(baseValue) + "$",
                         "bonus", NumberFormatter.formatDoubleNumber(bonus) + "$"
                 ));
             } else {
                 Messages.sendActionBarFormatted(player, "events.picking.item_stolen", Map.of(
                         "item", itemName,
-                        "value", NumberFormatter.formatDoubleNumber(totalValue) + "$"
+                        "value", NumberFormatter.formatDoubleNumber(baseValue) + "$"
                 ));
             }
 
@@ -87,20 +87,20 @@ public class PickingTask extends BukkitRunnable {
                     p.addItemToBackpack(item, storeId);
                     Messages.sendActionBarFormatted(player, "events.picking.triple_item", Map.of(
                             "item", itemName,
-                            "value", NumberFormatter.formatDoubleNumber(totalValue * 2) + "$"
+                            "value", NumberFormatter.formatDoubleNumber(baseValue * 2) + "$"
                     ));
                 } else if (doubleChance > 0 && random.nextDouble() < doubleChance) {
                     p.addItemToBackpack(item, storeId);
                     Messages.sendActionBarFormatted(player, "events.picking.double_item", Map.of(
                             "item", itemName,
-                            "value", NumberFormatter.formatDoubleNumber(totalValue) + "$"
+                            "value", NumberFormatter.formatDoubleNumber(baseValue) + "$"
                     ));
                 } else if (masteryDoubled) {
                     // M8: mastery double item
                     p.addItemToBackpack(item, storeId);
                     Messages.sendActionBarFormatted(player, "events.picking.double_item", Map.of(
                             "item", itemName,
-                            "value", NumberFormatter.formatDoubleNumber(totalValue) + "$"
+                            "value", NumberFormatter.formatDoubleNumber(baseValue) + "$"
                     ));
                 }
             }
