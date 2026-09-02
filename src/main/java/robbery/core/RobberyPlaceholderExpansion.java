@@ -149,6 +149,42 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             case "total_rewards" -> getTotalRewards(pd);
             case "skilltreereset_points" -> String.valueOf(pd.getResetSkillTreePoints());
             case "skilltreereset_skillpoints" -> String.valueOf(Robbery.getSkillTreeConfig().calculateTotalRefund(pd));
+            case "skillpoint_chance" -> String.format("%.2f", main.getSacrificeManager().getChance(player, "coal") * 100);
+
+            case "crypto_status" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(player.getUniqueId());
+                if (machine == null || !machine.isPlaced()) yield "&cNot Placed";
+                if (machine.getFuelTicks() > 0) yield "&aOnline";
+                yield "&cOffline (Needs Battery)";
+            }
+            case "crypto_money_ps" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(player.getUniqueId());
+                if (machine == null) yield "0";
+                long baseRate = main.getCryptoManager().getBaseRateForStore(pd.getHighestOwnedStoreTier());
+                double qualityMult = machine.getQualityMultiplier();
+                double speedMult = machine.getSpeedMultiplier();
+                double rewardMult = machine.getRewardMultiplier();
+                double onlineBuff = 1.0;
+                if (player.isOnline() && machine.getFuelTicks() > 0) onlineBuff = 1.20; // 20% online buff
+                
+                long totalPs = (long) (baseRate * qualityMult * speedMult * rewardMult * onlineBuff);
+                yield NumberFormatter.formatDoubleNumber((double) totalPs);
+            }
+            case "crypto_battery" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(player.getUniqueId());
+                if (machine == null || machine.getFuelTicks() <= 0) yield "&cNo Battery";
+                long totalSeconds = machine.getFuelTicks();
+                long hours = totalSeconds / 3600;
+                long minutes = (totalSeconds % 3600) / 60;
+                long seconds = totalSeconds % 60;
+                if (hours > 0) yield String.format("%02d:%02d:%02d", hours, minutes, seconds);
+                yield String.format("%02d:%02d", minutes, seconds);
+            }
+            case "crypto_stored_batteries" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(player.getUniqueId());
+                if (machine == null) yield "0";
+                yield String.valueOf(machine.getStoredFuels().size());
+            }
 
             default -> null;
         };

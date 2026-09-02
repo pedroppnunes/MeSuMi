@@ -274,6 +274,7 @@ public class Robbery extends JavaPlugin implements Listener {
         startItemClearTask();
         startVoteReminderTask();
         startTipsTask();
+        robbery.leaderboard.DatabaseLeaderboard.startTask(this);
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(main, main::saveItems, 20L * 60, 20L * 60 * 5);
     }

@@ -1,0 +1,116 @@
+menu_title: 'Crypto Machine'
+size: 54
+
+items:
+  'border':
+    material: BLACK_STAINED_GLASS_PANE
+    slots: [0,1,2,3,4,5,6,7,8,9,17,18,26,27,35,36,44,45,46,47,48,50,51,52,53]
+    display_name: ' '
+
+  'status':
+    material: COMPASS
+    slot: 13
+    display_name: '&fMachine Info'
+    lore:
+      - '&7Status: %robbery_crypto_status%'
+      - '&7Unclaimed Balance: &a$%robbery_crypto_money%'
+      - '&7Generating: &a$%robbery_crypto_money_ps% / sec'
+      - '&7Active Battery Quality: &e%robbery_crypto_quality%%'
+      - '&7Active Battery Remaining: &a%robbery_crypto_battery%'
+      - '&7Active Battery Duration: &b%robbery_crypto_battery_time_formatted%'
+      - ''
+      - '&7Upgrade Levels (Max 39):'
+      - ' &8- &7Speed: &e%robbery_crypto_speed_level% &8/ &739'
+      - ' &8- &7Duration: &b%robbery_crypto_battery_time_level% &8/ &739'
+      - ' &8- &7Reward: &a%robbery_crypto_reward_level% &8/ &739'
+      - ''
+      - '&7Total Multiplier: &a%robbery_crypto_multiplier%x'
+
+  'battery_storage':
+    material: HOPPER
+    slot: 30
+    display_name: '&fVirtual Battery Storage'
+    lore:
+      - '&7Stored Battery Canisters: &e%robbery_crypto_stored_batteries%'
+      - ''
+      - '&7Select which battery canister to load'
+      - '&7into your machine or delete canisters.'
+      - ''
+      - '&eClick to open!'
+    left_click_commands:
+      - '[player] crypto batterystorage'
+
+  'claim':
+    material: GOLD_INGOT
+    slot: 32
+    display_name: '&fClaim Money'
+    lore:
+      - '&7Unclaimed Balance: &a$%robbery_crypto_money%'
+      - ''
+      - '&eClick to deposit into bank!'
+    left_click_commands:
+      - '[player] crypto claim'
+      - '[refresh]'
+
+  'upgrade_speed':
+    material: SUGAR
+    slot: 38
+    display_name: '&fUpgrade Speed'
+    lore:
+      - '&7Current Level: &e%robbery_crypto_speed_level% &8/ &739'
+      - '&7Increases generation speed per second.'
+      - ''
+      - '&fNext Cost: &a$%robbery_crypto_speed_cost_formatted%'
+      - '&fPrestige Req: &ePrestige %robbery_crypto_speed_req_prestige%'
+      - ''
+      - '&eClick to upgrade!'
+    left_click_commands:
+      - '[player] crypto upgrade speed'
+      - '[refresh]'
+
+  'upgrade_batterytime':
+    material: CLOCK
+    slot: 40
+    display_name: '&fUpgrade Battery Duration'
+    lore:
+      - '&7Current Level: &b%robbery_crypto_battery_time_level% &8/ &739'
+      - '&7Current Duration: &b%robbery_crypto_battery_time_formatted%'
+      - '&7Increases active battery duration.'
+      - ''
+      - '&fNext Cost: &a$%robbery_crypto_battery_time_cost_formatted%'
+      - '&fPrestige Req: &ePrestige %robbery_crypto_battery_time_req_prestige%'
+      - ''
+      - '&eClick to upgrade!'
+    left_click_commands:
+      - '[player] crypto upgrade batterytime'
+      - '[refresh]'
+
+  'upgrade_reward':
+    material: GOLD_NUGGET
+    slot: 42
+    display_name: '&fUpgrade Money Reward'
+    lore:
+      - '&7Current Level: &a%robbery_crypto_reward_level% &8/ &739'
+      - '&7Increases money payout multiplier.'
+      - ''
+      - '&fNext Cost: &a$%robbery_crypto_reward_cost_formatted%'
+      - '&fPrestige Req: &ePrestige %robbery_crypto_reward_req_prestige%'
+      - ''
+      - '&eClick to upgrade!'
+    left_click_commands:
+      - '[player] crypto upgrade reward'
+      - '[refresh]'
+
+  'pickup':
+    material: REDSTONE_BLOCK
+    slot: 49
+    display_name: '&cPick Up Machine'
+    lore:
+      - '&7Picks up your machine into your inventory.'
+      - '&cWARNING: &7This will pause generation'
+      - '&7until you place it again.'
+      - ''
+      - '&cClick to pick up!'
+    left_click_commands:
+      - '[player] crypto pickup'
+      - '[close]'

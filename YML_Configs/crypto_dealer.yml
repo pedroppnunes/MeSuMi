@@ -1,0 +1,46 @@
+menu_title: '&8&lCrypto Dealer''s Shop'
+size: 27
+
+items:
+  'border':
+    material: BLACK_STAINED_GLASS_PANE
+    slots: [0,1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,26]
+    display_name: ' '
+
+  'machine_owned':
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTAzNTBiM2E0OTA0OWU0ZjI1N2NjZDJkOWY0YjhmYTg2YzEzZTU2YmU1ZDExNWM1ZjE2MGEzOTg2MjdkMTgxMyJ9fX0=
+    slot: 13
+    priority: 1
+    view_requirement:
+      requirements:
+        has_machine:
+          type: string equals
+          input: '%robbery_crypto_has_machine%'
+          output: 'true'
+    display_name: '&6&lCrypto Machine &c(Already Owned)'
+    lore:
+      - '&7You already own a &6Crypto Machine&7!'
+      - '&7Limit: &e1 / 1 &7machines'
+      - ''
+      - '&cYou cannot possess or claim more machines.'
+    left_click_commands:
+      - '[message] &5&lRobbery &8> &cYou already possess 1 Crypto Machine! You cannot claim another.'
+      - '[sound] ENTITY_VILLAGER_NO'
+
+  'machine_claim':
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTAzNTBiM2E0OTA0OWU0ZjI1N2NjZDJkOWY0YjhmYTg2YzEzZTU2YmU1ZDExNWM1ZjE2MGEzOTg2MjdkMTgxMyJ9fX0=
+    slot: 13
+    priority: 2
+    display_name: '&6&lCrypto Machine'
+    lore:
+      - '&7A specialized underground device that'
+      - '&7generates passive income using batteries!'
+      - '&7Limit: &e1 &7per player'
+      - ''
+      - '&7Rewards will be sent to &6/claim&7!'
+      - ''
+      - '&eClick to claim your Crypto Machine!'
+    left_click_commands:
+      - '[console] crypto admin givereward %player_name%'
+      - '[refresh]'
+      - '[sound] ENTITY_PLAYER_LEVELUP'
