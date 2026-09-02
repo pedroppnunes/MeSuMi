@@ -23,7 +23,7 @@ public class XPManager {
     // Growth constants
     private final int SOFTCAP = 120;
     private final double BASE_MULT = 100.0;
-    private final double EXPONENT = 2.2;
+    private final double EXPONENT = 1.7;
     private final double SOFTCAP_MULT = 1.15;
 
     public XPManager(Robbery plugin) {
