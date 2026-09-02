@@ -280,6 +280,17 @@ public class Robbery extends JavaPlugin implements Listener {
         questManager.loadFromConfig("quests.yml");
         questService = new QuestService(questManager,main);
         Objects.requireNonNull(getCommand("acceptalldaily")).setExecutor(new AcceptAllDailyQuestsCommand(main,questService));
+        if (getCommand("outpost") != null) {
+            getCommand("outpost").setExecutor(new robbery.outpost.Outpost());
+        }
+        if (getCommand("outpostinfo") != null) {
+            getCommand("outpostinfo").setExecutor((sender, cmd, label, args) -> {
+                if (sender instanceof org.bukkit.entity.Player p) {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "dm open outpost " + p.getName());
+                }
+                return true;
+            });
+        }
         Objects.requireNonNull(getCommand("quests")).setExecutor(new QuestsCommand(main));
         getServer().getMessenger().registerOutgoingPluginChannel(main, "BungeeCord");
         PrestigeCountManager.load();

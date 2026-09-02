@@ -1,6 +1,7 @@
 package robbery.outpost;
 
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,21 +21,6 @@ import robbery.player.PlayerDataManager;
  */
 public class Outpost implements CommandExecutor {
 
-    /**
-     * Executes the /outpost command.
-     *
-     * <ul>
-     *     <li>If the sender is not a player, a message is sent and nothing happens.</li>
-     *     <li>If the player's backpack is not empty, a message is sent and teleportation is canceled.</li>
-     *     <li>If conditions are met, the player is teleported to the outpost using a console command.</li>
-     * </ul>
-     *
-     * @param sender the command sender
-     * @param command the command object
-     * @param label the alias of the command used
-     * @param args the command arguments
-     * @return true always, as command processing is complete
-     */
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
@@ -45,12 +31,19 @@ public class Outpost implements CommandExecutor {
         PlayerData pd = PlayerDataManager.getPlayerData(player);
         if (!player.isOnline()) return true;
 
-        if (pd.getBackpack() != null && pd.getBackpack().getSize() != 0) {
+        if (pd != null && pd.getBackpack() != null && !pd.getBackpack().getItems().isEmpty()) {
             Messages.send(player, "command.outpost.backpack-not-empty");
             return true;
         }
 
-        // Teleport player to outpost using Multiverse command
+        // Try direct world teleport first if world "outpost" exists
+        World outpostWorld = Bukkit.getWorld("outpost");
+        if (outpostWorld != null) {
+            player.teleport(outpostWorld.getSpawnLocation());
+            return true;
+        }
+
+        // Fallback to Multiverse or warp command
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv tp " + player.getName() + " outpost");
         return true;
     }
