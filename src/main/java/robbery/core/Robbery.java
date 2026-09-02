@@ -113,6 +113,22 @@ public class Robbery extends JavaPlugin implements Listener {
     private QuestManager questManager;
     private QuestService questService;
     
+    private robbery.crypto.CryptoManager cryptoManager;
+    private robbery.crypto.CryptoDealerGUI cryptoDealerGUI;
+    private robbery.crypto.FuelRouletteGUI fuelRouletteGUI;
+    private robbery.crypto.CryptoSacrificeGUI cryptoSacrificeGUI;
+    private robbery.crypto.CryptoBatteryStorageGUI cryptoBatteryStorageGUI;
+    private robbery.crypto.SacrificeManager sacrificeManager;
+    private robbery.backpacks.BackpackGUI backpackGUI;
+
+    public robbery.crypto.CryptoManager getCryptoManager() { return cryptoManager; }
+    public robbery.crypto.CryptoDealerGUI getCryptoDealerGUI() { return cryptoDealerGUI; }
+    public robbery.crypto.FuelRouletteGUI getFuelRouletteGUI() { return fuelRouletteGUI; }
+    public robbery.crypto.CryptoSacrificeGUI getCryptoSacrificeGUI() { return cryptoSacrificeGUI; }
+    public robbery.crypto.CryptoBatteryStorageGUI getCryptoBatteryStorageGUI() { return cryptoBatteryStorageGUI; }
+    public robbery.crypto.SacrificeManager getSacrificeManager() { return sacrificeManager; }
+    public robbery.backpacks.BackpackGUI getBackpackGUI() { return backpackGUI; }
+    
     private robbery.database.DatabaseManager databaseManager;
     private robbery.database.PlayerDataDao playerDataDao;
 
@@ -218,6 +234,26 @@ public class Robbery extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("help")).setExecutor(new HelpCommand(main));
         SpawnCommand s = new SpawnCommand();
         Objects.requireNonNull(getCommand("spawn")).setExecutor(s);
+
+        this.cryptoManager = new robbery.crypto.CryptoManager(this);
+        this.cryptoDealerGUI = new robbery.crypto.CryptoDealerGUI(this);
+        this.fuelRouletteGUI = new robbery.crypto.FuelRouletteGUI(this);
+        this.cryptoSacrificeGUI = new robbery.crypto.CryptoSacrificeGUI(this);
+        this.cryptoBatteryStorageGUI = new robbery.crypto.CryptoBatteryStorageGUI(this);
+        this.sacrificeManager = new robbery.crypto.SacrificeManager(this);
+        this.backpackGUI = new robbery.backpacks.BackpackGUI(this);
+
+        getServer().getPluginManager().registerEvents(cryptoDealerGUI, this);
+        getServer().getPluginManager().registerEvents(fuelRouletteGUI, this);
+        getServer().getPluginManager().registerEvents(cryptoSacrificeGUI, this);
+        getServer().getPluginManager().registerEvents(cryptoBatteryStorageGUI, this);
+        getServer().getPluginManager().registerEvents(backpackGUI, this);
+        getServer().getPluginManager().registerEvents(new robbery.crypto.CryptoListener(this), this);
+        getServer().getPluginManager().registerEvents(new robbery.crypto.CryptoNPCListener(this), this);
+
+        Objects.requireNonNull(getCommand("crypto")).setExecutor(new robbery.crypto.CryptoCommand(this));
+        Objects.requireNonNull(getCommand("backpacks")).setExecutor(new robbery.backpacks.BackpackCommand(this));
+        Objects.requireNonNull(getCommand("hideout")).setExecutor(new robbery.core.HideoutAliasCommand());
         Objects.requireNonNull(getCommand("s")).setExecutor(s);
         Objects.requireNonNull(getCommand("ct")).setExecutor(new ChatColorCommand(main));
         Lobby l = new Lobby(main);
