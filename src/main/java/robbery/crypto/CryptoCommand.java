@@ -238,7 +238,6 @@ public class CryptoCommand implements CommandExecutor {
                         }
 
                         // Deduct selected items from backpack
-                        PlayerData pd = PlayerDataManager.getPlayerData(p);
                         if (pd != null) {
                             List<Items> liveBackpack = pd.getBackpack().getItems();
                             for (Map.Entry<String, Integer> entry : sm.getSelectedMap(p.getUniqueId()).entrySet()) {
