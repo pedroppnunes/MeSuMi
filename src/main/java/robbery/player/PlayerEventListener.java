@@ -104,7 +104,11 @@ public class PlayerEventListener implements Listener {
                 }
             }
 
-            savePlayerData(player, memory);
+            if (memory != null) {
+                memory.stopBoosters();
+            }
+
+            savePlayerData(player, memory, true);
             PlayerDataManager.setPlayerData(player, null);
             PlayerDataManager.setPlayerData(event.getPlayer(), null);
         }
@@ -112,6 +116,15 @@ public class PlayerEventListener implements Listener {
     }
 
     public void savePlayerData(Player player, PlayerData memory) {
+        savePlayerData(player, memory, false);
+    }
+
+    public void savePlayerDataSync(Player player, PlayerData memory) {
+        savePlayerData(player, memory, true);
+    }
+
+    public void savePlayerData(Player player, PlayerData memory, boolean forceSync) {
+        if (player == null || memory == null) return;
         YamlConfiguration cfg = new YamlConfiguration();
 
         // Basic stats
@@ -195,7 +208,7 @@ public class PlayerEventListener implements Listener {
             }
         };
 
-        if (!plugin.isEnabled()) {
+        if (forceSync || !plugin.isEnabled() || plugin.getIsBackup()) {
             saveTask.run(); // Run synchronously during shutdown
         } else {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, saveTask);
@@ -278,9 +291,13 @@ public class PlayerEventListener implements Listener {
         memory.setBackpackunlucked(cfg.getString("stats.hasbackpack"));
 
         // Boosters
-        memory.setBoostersPaused(cfg.getBoolean("stats.boosterpaused"));
+        boolean wasPaused = cfg.getBoolean("stats.boosterpaused", false);
+        memory.setBoostersPaused(false);
         memory.setActiveBooster(cfg.getString("stats.booster"));
         memory.setBoostersFromString(cfg.getString("stats.hasbooster"));
+        if (wasPaused) {
+            memory.stopBoosters();
+        }
 
         // Daily Quests
         if (cfg.contains("dailyQuests.offered"))

@@ -29,6 +29,7 @@ import robbery.backpacks.BuyBackpack;
 import robbery.backpacks.PvCommand;
 import robbery.keys.BuyKey;
 import robbery.keys.Rcrate;
+import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 import robbery.quest.*;
 import robbery.skilltree.*;
@@ -362,7 +363,11 @@ public class Robbery extends JavaPlugin implements Listener {
         this.isBackingUp = true;
         PrestigeCountManager.save();
         for (Player player : Bukkit.getOnlinePlayers()) {
-            playerEventListener.savePlayerData(player, PlayerDataManager.getPlayerData(player));
+            PlayerData pd = PlayerDataManager.getPlayerData(player);
+            if (pd != null) {
+                pd.stopBoosters();
+                playerEventListener.savePlayerDataSync(player, pd);
+            }
             player.kick(Component.text(Messages.get("reload.player-kick")));
         }
         Bukkit.getScheduler().cancelTasks(this);
