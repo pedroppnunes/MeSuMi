@@ -257,15 +257,15 @@ public class CryptoCommand implements CommandExecutor {
                 return true;
             }
 
-            String worldName = p.getWorld().getName();
-            if (!worldName.equalsIgnoreCase("outpost") && !worldName.equalsIgnoreCase("SuperiorWorld")) {
-                Messages.send(p, "global.not-here");
-                return true;
-            }
-
-            if (machine == null) return true;
-
             if (args[0].equalsIgnoreCase("claim")) {
+                String worldName = p.getWorld().getName();
+                if (!worldName.equalsIgnoreCase("outpost") && !worldName.equalsIgnoreCase("SuperiorWorld") && !worldName.equalsIgnoreCase("world")) {
+                    Messages.send(p, "global.not-here");
+                    return true;
+                }
+
+                if (machine == null) return true;
+
                 long money = machine.getUnclaimedMoney();
                 if (money > 0) {
                     Robbery.getEconomy().depositPlayer(p, money);
@@ -275,8 +275,17 @@ public class CryptoCommand implements CommandExecutor {
                 } else {
                     Messages.send(p, "crypto.no-claim");
                 }
+                return true;
             }
             else if (args[0].equalsIgnoreCase("pickup")) {
+                String worldName = p.getWorld().getName();
+                if (!worldName.equalsIgnoreCase("outpost") && !worldName.equalsIgnoreCase("SuperiorWorld")) {
+                    Messages.send(p, "global.not-here");
+                    return true;
+                }
+
+                if (machine == null) return true;
+
                 if (machine.isPlaced()) {
                     if (p.getInventory().firstEmpty() == -1) {
                         Messages.send(p, "crypto.inventory-full");
@@ -296,6 +305,7 @@ public class CryptoCommand implements CommandExecutor {
                     p.getInventory().addItem(machineItem);
                     Messages.send(p, "crypto.pickup");
                 }
+                return true;
             }
         }
         return true;
