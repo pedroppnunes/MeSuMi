@@ -155,11 +155,26 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                 yield "1/" + (int)(baseChance / (1.0 + buff));
             }
 
+            case "crypto_has_machine" -> String.valueOf(robbery.crypto.CryptoItemHelper.playerAlreadyHasMachine(p, main));
+            case "crypto_is_placed" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                yield String.valueOf(machine != null && machine.isPlaced());
+            }
             case "crypto_status" -> {
                 robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
                 if (machine == null || !machine.isPlaced()) yield "&cNot Placed";
                 if (machine.getFuelTicks() > 0) yield "&aOnline";
                 yield "&cOffline (Needs Battery)";
+            }
+            case "crypto_money" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "0";
+                yield NumberFormatter.formatDoubleNumber((double) machine.getUnclaimedMoney());
+            }
+            case "crypto_money_raw" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "0";
+                yield String.valueOf(machine.getUnclaimedMoney());
             }
             case "crypto_money_ps" -> {
                 robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
@@ -174,6 +189,24 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                 long totalPs = (long) (baseRate * qualityMult * speedMult * rewardMult * onlineBuff);
                 yield NumberFormatter.formatDoubleNumber((double) totalPs);
             }
+            case "crypto_money_ps_raw" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "0";
+                long baseRate = main.getCryptoManager().getBaseRateForStore(pd.getHighestOwnedStoreTier());
+                double qualityMult = machine.getQualityMultiplier();
+                double speedMult = machine.getSpeedMultiplier();
+                double rewardMult = machine.getRewardMultiplier();
+                double onlineBuff = 1.0;
+                if (p.isOnline() && machine.getFuelTicks() > 0) onlineBuff = 1.20;
+                
+                long totalPs = (long) (baseRate * qualityMult * speedMult * rewardMult * onlineBuff);
+                yield String.valueOf(totalPs);
+            }
+            case "crypto_quality" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null || machine.getFuelTicks() <= 0) yield "0";
+                yield String.format("%.1f", machine.getFuelQuality());
+            }
             case "crypto_battery" -> {
                 robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
                 if (machine == null || machine.getFuelTicks() <= 0) yield "&cNo Battery";
@@ -184,11 +217,96 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                 if (hours > 0) yield String.format("%02d:%02d:%02d", hours, minutes, seconds);
                 yield String.format("%02d:%02d", minutes, seconds);
             }
-            case "crypto_stored_batteries" -> {
+            case "crypto_battery_raw" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "0";
+                yield String.valueOf(machine.getFuelTicks());
+            }
+            case "crypto_battery_time_formatted" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "0s";
+                yield robbery.crypto.CryptoMachine.getFuelDurationFormattedForLevel(machine.getFuelTimeLevel());
+            }
+            case "crypto_speed_level" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "1";
+                yield String.valueOf(machine.getSpeedLevel());
+            }
+            case "crypto_battery_time_level", "crypto_fueltime_level" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "1";
+                yield String.valueOf(machine.getFuelTimeLevel());
+            }
+            case "crypto_reward_level" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "1";
+                yield String.valueOf(machine.getRewardLevel());
+            }
+            case "crypto_multiplier" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "1.00";
+                double mult = machine.getQualityMultiplier() * machine.getSpeedMultiplier() * machine.getRewardMultiplier();
+                if (p.isOnline() && machine.getFuelTicks() > 0) mult *= 1.20;
+                yield String.format("%.2f", mult);
+            }
+            case "crypto_stored_batteries", "crypto_stored_fuels" -> {
                 robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
                 if (machine == null) yield "0";
                 yield String.valueOf(machine.getStoredFuels().size());
             }
+            case "crypto_speed_cost" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "0";
+                long cost = robbery.crypto.CryptoUpgradeManager.getUpgradeCost(machine.getSpeedLevel());
+                yield cost < 0 ? "MAX" : String.valueOf(cost);
+            }
+            case "crypto_speed_cost_formatted" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "0";
+                long cost = robbery.crypto.CryptoUpgradeManager.getUpgradeCost(machine.getSpeedLevel());
+                yield cost < 0 ? "MAX" : NumberFormatter.formatDoubleNumber((double) cost);
+            }
+            case "crypto_speed_req_prestige" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "0";
+                yield String.valueOf(robbery.crypto.CryptoUpgradeManager.getRequiredPrestige(machine.getSpeedLevel() + 1));
+            }
+            case "crypto_battery_time_cost", "crypto_fueltime_cost" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "0";
+                long cost = robbery.crypto.CryptoUpgradeManager.getUpgradeCost(machine.getFuelTimeLevel());
+                yield cost < 0 ? "MAX" : String.valueOf(cost);
+            }
+            case "crypto_battery_time_cost_formatted", "crypto_fueltime_cost_formatted" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "0";
+                long cost = robbery.crypto.CryptoUpgradeManager.getUpgradeCost(machine.getFuelTimeLevel());
+                yield cost < 0 ? "MAX" : NumberFormatter.formatDoubleNumber((double) cost);
+            }
+            case "crypto_battery_time_req_prestige", "crypto_fueltime_req_prestige" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "0";
+                yield String.valueOf(robbery.crypto.CryptoUpgradeManager.getRequiredPrestige(machine.getFuelTimeLevel() + 1));
+            }
+            case "crypto_reward_cost" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "0";
+                long cost = robbery.crypto.CryptoUpgradeManager.getUpgradeCost(machine.getRewardLevel());
+                yield cost < 0 ? "MAX" : String.valueOf(cost);
+            }
+            case "crypto_reward_cost_formatted" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "0";
+                long cost = robbery.crypto.CryptoUpgradeManager.getUpgradeCost(machine.getRewardLevel());
+                yield cost < 0 ? "MAX" : NumberFormatter.formatDoubleNumber((double) cost);
+            }
+            case "crypto_reward_req_prestige" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "0";
+                yield String.valueOf(robbery.crypto.CryptoUpgradeManager.getRequiredPrestige(machine.getRewardLevel() + 1));
+            }
+            case "crypto_dealer_talked", "crypto_talked_npc" -> String.valueOf(pd.hasTalkedToCryptoNPC());
+            case "crypto_battery_talked", "crypto_talked_battery_npc" -> String.valueOf(pd.hasTalkedToCryptoBatteryNPC());
 
             default -> null;
         };
@@ -203,6 +321,27 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
         String type = parts[0];
         try {
             switch (type) {
+                case "crypto":
+                    if (parts.length >= 4 && parts[1].equalsIgnoreCase("fuel")) {
+                        robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(pd.getPlayer().getUniqueId());
+                        if (machine == null) return "0";
+                        try {
+                            int idx = Integer.parseInt(parts[3]) - 1; // 1-based index
+                            if (idx >= 0 && idx < machine.getStoredFuels().size()) {
+                                robbery.crypto.StoredFuel fuel = machine.getStoredFuels().get(idx);
+                                if (parts[2].equalsIgnoreCase("quality")) {
+                                    return String.format("%.1f", fuel.getQuality());
+                                } else if (parts[2].equalsIgnoreCase("duration")) {
+                                    long baseDur = machine.getFuelDurationTicks();
+                                    long scaled = (long) (baseDur * (fuel.getQuality() / 100.0));
+                                    return robbery.crypto.CryptoMachine.getFuelDurationFormattedForTicks(scaled);
+                                }
+                            }
+                        } catch (NumberFormatException ignored) {}
+                        return "0";
+                    }
+                    return null;
+
                 case "has":
                     if (parts.length < 3) return null;
                     return switch (parts[1]) {

@@ -211,22 +211,18 @@ public class FuelRouletteGUI implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent event) {
-        String titleStr = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(event.getView().title());
-        if (titleStr.contains("Rolling Fuel Quality") || titleStr.contains("Fuel Quality") || titleStr.contains("Rolling Battery Quality") || titleStr.contains("Battery Quality")) {
+        if (activeSpins.containsKey(event.getWhoClicked().getUniqueId())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
-        String titleStr = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(event.getView().title());
-        if (titleStr.contains("Rolling Fuel Quality") || titleStr.contains("Fuel Quality") || titleStr.contains("Rolling Battery Quality") || titleStr.contains("Battery Quality")) {
-            UUID uuid = event.getPlayer().getUniqueId();
-            SpinInfo info = activeSpins.remove(uuid);
-            if (info != null) {
-                Bukkit.getScheduler().cancelTask(info.taskId);
-                finishSpin((Player) event.getPlayer(), info.winningItem, false);
-            }
+        UUID uuid = event.getPlayer().getUniqueId();
+        SpinInfo info = activeSpins.remove(uuid);
+        if (info != null) {
+            Bukkit.getScheduler().cancelTask(info.taskId);
+            finishSpin((Player) event.getPlayer(), info.winningItem, false);
         }
     }
 }
