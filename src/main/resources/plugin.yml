@@ -160,6 +160,15 @@ commands:
   weeklyleaderboard:
     usage: /weeklyleaderboard
     permission: robbery.op
+  crypto:
+    description: Open the crypto menu
+    usage: /crypto
+  backpacks:
+    description: View your backpacks
+    usage: /backpacks
+  ho:
+    description: Alias for hideout
+    usage: /ho
 
 permissions:
   robbery.op:
