@@ -289,14 +289,28 @@ public class PlayerData {
     }
     public int getExtraSlots() { return (int) (rank.extraSlots() + getPerkValue(PERK_BACK_SLOTS1));}
     public double getExtraDamage() {
+        return getExtraDamage("store1");
+    }
+
+    public double getExtraDamage(String storeId) {
         double baseDamage = rank.extraDamage()*100
                 + getOutSpeedBonus()
                 + getPerkValue(PERK_STEAL_SPEED1)
                 + getPerkValue(PERK_STEAL_SPEED2)
-                + itemStreakBonus;
+                + itemStreakBonus
+                + getStoreMasteryStealSpeed(storeId);
 
         if (hasTemporaryPerk(PERK_ITEM_STREAK1)) {
             baseDamage += 50;
+        }
+
+        if (hasTemporaryPerk(PERK_ABILITY_STEALSPEED1)) {
+            baseDamage += 50;
+        }
+
+        robbery.crypto.CryptoMachine machine = robbery.core.Robbery.getInstance().getCryptoManager().getMachine(this.player.getUniqueId());
+        if (machine != null && machine.getFuelTicks() > 0) {
+            baseDamage += 5.0;
         }
 
         return baseDamage;
@@ -529,7 +543,18 @@ public class PlayerData {
         return xp;
     }
     public double getXPBoost(){
-        return rank.xpboost() + getPerkValue(PERK_XP1) + getPerkValue(PERK_XP2);
+        return getXPBoost("store1");
+    }
+
+    public double getXPBoost(String storeId){
+        double xpBoost = rank.xpboost() + getPerkValue(PERK_XP1) + getPerkValue(PERK_XP2) + getStoreMasteryRobberyXp(storeId);
+        
+        robbery.crypto.CryptoMachine machine = robbery.core.Robbery.getInstance().getCryptoManager().getMachine(this.player.getUniqueId());
+        if (machine != null && machine.getFuelTicks() > 0) {
+            xpBoost += 0.05;
+        }
+        
+        return xpBoost;
     }
     public void setXp(long xp) {
         this.xp = Math.max(0L, xp);
@@ -598,6 +623,16 @@ public int getStoreItems(String storeId) {
 
     public int getStoreMastery(String storeId) {
         return getStoreItems(storeId);
+    }
+
+    public double getStoreMasteryStealSpeed(String storeId) {
+        int level = robbery.core.Robbery.getInstance().getMasteryManager().getLevelFromItems(storeId, getStoreItems(storeId));
+        return level * 5.0;
+    }
+
+    public double getStoreMasteryRobberyXp(String storeId) {
+        int level = robbery.core.Robbery.getInstance().getMasteryManager().getLevelFromItems(storeId, getStoreItems(storeId));
+        return level * 0.05;
     }
 
 //SkillTree
