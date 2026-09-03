@@ -58,6 +58,12 @@ public class PlayerEventListener implements Listener {
     @org.bukkit.event.EventHandler
     public void onPreLogin(org.bukkit.event.player.AsyncPlayerPreLoginEvent event) {
         YamlConfiguration cfg = plugin.getPlayerDataDao().loadPlayerData(event.getUniqueId());
+        if (cfg == null) {
+            java.io.File f = new java.io.File(plugin.getDataFolder(), "Playerdata/" + event.getUniqueId() + ".yml");
+            if (f.exists()) {
+                cfg = YamlConfiguration.loadConfiguration(f);
+            }
+        }
         if (cfg != null) {
             tempCache.put(event.getUniqueId(), cfg);
         }
@@ -188,6 +194,7 @@ public class PlayerEventListener implements Listener {
         cfg.set("crypto.talkedToNPC", memory.hasTalkedToCryptoNPC());
         cfg.set("crypto.talkedToBatteryNPC", memory.hasTalkedToCryptoBatteryNPC());
         cfg.set("stats.talkedToShopSellNPC", memory.hasTalkedToShopSellNPC());
+        cfg.set("stats.profilePrivacy", memory.getProfilePrivacy());
 
         // Quest progress
         Map<String, Map<String, Object>> progressMap = new HashMap<>();
@@ -213,6 +220,13 @@ public class PlayerEventListener implements Listener {
 
         Runnable saveTask = () -> {
             try {
+                // 1. Save to local YAML file
+                java.io.File folder = new java.io.File(plugin.getDataFolder(), "Playerdata");
+                if (!folder.exists()) folder.mkdirs();
+                java.io.File file = new java.io.File(folder, player.getUniqueId() + ".yml");
+                cfg.save(file);
+
+                // 2. Save to MySQL database
                 plugin.getPlayerDataDao().savePlayerData(
                     player.getUniqueId(),
                     player.getName(),
@@ -341,6 +355,7 @@ public class PlayerEventListener implements Listener {
         memory.setTalkedToCryptoNPC(cfg.getBoolean("crypto.talkedToNPC", false));
         memory.setTalkedToCryptoBatteryNPC(cfg.getBoolean("crypto.talkedToBatteryNPC", false));
         memory.setTalkedToShopSellNPC(cfg.getBoolean("stats.talkedToShopSellNPC", false));
+        memory.setProfilePrivacy(cfg.getString("stats.profilePrivacy", "PUBLIC"));
 
         // FIXED: Quest progress (Casting fix)
         if (cfg.contains("dailyQuests.progress")) {

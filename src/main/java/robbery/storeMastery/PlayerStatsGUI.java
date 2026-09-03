@@ -7,7 +7,9 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,15 +24,19 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import robbery.backpacks.BackpackManager;
 import robbery.core.Robbery;
-import robbery.items.Items;
 import robbery.keys.KeyManager;
+import robbery.keys.Keys;
 import robbery.number.NumberFormatter;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
+import robbery.tool.ToolManager;
+import robbery.tool.Tools;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static robbery.attribute.Attribute.*;
 
@@ -45,16 +51,83 @@ public class PlayerStatsGUI implements Listener {
     }
 
     public void openGUI(Player viewer, Player target) {
-        if (viewer == null || target == null || !target.isOnline()) return;
-
+        if (viewer == null || target == null) return;
         PlayerData pd = PlayerDataManager.getPlayerData(target);
         if (pd == null) return;
 
-        Economy econ = Robbery.getEconomy();
-        double balance = econ != null ? econ.getBalance(target) : 0.0;
+        openGUIForData(viewer, pd, target.getName(), target.getUniqueId());
+    }
 
-        String titleStr = "Stats: " + target.getName();
-        Inventory inv = Bukkit.createInventory(null, 54, Component.text(titleStr).color(NamedTextColor.GOLD));
+    public void openGUIForOfflinePlayer(Player viewer, OfflinePlayer offlineTarget) {
+        if (viewer == null || offlineTarget == null) return;
+
+        if (offlineTarget.isOnline() && offlineTarget.getPlayer() != null) {
+            openGUI(viewer, offlineTarget.getPlayer());
+            return;
+        }
+
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            UUID uuid = offlineTarget.getUniqueId();
+            String name = offlineTarget.getName() != null ? offlineTarget.getName() : "Offline Player";
+
+            YamlConfiguration cfg = plugin.getPlayerDataDao().loadPlayerData(uuid);
+            if (cfg == null) {
+                java.io.File f = new java.io.File(plugin.getDataFolder(), "Playerdata/" + uuid + ".yml");
+                if (f.exists()) {
+                    cfg = YamlConfiguration.loadConfiguration(f);
+                }
+            }
+
+            if (cfg == null) {
+                viewer.sendMessage("§cNo statistics found for player " + name + "!");
+                return;
+            }
+
+            PlayerData offlineData = new PlayerData(null);
+            plugin.getPlayerEventListener().loadPlayerDataFromDB(null, offlineData, cfg);
+
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                openGUIForData(viewer, offlineData, name, uuid);
+            });
+        });
+    }
+
+    private void openGUIForData(Player viewer, PlayerData pd, String targetName, UUID targetUuid) {
+        // Privacy check
+        boolean isSelf = viewer.getUniqueId().equals(targetUuid);
+        boolean isOp = viewer.isOp() || viewer.hasPermission("robbery.op");
+
+        if (!isSelf && !isOp) {
+            String privacy = pd.getProfilePrivacy();
+            if (privacy.equalsIgnoreCase("PRIVATE")) {
+                viewer.sendMessage("§cThis player's profile is set to Private!");
+                viewer.playSound(viewer.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+                return;
+            }
+            if (privacy.equalsIgnoreCase("HIDEOUT")) {
+                // Check hideout membership if hideout manager present
+                boolean inSameHideout = false;
+                if (plugin.getHideoutManager() != null && viewer.isOnline()) {
+                    inSameHideout = plugin.getHideoutManager().areInSameHideout(viewer, targetUuid);
+                }
+                if (!inSameHideout) {
+                    viewer.sendMessage("§cThis player's profile is set to Hideout Members Only!");
+                    viewer.playSound(viewer.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+                    return;
+                }
+            }
+        }
+
+        Economy econ = Robbery.getEconomy();
+        double balance = 0.0;
+        if (targetUuid != null) {
+            OfflinePlayer off = Bukkit.getOfflinePlayer(targetUuid);
+            if (econ != null) balance = econ.getBalance(off);
+        }
+
+        // Dark Gray title format: "Stats: PlayerName"
+        String titleStr = "Stats: " + targetName;
+        Inventory inv = Bukkit.createInventory(null, 27, Component.text(titleStr).color(NamedTextColor.DARK_GRAY));
 
         // Background Glass
         ItemStack glass = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
@@ -63,40 +136,39 @@ public class PlayerStatsGUI implements Listener {
             glassMeta.displayName(Component.text(" "));
             glass.setItemMeta(glassMeta);
         }
-        for (int i = 0; i < 54; i++) {
+        for (int i = 0; i < 27; i++) {
             inv.setItem(i, glass);
         }
 
-        // Header Skull (Slot 4)
+        // 1. Header Skull (Slot 4) - "[Level] PlayerName"
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta headMeta = (SkullMeta) head.getItemMeta();
         if (headMeta != null) {
-            headMeta.setOwningPlayer(target);
-            headMeta.displayName(Component.text(target.getName()).color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+            if (targetUuid != null) headMeta.setOwningPlayer(Bukkit.getOfflinePlayer(targetUuid));
+            headMeta.displayName(Component.text("[" + pd.getLevel() + "] " + targetName).color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
             headMeta.lore(List.of(
-                    Component.text("Robbery Level: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                            .append(Component.text("Level " + pd.getLevel()).color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)),
-                    Component.text("Prestige: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                            .append(Component.text("Prestige " + pd.getPrestige()).color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
+                    Component.text("Total XP: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                            .append(Component.text(NumberFormatter.formatDoubleNumber((double) pd.getXp()) + " XP").color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false))
             ));
             head.setItemMeta(headMeta);
         }
         inv.setItem(4, head);
 
-        // 1. Overview & Level Card (Slot 10)
+        // 2. Overview & Account Card (Slot 10 - Chest)
         ItemStack overviewItem = new ItemStack(Material.CHEST);
         ItemMeta oMeta = overviewItem.getItemMeta();
         if (oMeta != null) {
             oMeta.displayName(Component.text("Overview & Account").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
             List<Component> lore = new ArrayList<>();
             lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+
+            String displayRank = getFormattedRank(targetUuid, pd);
             lore.add(Component.text("Rank: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text(pd.getRank()).color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
-            lore.add(Component.text("Prestige Level: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(displayRank).color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+            lore.add(Component.text("Prestige: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text("Prestige " + pd.getPrestige()).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Robbery Level: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text("Level " + pd.getLevel()).color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false))
-                    .append(Component.text(" (" + NumberFormatter.formatDoubleNumber((double) pd.getXp()) + " XP)").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
+                    .append(Component.text("Level " + pd.getLevel()).color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Balance: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text("$" + NumberFormatter.formatDoubleNumber(balance)).color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Skill Points: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
@@ -111,11 +183,11 @@ public class PlayerStatsGUI implements Listener {
         }
         inv.setItem(10, overviewItem);
 
-        // 2. Attributes & Multipliers Card (Slot 12)
+        // 3. Attributes & Boosts Card (Slot 12 - Beacon)
         ItemStack attrItem = new ItemStack(Material.BEACON);
         ItemMeta aMeta = attrItem.getItemMeta();
         if (aMeta != null) {
-            aMeta.displayName(Component.text("Attributes & Multipliers").color(NamedTextColor.AQUA).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+            aMeta.displayName(Component.text("Attributes & Boosts").color(NamedTextColor.AQUA).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
             List<Component> lore = new ArrayList<>();
             lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
             lore.add(Component.text("Money Multiplier: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
@@ -124,7 +196,7 @@ public class PlayerStatsGUI implements Listener {
                     .append(Component.text("+" + String.format("%.1f", pd.getExtraDamage()) + "%").color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Robbery XP Boost: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text("+" + String.format("%.1f", pd.getXPBoost() * 100) + "%").color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)));
-            lore.add(Component.text("Skill Point Chance: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+            lore.add(Component.text("Extra Skill Point Chance: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text("+" + String.format("%.2f", pd.getPerkValue(PERK_CHANCE_SP1)) + "%").color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Extra Backpack Slots: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text("+" + pd.getExtraSlots()).color(NamedTextColor.DARK_AQUA).decoration(TextDecoration.ITALIC, false)));
@@ -140,112 +212,152 @@ public class PlayerStatsGUI implements Listener {
         }
         inv.setItem(12, attrItem);
 
-        // 3. Equipment & Progression Card (Slot 14)
+        // 4. Equipment & Unlocks Card (Slot 14 - Diamond Pickaxe)
         ItemStack equipItem = new ItemStack(Material.DIAMOND_PICKAXE);
         ItemMeta eMeta = equipItem.getItemMeta();
         if (eMeta != null) {
             eMeta.displayName(Component.text("Equipment & Unlocks").color(NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
             List<Component> lore = new ArrayList<>();
             lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+
+            // Backpack name without (Cap.5)
+            String backName = pd.getBackpack() != null ? pd.getBackpack().getName() : "Cloth Backpack";
             lore.add(Component.text("Current Backpack: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text(pd.getBackpack().getName() + " (Cap: " + pd.getBackpack().getcapacity() + ")").color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
-            lore.add(Component.text("Backpacks Unlocked: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text(pd.getBackpackUnlocked() + "/20").color(NamedTextColor.DARK_AQUA).decoration(TextDecoration.ITALIC, false)));
+                    .append(Component.text(backName).color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+
+            // Real Tool Display Name
+            String toolId = pd.getToolString();
+            Tools toolObj = ToolManager.getToolsName(toolId);
+            String toolName = toolObj != null ? toolObj.getColorname() : toolId;
             lore.add(Component.text("Current Tool: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text(pd.getToolString()).color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
-            lore.add(Component.text("Tools Unlocked: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text(pd.getToolsUnlocked() + "/20").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)));
-            lore.add(Component.text("Active Booster: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text(pd.getActiveboost().getName()).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
-            lore.add(Component.text("Highest Key Tier: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text("Store " + pd.getHighestOwnedStoreTier()).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
+                    .append(Component.text(toolName).color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+
+            // Highest Achieved Store
+            int highestKeyTier = pd.getHighestOwnedStoreTier();
+            String highestStoreName = KeyManager.getStoreN("store" + highestKeyTier);
+            if (highestStoreName == null) highestStoreName = "Store " + highestKeyTier;
+
+            lore.add(Component.text("Highest Achieved Store: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(highestStoreName).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
+
+            // Current Store with Milestone in gray in front: e.g. "Supermarket (M1)"
+            String currentStoreId = pd.getKey() != null ? pd.getKey().getId() : "store1";
+            Keys curKey = KeyManager.getStoreName(currentStoreId);
+            String curStoreName = curKey != null ? curKey.getName() : "Supermarket";
+            int curMastery = pd.getStoreMasteryLevel(currentStoreId);
+
+            lore.add(Component.text("Current Store: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(curStoreName + " ").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
+                    .append(Component.text("(M" + curMastery + ")").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
+
             lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
             eMeta.lore(lore);
             equipItem.setItemMeta(eMeta);
         }
         inv.setItem(14, equipItem);
 
-        // 4. Per-Store Detailed Progress Card (Slot 16)
-        ItemStack storeProgressItem = new ItemStack(Material.GOLD_ORE);
-        ItemMeta spMeta = storeProgressItem.getItemMeta();
-        if (spMeta != null) {
-            spMeta.displayName(Component.text("Store Progress & Playtimes").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-            List<Component> lore = new ArrayList<>();
-            lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-
-            for (int i = 1; i <= 12; i++) {
-                String sId = "store" + i;
-                String storeName = KeyManager.getStoreN(sId);
-                if (storeName == null) storeName = sId;
-
-                int items = pd.getStoreItems(sId);
-                long time = pd.getStorePlaytime(sId);
-                int mastery = pd.getStoreMasteryLevel(sId);
-
-                lore.add(Component.text("• ").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)
-                        .append(Component.text(storeName + ": ").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
-                        .append(Component.text(items + " items").color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false))
-                        .append(Component.text(" | ").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false))
-                        .append(Component.text(formatSeconds(time)).color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false))
-                        .append(Component.text(" | M" + mastery).color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false)));
-            }
-            lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-            spMeta.lore(lore);
-            storeProgressItem.setItemMeta(spMeta);
+        // 5. Skill Tree Button (Slot 16 - Enchanted Book)
+        ItemStack skillTreeBtn = new ItemStack(Material.ENCHANTED_BOOK);
+        ItemMeta stMeta = skillTreeBtn.getItemMeta();
+        if (stMeta != null) {
+            stMeta.displayName(Component.text("Skill Tree Progress").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+            stMeta.lore(List.of(
+                    Component.text("Click to view " + targetName + "'s full Skill Tree").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
+                    Component.text("and tier-by-tier perk upgrades!").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+            ));
+            skillTreeBtn.setItemMeta(stMeta);
         }
-        inv.setItem(16, storeProgressItem);
+        inv.setItem(16, skillTreeBtn);
 
-        // 5. Per-Prestige Analytics Card (Slot 31)
-        ItemStack prestigeAnalyticsItem = new ItemStack(Material.CLOCK);
-        ItemMeta paMeta = prestigeAnalyticsItem.getItemMeta();
-        if (paMeta != null) {
-            paMeta.displayName(Component.text("Per-Prestige Analytics").color(NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-            List<Component> lore = new ArrayList<>();
-            lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+        // 6. Privacy Dye Button (Slot 20 - Dye, only interactive for self)
+        String currentPrivacy = pd.getProfilePrivacy();
+        ItemStack dyeItem;
+        String dyeName;
+        NamedTextColor dyeColor;
 
-            int currentP = pd.getPrestige();
-            for (int p = 0; p <= currentP; p++) {
-                long pTime = pd.getPrestigePlaytime(p);
-                int pStolen = pd.getPrestigeItemsStolen(p);
-                String mostStore = pd.getMostTimeConsumingStore(p);
-
-                lore.add(Component.text("Prestige " + p + ":").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-                lore.add(Component.text("  Duration: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                        .append(Component.text(formatSeconds(pTime)).color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false))
-                        .append(Component.text(" | Stolen: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false))
-                        .append(Component.text(String.valueOf(pStolen)).color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)));
-                lore.add(Component.text("  Most Time Spent In: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                        .append(Component.text(mostStore).color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)));
-            }
-            lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-            paMeta.lore(lore);
-            prestigeAnalyticsItem.setItemMeta(paMeta);
+        if (currentPrivacy.equalsIgnoreCase("PRIVATE")) {
+            dyeItem = new ItemStack(Material.RED_DYE);
+            dyeName = "Profile Privacy: PRIVATE";
+            dyeColor = NamedTextColor.RED;
+        } else if (currentPrivacy.equalsIgnoreCase("HIDEOUT")) {
+            dyeItem = new ItemStack(Material.YELLOW_DYE);
+            dyeName = "Profile Privacy: HIDEOUT ONLY";
+            dyeColor = NamedTextColor.YELLOW;
+        } else {
+            dyeItem = new ItemStack(Material.LIME_DYE);
+            dyeName = "Profile Privacy: PUBLIC";
+            dyeColor = NamedTextColor.GREEN;
         }
-        inv.setItem(31, prestigeAnalyticsItem);
 
-        // 6. View Store Item Catalog Button (Slot 40)
+        ItemMeta dyeMeta = dyeItem.getItemMeta();
+        if (dyeMeta != null) {
+            dyeMeta.displayName(Component.text(dyeName).color(dyeColor).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+            if (isSelf) {
+                dyeMeta.lore(List.of(
+                        Component.text("Click to toggle profile privacy:").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
+                        Component.text("• PUBLIC (Everyone can view)").color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false),
+                        Component.text("• HIDEOUT ONLY (Only hideout members)").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false),
+                        Component.text("• PRIVATE (Only OP & self)").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)
+                ));
+            } else {
+                dyeMeta.lore(List.of(
+                        Component.text("Status: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                                .append(Component.text(currentPrivacy).color(dyeColor).decoration(TextDecoration.ITALIC, false))
+                ));
+            }
+            dyeItem.setItemMeta(dyeMeta);
+        }
+        inv.setItem(20, dyeItem);
+
+        // 7. Store Item Catalog Button (Slot 22 - Writable Book)
         ItemStack catalogButton = new ItemStack(Material.WRITABLE_BOOK);
         ItemMeta cMeta = catalogButton.getItemMeta();
         if (cMeta != null) {
             cMeta.displayName(Component.text("View Store Item Catalog").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
             cMeta.lore(List.of(
-                    Component.text("Click to open the completionist catalog menu").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
-                    Component.text("and view item values, robbery XP & discovered items!").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    Component.text("Click to open completionist item catalog!").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
             ));
             catalogButton.setItemMeta(cMeta);
         }
-        inv.setItem(40, catalogButton);
+        inv.setItem(22, catalogButton);
 
-        // Close Button (Slot 49)
+        // 8. Close Button (Slot 24 - Barrier)
         ItemStack closeItem = new ItemStack(Material.BARRIER);
         ItemMeta closeMeta = closeItem.getItemMeta();
         if (closeMeta != null) {
             closeMeta.displayName(Component.text("Close").color(NamedTextColor.RED).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
             closeItem.setItemMeta(closeMeta);
         }
-        inv.setItem(49, closeItem);
+        inv.setItem(24, closeItem);
+
+        // 9. Target Head Indicator at Bottom Right (Slot 26)
+        ItemStack targetIndicatorHead = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta tiMeta = (SkullMeta) targetIndicatorHead.getItemMeta();
+        if (tiMeta != null) {
+            if (targetUuid != null) tiMeta.setOwningPlayer(Bukkit.getOfflinePlayer(targetUuid));
+            tiMeta.displayName(Component.text("Inspecting: ").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(targetName).color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+            targetIndicatorHead.setItemMeta(tiMeta);
+        }
+        inv.setItem(26, targetIndicatorHead);
 
         viewer.openInventory(inv);
+    }
+
+    private String getFormattedRank(UUID targetUuid, PlayerData pd) {
+        String r = pd.getRank();
+        if (r == null || r.equalsIgnoreCase("NONE") || r.equalsIgnoreCase("rank0")) {
+            if (targetUuid != null) {
+                Player p = Bukkit.getPlayer(targetUuid);
+                if (p != null) {
+                    for (int i = 7; i >= 1; i--) {
+                        if (p.hasPermission("robbery.rank" + i)) return "Rank " + i;
+                    }
+                }
+            }
+            return "Burglar";
+        }
+        return r;
     }
 
     @EventHandler
@@ -255,7 +367,7 @@ public class PlayerStatsGUI implements Listener {
         Component title = event.getView().title();
         String titleStr = title.toString();
 
-        // 1. Detect click in DeluxeMenus Main Menu / General Menu on slot 4 (Player Head)
+        // 1. Detect click in DeluxeMenus Main Menu on slot 4 (Player Head)
         boolean isGeneralMenu = titleStr.toLowerCase().contains("general") || titleStr.toLowerCase().contains("main menu") || titleStr.toLowerCase().contains("robbery menu");
         if (isGeneralMenu && event.getSlot() == 4) {
             ItemStack clicked = event.getCurrentItem();
@@ -273,10 +385,47 @@ public class PlayerStatsGUI implements Listener {
             ItemStack clicked = event.getCurrentItem();
             if (clicked == null || clicked.getType() == Material.AIR) return;
 
+            String targetName = titleStr.substring(titleStr.indexOf("Stats: ") + 7).trim();
+            OfflinePlayer offTarget = Bukkit.getOfflinePlayer(targetName);
+            PlayerData targetPd = PlayerDataManager.getPlayerData(offTarget.getUniqueId());
+
+            if (clicked.getType() == Material.ENCHANTED_BOOK) {
+                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
+                if (targetPd != null) {
+                    plugin.getPlayerSkillTreeGUI().openGUI(player, targetPd, targetName, offTarget.getUniqueId(), 1);
+                } else {
+                    openGUIForOfflinePlayer(player, offTarget);
+                }
+                return;
+            }
+
             if (clicked.getType() == Material.WRITABLE_BOOK) {
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
                 plugin.getStoreCatalogGUI().openStoreSelectorGUI(player);
-            } else if (clicked.getType() == Material.BARRIER) {
+                return;
+            }
+
+            if (clicked.getType() == Material.LIME_DYE || clicked.getType() == Material.YELLOW_DYE || clicked.getType() == Material.RED_DYE) {
+                // Toggle privacy if viewing self
+                if (player.getUniqueId().equals(offTarget.getUniqueId())) {
+                    PlayerData selfPd = PlayerDataManager.getPlayerData(player);
+                    if (selfPd != null) {
+                        String current = selfPd.getProfilePrivacy();
+                        String next = switch (current.toUpperCase()) {
+                            case "PUBLIC" -> "HIDEOUT";
+                            case "HIDEOUT" -> "PRIVATE";
+                            default -> "PUBLIC";
+                        };
+                        selfPd.setProfilePrivacy(next);
+                        plugin.getPlayerEventListener().savePlayerData(player, selfPd);
+                        player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
+                        openGUI(player, player);
+                    }
+                }
+                return;
+            }
+
+            if (clicked.getType() == Material.BARRIER) {
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
                 player.closeInventory();
             }
@@ -321,15 +470,5 @@ public class PlayerStatsGUI implements Listener {
             clicker.playSound(clicker.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
             openGUI(clicker, targetPlayer);
         }
-    }
-
-    private String formatSeconds(long seconds) {
-        if (seconds <= 0) return "0s";
-        long h = seconds / 3600;
-        long m = (seconds % 3600) / 60;
-        long s = seconds % 60;
-        if (h > 0) return h + "h " + m + "m " + s + "s";
-        if (m > 0) return m + "m " + s + "s";
-        return s + "s";
     }
 }

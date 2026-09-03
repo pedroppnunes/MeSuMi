@@ -41,17 +41,23 @@ public class StoreCatalogCommand implements CommandExecutor, TabCompleter {
 
         // Handle /stats [player] command
         if (cmdName.equals("stats")) {
-            Player target = player;
-            if (args.length > 0) {
-                Player specified = Bukkit.getPlayer(args[0]);
-                if (specified != null && specified.isOnline()) {
-                    target = specified;
+            if (args.length == 0) {
+                plugin.getPlayerStatsGUI().openGUI(player, player);
+                return true;
+            }
+
+            String targetName = args[0];
+            Player specified = Bukkit.getPlayer(targetName);
+            if (specified != null && specified.isOnline()) {
+                plugin.getPlayerStatsGUI().openGUI(player, specified);
+            } else {
+                org.bukkit.OfflinePlayer offTarget = Bukkit.getOfflinePlayer(targetName);
+                if (offTarget != null && (offTarget.hasPlayedBefore() || offTarget.isOnline())) {
+                    plugin.getPlayerStatsGUI().openGUIForOfflinePlayer(player, offTarget);
                 } else {
                     Messages.send(sender, "global.player-not-found");
-                    return true;
                 }
             }
-            plugin.getPlayerStatsGUI().openGUI(player, target);
             return true;
         }
 

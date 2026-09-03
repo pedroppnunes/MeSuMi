@@ -135,10 +135,12 @@ public class Robbery extends JavaPlugin implements Listener {
     private robbery.storeMastery.StoreCatalogGUI storeCatalogGUI;
     private robbery.storeMastery.StorePlaytimeTask storePlaytimeTask;
     private robbery.storeMastery.PlayerStatsGUI playerStatsGUI;
+    private robbery.storeMastery.PlayerSkillTreeGUI playerSkillTreeGUI;
 
     public robbery.storeMastery.StoreCatalogGUI getStoreCatalogGUI() { return storeCatalogGUI; }
     public robbery.storeMastery.StorePlaytimeTask getStorePlaytimeTask() { return storePlaytimeTask; }
     public robbery.storeMastery.PlayerStatsGUI getPlayerStatsGUI() { return playerStatsGUI; }
+    public robbery.storeMastery.PlayerSkillTreeGUI getPlayerSkillTreeGUI() { return playerSkillTreeGUI; }
     
     private robbery.database.DatabaseManager databaseManager;
     private robbery.database.PlayerDataDao playerDataDao;
@@ -258,6 +260,7 @@ public class Robbery extends JavaPlugin implements Listener {
         this.storeCatalogGUI = new robbery.storeMastery.StoreCatalogGUI(this);
         this.storePlaytimeTask = new robbery.storeMastery.StorePlaytimeTask(this);
         this.playerStatsGUI = new robbery.storeMastery.PlayerStatsGUI(this);
+        this.playerSkillTreeGUI = new robbery.storeMastery.PlayerSkillTreeGUI(this);
         this.storePlaytimeTask.runTaskTimer(this, 20L, 20L);
 
         getServer().getPluginManager().registerEvents(fuelRouletteGUI, this);
@@ -266,6 +269,7 @@ public class Robbery extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(backpackGUI, this);
         getServer().getPluginManager().registerEvents(storeCatalogGUI, this);
         getServer().getPluginManager().registerEvents(playerStatsGUI, this);
+        getServer().getPluginManager().registerEvents(playerSkillTreeGUI, this);
         getServer().getPluginManager().registerEvents(new robbery.storeMastery.StoreNPCListener(this), this);
         getServer().getPluginManager().registerEvents(new robbery.crypto.CryptoListener(this), this);
         getServer().getPluginManager().registerEvents(new robbery.crypto.CryptoNPCListener(this), this);

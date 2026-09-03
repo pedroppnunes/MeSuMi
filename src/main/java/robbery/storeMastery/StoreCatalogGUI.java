@@ -101,6 +101,20 @@ public class StoreCatalogGUI implements Listener {
             inv.setItem(i, glass);
         }
 
+        // Header Player Skull (Slot 4)
+        ItemStack pHead = new ItemStack(Material.PLAYER_HEAD);
+        org.bukkit.inventory.meta.SkullMeta pMeta = (org.bukkit.inventory.meta.SkullMeta) pHead.getItemMeta();
+        if (pMeta != null) {
+            pMeta.setOwningPlayer(player);
+            pMeta.displayName(Component.text("[" + pd.getLevel() + "] " + player.getName()).color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+            pMeta.lore(List.of(
+                    Component.text("Inspecting Store Catalog: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                            .append(Component.text(storeName).color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
+            ));
+            pHead.setItemMeta(pMeta);
+        }
+        inv.setItem(4, pHead);
+
         // Count unlocked items for completion calculation
         int unlockedCount = 0;
         for (Items itemObj : storeItemList) {
