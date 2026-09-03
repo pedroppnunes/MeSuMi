@@ -47,12 +47,18 @@ public class XPManager {
             level = 1;
 
         long rawXp;
-        if (level <= SOFTCAP) {
+        if (level <= 44) {
+            // Unchanged early-game scaling for levels 1 to 44
             rawXp = Math.round(BASE_MULT * Math.pow(level, EXPONENT));
+        } else if (level <= SOFTCAP) {
+            // End-game nerf starting at level 45+: XP needed scales higher per level
+            double nerfMultiplier = 1.0 + 0.02 * (level - 44);
+            rawXp = Math.round(BASE_MULT * Math.pow(level, EXPONENT) * nerfMultiplier);
         } else {
-            long base = Math.round(BASE_MULT * Math.pow(SOFTCAP, EXPONENT));
-            // Linear scaling above level 120 softcap (+25,000 XP per level above 120) to prevent numeric overflow
-            rawXp = base + (long) (level - SOFTCAP) * 25000L;
+            double softcapFactor = 1.0 + 0.02 * (SOFTCAP - 44);
+            long base = Math.round(BASE_MULT * Math.pow(SOFTCAP, EXPONENT) * softcapFactor);
+            // Linear scaling above level 120 softcap (+35,000 XP per level above 120)
+            rawXp = base + (long) (level - SOFTCAP) * 35000L;
         }
 
         return Math.max(100L, rawXp);

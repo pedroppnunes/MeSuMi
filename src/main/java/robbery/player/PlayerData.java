@@ -623,7 +623,9 @@ public class PlayerData {
     }
 
     public double getXPBoost(String storeId){
-        double xpBoost = rank.xpboost() + getPerkValue(PERK_XP1) + getPerkValue(PERK_XP2) + getStoreMasteryRobberyXp(storeId);
+        double perkXpFraction = (getPerkValue(PERK_XP1) + getPerkValue(PERK_XP2)) / 100.0;
+        double prestigeXpFraction = this.prestige * 0.10; // +10% Robbery XP per prestige level
+        double xpBoost = rank.xpboost() + perkXpFraction + getStoreMasteryRobberyXp(storeId) + prestigeXpFraction;
         
         if (this.player != null) {
             robbery.crypto.CryptoMachine machine = robbery.core.Robbery.getInstance().getCryptoManager().getMachine(this.player.getUniqueId());
