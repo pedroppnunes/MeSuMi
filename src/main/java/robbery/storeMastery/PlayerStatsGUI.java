@@ -96,7 +96,7 @@ public class PlayerStatsGUI implements Listener {
     private void openGUIForData(Player viewer, PlayerData pd, String targetName, UUID targetUuid) {
         // Privacy check
         boolean isSelf = viewer.getUniqueId().equals(targetUuid);
-        boolean isOp = viewer.isOp() || viewer.hasPermission("robbery.op");
+        boolean isOp = viewer.isOp() || viewer.hasPermission("robbery.op") || viewer.hasPermission("robbery.admin") || viewer.hasPermission("robbery.staff");
 
         if (!isSelf && !isOp) {
             String privacy = pd.getProfilePrivacy();

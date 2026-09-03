@@ -23,6 +23,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import java.util.UUID;
 import robbery.core.Robbery;
 import robbery.backpacks.BackpackManager;
 import robbery.backpacks.PvCommand;
