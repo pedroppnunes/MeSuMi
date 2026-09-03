@@ -366,9 +366,11 @@ public class PlayerData {
             baseDamage += 50;
         }
 
-        robbery.crypto.CryptoMachine machine = robbery.core.Robbery.getInstance().getCryptoManager().getMachine(this.player.getUniqueId());
-        if (machine != null && machine.getFuelTicks() > 0) {
-            baseDamage += 5.0;
+        if (this.player != null) {
+            robbery.crypto.CryptoMachine machine = robbery.core.Robbery.getInstance().getCryptoManager().getMachine(this.player.getUniqueId());
+            if (machine != null && machine.getFuelTicks() > 0) {
+                baseDamage += 5.0;
+            }
         }
 
         return baseDamage;
@@ -607,9 +609,11 @@ public class PlayerData {
     public double getXPBoost(String storeId){
         double xpBoost = rank.xpboost() + getPerkValue(PERK_XP1) + getPerkValue(PERK_XP2) + getStoreMasteryRobberyXp(storeId);
         
-        robbery.crypto.CryptoMachine machine = robbery.core.Robbery.getInstance().getCryptoManager().getMachine(this.player.getUniqueId());
-        if (machine != null && machine.getFuelTicks() > 0) {
-            xpBoost += 0.05;
+        if (this.player != null) {
+            robbery.crypto.CryptoMachine machine = robbery.core.Robbery.getInstance().getCryptoManager().getMachine(this.player.getUniqueId());
+            if (machine != null && machine.getFuelTicks() > 0) {
+                xpBoost += 0.05;
+            }
         }
         
         return xpBoost;

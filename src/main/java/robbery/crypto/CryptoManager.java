@@ -109,43 +109,35 @@ public class CryptoManager {
             long now = System.currentTimeMillis();
             for (Map.Entry<UUID, CryptoMachine> entry : activeMachines.entrySet()) {
                 CryptoMachine machine = entry.getValue();
-                
-                // If it has active fuel and is placed
-                if (machine.getFuelTicks() > 0 && machine.isPlaced()) {
+
+                if (machine.getFuelTicks() > 0) {
                     Player p = Bukkit.getPlayer(entry.getKey());
+                    int storeTier = 1;
                     if (p != null && p.isOnline()) {
                         PlayerData pd = PlayerDataManager.getPlayerData(p);
-                        if (pd != null) {
-                            int storeTier = pd.getHighestOwnedStoreTier();
-                            
-                            // Base rate per second
-                            long baseRate = getBaseRateForStore(storeTier);
-                            
-                            // Multipliers
-                            double qualityMult = machine.getQualityMultiplier();
-                            double speedMult = machine.getSpeedMultiplier();
-                            double rewardMult = machine.getRewardMultiplier();
-                            
-                            double onlineBuff = 1.0;
-                            if (p.isOnline() && machine.getFuelTicks() > 0) {
-                                onlineBuff = 1.20; // 20% online buff
-                            }
-                            
-                            long moneyGenerated = (long) (baseRate * qualityMult * speedMult * rewardMult * onlineBuff);
-                            
-                            machine.addUnclaimedMoney(moneyGenerated);
-                            machine.setFuelTicks(machine.getFuelTicks() - 1);
-                            machine.setLastUpdated(now);
-                            machine.updateHologram();
-                        }
+                        if (pd != null) storeTier = pd.getHighestOwnedStoreTier();
+                    }
+
+                    long baseRate = getBaseRateForStore(storeTier);
+                    double qualityMult = machine.getQualityMultiplier();
+                    double speedMult = machine.getSpeedMultiplier();
+                    double rewardMult = machine.getRewardMultiplier();
+                    double onlineBuff = (p != null && p.isOnline()) ? 1.20 : 1.0;
+
+                    long moneyGenerated = (long) Math.max(1, baseRate * qualityMult * speedMult * rewardMult * onlineBuff);
+
+                    machine.addUnclaimedMoney(moneyGenerated);
+                    machine.setFuelTicks(machine.getFuelTicks() - 1);
+                    machine.setLastUpdated(now);
+
+                    if (machine.isPlaced()) {
+                        machine.updateHologram();
                     }
                 } else if (machine.isPlaced()) {
-                    // Just update lastUpdated so it doesn't try to generate money offline when they log in 
-                    // if it had no fuel before
                     machine.setLastUpdated(now);
                 }
             }
-        }, 20L, 20L); // Run every second (20 ticks)
+        }, 20L, 20L); // Run every second
     }
     
     public long getBaseRateForStore(int storeTier) {

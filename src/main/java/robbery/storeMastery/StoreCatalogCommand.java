@@ -114,8 +114,22 @@ public class StoreCatalogCommand implements CommandExecutor, TabCompleter {
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 1) {
             List<String> suggestions = new ArrayList<>();
+            String arg = args[0].toLowerCase();
+
+            if (command.getName().equalsIgnoreCase("stats")) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (p.getName().toLowerCase().startsWith(arg)) {
+                        suggestions.add(p.getName());
+                    }
+                }
+                return suggestions;
+            }
+
             for (int i = 1; i <= 12; i++) {
-                suggestions.add("store" + i);
+                String sId = "store" + i;
+                if (sId.toLowerCase().startsWith(arg)) suggestions.add(sId);
+                String name = KeyManager.getStoreN(sId);
+                if (name != null && name.toLowerCase().startsWith(arg)) suggestions.add(name);
             }
             return suggestions;
         }

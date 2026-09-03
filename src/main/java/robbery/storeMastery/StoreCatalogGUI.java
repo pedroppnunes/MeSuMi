@@ -267,7 +267,8 @@ public class StoreCatalogGUI implements Listener {
             for (int lvl = 1; lvl <= 10; lvl++) {
                 String rewardDesc = plugin.getMasteryManager().getRewardDisplay(storeId, lvl);
                 boolean unlocked = currentMasteryLevel >= lvl;
-                Component line = Component.text("M" + lvl + ": ").color(unlocked ? NamedTextColor.GREEN : NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                NamedTextColor tagColor = (lvl == 10) ? (unlocked ? NamedTextColor.LIGHT_PURPLE : NamedTextColor.DARK_PURPLE) : (unlocked ? NamedTextColor.GREEN : NamedTextColor.GRAY);
+                Component line = Component.text("M" + lvl + ": ").color(tagColor).decoration(TextDecoration.ITALIC, false)
                         .append(Component.text(rewardDesc).color(unlocked ? NamedTextColor.WHITE : NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
                 mLore.add(line);
             }

@@ -137,15 +137,16 @@ public class PlayerStatsGUI implements Listener {
         }
 
         // 1. Header Skull (Slot 4) - "[Level] PlayerName"
+        // 1. Target Skull Header (Slot 4)
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta headMeta = (SkullMeta) head.getItemMeta();
         if (headMeta != null) {
             if (targetUuid != null) headMeta.setOwningPlayer(Bukkit.getOfflinePlayer(targetUuid));
-            headMeta.displayName(Component.text("[" + pd.getLevel() + "] " + targetName).color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-            headMeta.lore(List.of(
-                    Component.text("Total XP: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                            .append(Component.text(NumberFormatter.formatDoubleNumber((double) pd.getXp()) + " XP").color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false))
-            ));
+            headMeta.displayName(Component.text("[").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(String.valueOf(pd.getLevel())).color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
+                    .append(Component.text("] ").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false))
+                    .append(Component.text(targetName).color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
+            headMeta.lore(null);
             head.setItemMeta(headMeta);
         }
         inv.setItem(4, head);
@@ -165,6 +166,8 @@ public class PlayerStatsGUI implements Listener {
                     .append(Component.text("Prestige " + pd.getPrestige()).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Robbery Level: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text("Level " + pd.getLevel()).color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)));
+            lore.add(Component.text("Total XP: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(NumberFormatter.formatDoubleNumber((double) pd.getXp()) + " XP").color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Balance: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text("$" + NumberFormatter.formatDoubleNumber(balance)).color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Skill Points: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
@@ -221,10 +224,10 @@ public class PlayerStatsGUI implements Listener {
             lore.add(Component.text("Current Backpack: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text(backName).color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 
-            // Real Tool Display Name
+            // Real Tool Display Name formatted in White
             String toolId = pd.getToolString();
             Tools toolObj = ToolManager.getToolsName(toolId);
-            String toolName = toolObj != null ? toolObj.getColorname() : toolId;
+            String toolName = toolObj != null ? ChatColor.stripColor(toolObj.getColorname()) : toolId;
             lore.add(Component.text("Current Tool: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text(toolName).color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 
@@ -361,7 +364,7 @@ public class PlayerStatsGUI implements Listener {
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
         Component title = event.getView().title();
-        String titleStr = title.toString();
+        String titleStr = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(title);
 
         // 1. Detect click in DeluxeMenus Main Menu on slot 4 (Player Head)
         boolean isGeneralMenu = titleStr.toLowerCase().contains("general") || titleStr.toLowerCase().contains("main menu") || titleStr.toLowerCase().contains("robbery menu");
@@ -401,16 +404,16 @@ public class PlayerStatsGUI implements Listener {
                 return;
             }
 
-            if (clicked.getType() == Material.LIME_DYE || clicked.getType() == Material.YELLOW_DYE || clicked.getType() == Material.RED_DYE) {
+            if (event.getRawSlot() == 20 || clicked.getType() == Material.LIME_DYE || clicked.getType() == Material.YELLOW_DYE || clicked.getType() == Material.RED_DYE) {
                 // Toggle privacy if viewing self
-                if (player.getUniqueId().equals(offTarget.getUniqueId())) {
+                if (player.getName().equalsIgnoreCase(targetName) || (offTarget != null && player.getUniqueId().equals(offTarget.getUniqueId()))) {
                     PlayerData selfPd = PlayerDataManager.getPlayerData(player);
                     if (selfPd != null) {
                         String current = selfPd.getProfilePrivacy();
                         String next = switch (current.toUpperCase()) {
-                            case "PUBLIC" -> "HIDEOUT";
                             case "HIDEOUT" -> "PRIVATE";
-                            default -> "PUBLIC";
+                            case "PRIVATE" -> "PUBLIC";
+                            default -> "HIDEOUT";
                         };
                         selfPd.setProfilePrivacy(next);
                         plugin.getPlayerEventListener().savePlayerData(player, selfPd);

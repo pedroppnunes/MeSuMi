@@ -446,7 +446,7 @@ public class PlayerEventListener implements Listener {
 
         Location loc = new Location(world, x, y, z, yaw, pitch);
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (player.isOnline()) player.teleport(loc);
+            if (player != null && player.isOnline()) player.teleport(loc);
         }, 5L);
     }
 
