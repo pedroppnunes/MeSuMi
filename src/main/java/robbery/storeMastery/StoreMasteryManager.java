@@ -169,7 +169,10 @@ public class StoreMasteryManager {
     }
 
     private void unlockRegion(Player player, String regionId) {
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rg addmember -w world " + regionId + " " + player.getName());
+        String name = player.getName();
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rg addmember " + regionId + " " + name + " -w world");
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rg addmember -w world " + regionId + " " + name);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "region addmember " + regionId + " " + name);
     }
 
     public String getRewardDisplay(String storeId, int milestone) {
