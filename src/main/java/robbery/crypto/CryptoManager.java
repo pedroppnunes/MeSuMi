@@ -65,7 +65,21 @@ public class CryptoManager {
             // Update last updated to now so we don't double count
             machine.setLastUpdated(System.currentTimeMillis());
             
+            // Preserve existing higher levels/progress if machine was already in memory
+            CryptoMachine existing = activeMachines.get(player.getUniqueId());
+            if (existing != null) {
+                if (existing.getSpeedLevel() > machine.getSpeedLevel()) machine.setSpeedLevel(existing.getSpeedLevel());
+                if (existing.getFuelTimeLevel() > machine.getFuelTimeLevel()) machine.setFuelTimeLevel(existing.getFuelTimeLevel());
+                if (existing.getRewardLevel() > machine.getRewardLevel()) machine.setRewardLevel(existing.getRewardLevel());
+                if (existing.getUnclaimedMoney() > machine.getUnclaimedMoney()) machine.setUnclaimedMoney(existing.getUnclaimedMoney());
+                if (existing.getStoredFuels().size() > machine.getStoredFuels().size()) {
+                    machine.getStoredFuels().clear();
+                    machine.getStoredFuels().addAll(existing.getStoredFuels());
+                }
+            }
+
             activeMachines.put(player.getUniqueId(), machine);
+            dao.saveMachine(machine);
             
             if (machine.isPlaced()) {
                 Bukkit.getScheduler().runTask(plugin, machine::updateHologram);
@@ -77,7 +91,7 @@ public class CryptoManager {
         CryptoMachine machine = activeMachines.remove(player.getUniqueId());
         if (machine != null) {
             machine.removeHologram();
-            dao.saveMachine(machine);
+            dao.saveMachineSync(machine);
         }
     }
     
@@ -90,8 +104,15 @@ public class CryptoManager {
         if (m == null) {
             m = new CryptoMachine(uuid, null, null, null, null, 0L, 0L, 0.0, 0, 0, 0, System.currentTimeMillis());
             activeMachines.put(uuid, m);
+            dao.saveMachine(m);
         }
         return m;
+    }
+
+    public void saveMachine(CryptoMachine machine) {
+        if (machine != null) {
+            dao.saveMachine(machine);
+        }
     }
     
     public Map<UUID, CryptoMachine> getActiveMachines() {
@@ -114,8 +135,12 @@ public class CryptoManager {
     }
 
     private void startTask() {
+        final int[] tickCount = {0};
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             long now = System.currentTimeMillis();
+            tickCount[0]++;
+            boolean autoSaveTime = (tickCount[0] % 60 == 0); // Auto-save every 60 seconds
+
             for (Map.Entry<UUID, CryptoMachine> entry : activeMachines.entrySet()) {
                 CryptoMachine machine = entry.getValue();
 
@@ -144,6 +169,10 @@ public class CryptoManager {
                     }
                 } else if (machine.isPlaced()) {
                     machine.setLastUpdated(now);
+                }
+
+                if (autoSaveTime) {
+                    dao.saveMachine(machine);
                 }
             }
         }, 20L, 20L); // Run every second

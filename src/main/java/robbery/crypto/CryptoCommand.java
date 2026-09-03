@@ -146,19 +146,23 @@ public class CryptoCommand implements CommandExecutor {
             } else if (action.equalsIgnoreCase("upgradespeed")) {
                 int newLvl = Math.min(CryptoUpgradeManager.MAX_LEVEL, machine.getSpeedLevel() + 1);
                 machine.setSpeedLevel(newLvl);
+                plugin.getCryptoManager().saveMachine(machine);
                 Messages.sendFormatted(sender, "crypto.admin-upgrade-speed", Map.of("player", target.getName(), "level", String.valueOf(machine.getSpeedLevel())));
             } else if (action.equalsIgnoreCase("upgradefueltime") || action.equalsIgnoreCase("upgradebatterytime")) {
                 int newLvl = Math.min(CryptoUpgradeManager.MAX_LEVEL, machine.getFuelTimeLevel() + 1);
                 machine.setFuelTimeLevel(newLvl);
+                plugin.getCryptoManager().saveMachine(machine);
                 Messages.sendFormatted(sender, "crypto.admin-upgrade-fueltime", Map.of("player", target.getName(), "level", String.valueOf(machine.getFuelTimeLevel()), "duration", CryptoMachine.getFuelDurationFormattedForLevel(machine.getFuelTimeLevel())));
             } else if (action.equalsIgnoreCase("upgradereward")) {
                 int newLvl = Math.min(CryptoUpgradeManager.MAX_LEVEL, machine.getRewardLevel() + 1);
                 machine.setRewardLevel(newLvl);
+                plugin.getCryptoManager().saveMachine(machine);
                 Messages.sendFormatted(sender, "crypto.admin-upgrade-reward", Map.of("player", target.getName(), "level", String.valueOf(machine.getRewardLevel())));
             } else if (action.equalsIgnoreCase("addstoredfuel") || action.equalsIgnoreCase("addstoredbattery")) {
                 if (args.length < 4) return true;
                 double quality = Double.parseDouble(args[3]);
                 machine.addStoredFuel(new StoredFuel(quality));
+                plugin.getCryptoManager().saveMachine(machine);
                 Messages.sendFormatted(sender, "crypto.admin-add-storedfuel", Map.of("player", target.getName(), "quality", String.format("%.1f", quality)));
             } else if (action.equalsIgnoreCase("sacrifice")) {
                 PlayerData pd = PlayerDataManager.getPlayerData(target);
@@ -226,11 +230,13 @@ public class CryptoCommand implements CommandExecutor {
                             machine.setFuelTicks(scaledDurationTicks);
                             machine.setFuelQuality(fuelObj.getQuality());
                             machine.getStoredFuels().remove(index);
+                            plugin.getCryptoManager().saveMachine(machine);
 
                             p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.5f);
                             Messages.sendFormatted(p, "crypto.battery-loaded", Map.of("quality", String.format("%.1f", fuelObj.getQuality()), "duration", CryptoMachine.getFuelDurationFormattedForTicks(scaledDurationTicks)));
                         } else if (subAction.equalsIgnoreCase("trash") || subAction.equalsIgnoreCase("delete")) {
                             machine.getStoredFuels().remove(index);
+                            plugin.getCryptoManager().saveMachine(machine);
                             p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
                             Messages.send(p, "crypto.battery-trashed");
                         }

@@ -71,6 +71,7 @@ public class CryptoListener implements Listener {
             
             machine.setLocation(event.getBlock().getLocation());
             machine.updateHologram();
+            plugin.getCryptoManager().saveMachine(machine);
             Messages.send(p, "crypto.placed");
         }
     }

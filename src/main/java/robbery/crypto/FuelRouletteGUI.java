@@ -140,6 +140,7 @@ public class FuelRouletteGUI implements Listener {
         CryptoMachine machine = plugin.getCryptoManager().getOrCreateMachine(player.getUniqueId());
         if (machine != null) {
             machine.addStoredFuel(new StoredFuel(quality));
+            plugin.getCryptoManager().saveMachine(machine);
         }
 
         Messages.sendFormatted(player, "crypto.spin-won-single", "quality", String.valueOf(quality));

@@ -162,6 +162,7 @@ public class CryptoUpgradeManager {
 
         eco.withdrawPlayer(player, cost);
         setTrackLevel(machine, track, targetLevel);
+        Robbery.getInstance().getCryptoManager().saveMachine(machine);
 
         String trackName = getTrackDisplayName(track);
         String costFormatted = NumberFormatter.formatDoubleNumber((double) cost);
