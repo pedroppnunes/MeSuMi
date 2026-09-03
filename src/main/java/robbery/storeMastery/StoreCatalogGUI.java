@@ -381,10 +381,6 @@ public class StoreCatalogGUI implements Listener {
             return PlayerDataManager.getPlayerData(online);
         }
         org.bukkit.configuration.file.YamlConfiguration cfg = plugin.getPlayerDataDao().loadPlayerData(uuid);
-        if (cfg == null) {
-            java.io.File f = new java.io.File(plugin.getDataFolder(), "Playerdata/" + uuid + ".yml");
-            if (f.exists()) cfg = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(f);
-        }
         if (cfg != null) {
             PlayerData data = new PlayerData(null);
             plugin.getPlayerEventListener().loadPlayerDataFromDB(null, data, cfg);

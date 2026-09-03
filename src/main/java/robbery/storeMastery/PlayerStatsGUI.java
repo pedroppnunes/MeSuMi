@@ -73,13 +73,6 @@ public class PlayerStatsGUI implements Listener {
 
             YamlConfiguration cfg = plugin.getPlayerDataDao().loadPlayerData(uuid);
             if (cfg == null) {
-                java.io.File f = new java.io.File(plugin.getDataFolder(), "Playerdata/" + uuid + ".yml");
-                if (f.exists()) {
-                    cfg = YamlConfiguration.loadConfiguration(f);
-                }
-            }
-
-            if (cfg == null) {
                 robbery.messages.Messages.sendFormatted(viewer, "storeMastery.stats.no-stats-found", "player", name);
                 return;
             }
