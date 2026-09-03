@@ -84,26 +84,38 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                 String targetName = identifier.substring(firstUnderscore + 1, secondUnderscore);
                 String subIdentifier = identifier.substring(secondUnderscore + 1);
 
-                org.bukkit.OfflinePlayer targetOff = org.bukkit.Bukkit.getOfflinePlayer(targetName);
-                if (targetOff != null) {
-                    PlayerData targetPd = null;
-                    if (targetOff.isOnline() && targetOff.getPlayer() != null) {
-                        targetPd = PlayerDataManager.getPlayerData(targetOff.getPlayer());
-                    } else {
-                        org.bukkit.configuration.file.YamlConfiguration tCfg = main.getPlayerDataDao().loadPlayerData(targetOff.getUniqueId());
-                        if (tCfg != null) {
-                            targetPd = new PlayerData(null);
-                            main.getPlayerEventListener().loadPlayerDataFromDB(null, targetPd, tCfg);
-                        }
+                if (targetName.equalsIgnoreCase("{arg:1}") || targetName.equalsIgnoreCase("%player_name%") || targetName.equalsIgnoreCase("{player_name}") || targetName.startsWith("{") || targetName.startsWith("%") || targetName.isEmpty()) {
+                    if (offlinePlayer != null && offlinePlayer.getName() != null) {
+                        targetName = offlinePlayer.getName();
                     }
-                    if (targetPd != null) {
-                        Player targetP = targetOff.isOnline() ? targetOff.getPlayer() : null;
-                        String subId = subIdentifier.toLowerCase();
-                        String match = handleStaticIdentifier(targetPd, subId, targetP);
-                        if (match != null) return match;
-                        String[] subParts = subId.split("_");
-                        if (subParts.length >= 2) {
-                            return handleDynamicIdentifier(targetPd, subParts, subId);
+                }
+
+                if (targetName != null && !targetName.isEmpty()) {
+                    String subId = subIdentifier.toLowerCase();
+                    if (subId.equals("playername") || subId.equals("name") || subId.equals("player_name")) {
+                        return targetName;
+                    }
+
+                    org.bukkit.OfflinePlayer targetOff = org.bukkit.Bukkit.getOfflinePlayer(targetName);
+                    if (targetOff != null) {
+                        PlayerData targetPd = null;
+                        if (targetOff.isOnline() && targetOff.getPlayer() != null) {
+                            targetPd = PlayerDataManager.getPlayerData(targetOff.getPlayer());
+                        } else {
+                            org.bukkit.configuration.file.YamlConfiguration tCfg = main.getPlayerDataDao().loadPlayerData(targetOff.getUniqueId());
+                            if (tCfg != null) {
+                                targetPd = new PlayerData(null);
+                                main.getPlayerEventListener().loadPlayerDataFromDB(null, targetPd, tCfg);
+                            }
+                        }
+                        if (targetPd != null) {
+                            Player targetP = targetOff.isOnline() ? targetOff.getPlayer() : null;
+                            String match = handleStaticIdentifier(targetPd, subId, targetP);
+                            if (match != null) return match;
+                            String[] subParts = subId.split("_");
+                            if (subParts.length >= 2) {
+                                return handleDynamicIdentifier(targetPd, subParts, subId);
+                            }
                         }
                     }
                 }
@@ -145,6 +157,7 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
     private String handleStaticIdentifier(PlayerData pd, String id, Player p) {
         XPManager xp = main.getXpManager();
         return switch (id) {
+            case "playername", "name", "player_name" -> (p != null ? p.getName() : (pd != null && pd.getPlayer() != null ? pd.getPlayer().getName() : ""));
             case "backpack_name" -> pd.getBackpack().getColorname();
             case "backpack_capacity" -> String.valueOf(pd.getBackpack().getcapacity());
             case "backpack_size" -> String.valueOf(pd.getBackpack().getSize());
