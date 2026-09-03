@@ -262,7 +262,7 @@ public class StoreCatalogGUI implements Listener {
             mLore.add(Component.text("Store Items Stolen: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text(currentItemsStolen + (reqItemsNext > 0 ? " / " + reqItemsNext : "")).color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)));
             mLore.add(Component.text(" ").decoration(TextDecoration.ITALIC, false));
-            mLore.add(Component.text("Mastery Rewards & Perks:").color(NamedTextColor.GOLD).decorate(TextDecoration.ITALIC, false));
+            mLore.add(Component.text("Mastery Rewards & Perks:").color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 
             for (int lvl = 1; lvl <= 10; lvl++) {
                 String rewardDesc = plugin.getMasteryManager().getRewardDisplay(storeId, lvl);
