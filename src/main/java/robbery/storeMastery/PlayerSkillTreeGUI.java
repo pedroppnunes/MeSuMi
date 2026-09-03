@@ -85,7 +85,16 @@ public class PlayerSkillTreeGUI implements Listener {
         }
 
         // Display Perks in Selected Tier (Slots 19 to 25)
-        List<SkillPerk> perksInTier = SkillTreeConfig.getPerksForTier(tier);
+        List<SkillPerk> perksInTier = new ArrayList<>();
+        if (plugin.getSkillTreeConfig() != null && plugin.getSkillTreeConfig().getTiers() != null) {
+            String suffix = String.valueOf(tier);
+            for (SkillPerk perk : plugin.getSkillTreeConfig().getTiers()) {
+                if (perk == null) continue;
+                if (perk.getId().endsWith(suffix) || (tier == 1 && !perk.getId().matches(".*[2-4]$"))) {
+                    perksInTier.add(perk);
+                }
+            }
+        }
         int[] perkSlots = {19, 20, 21, 22, 23, 24, 25};
 
         if (perksInTier != null) {
