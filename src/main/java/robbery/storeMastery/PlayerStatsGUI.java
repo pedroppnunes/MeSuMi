@@ -383,7 +383,7 @@ public class PlayerStatsGUI implements Listener {
 
             String targetName = titleStr.substring(titleStr.indexOf("Stats: ") + 7).trim();
             OfflinePlayer offTarget = Bukkit.getOfflinePlayer(targetName);
-            PlayerData targetPd = PlayerDataManager.getPlayerData(offTarget.getUniqueId());
+            PlayerData targetPd = (offTarget.isOnline() && offTarget.getPlayer() != null) ? PlayerDataManager.getPlayerData(offTarget.getPlayer()) : null;
 
             if (clicked.getType() == Material.ENCHANTED_BOOK) {
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
