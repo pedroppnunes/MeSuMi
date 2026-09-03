@@ -101,7 +101,7 @@ public class StoreCatalogCommand implements CommandExecutor, TabCompleter {
         }
 
         if (targetStore == null) {
-            player.sendMessage(ChatColor.RED + "Unknown store! Usage: /catalog [1-12 | storeName]");
+            Messages.send(player, "storeMastery.catalog.unknown-store");
             return true;
         }
 

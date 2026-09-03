@@ -89,26 +89,26 @@ public class StoreNPCListener implements Listener {
         talkingPlayers.add(uuid);
 
         player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_AMBIENT, 1.0f, 1.0f);
-        player.sendMessage("§e§lShopSell §8> §fHey there! Welcome to the §aSupermarket§f! I'm the store clerk here.");
+        Messages.send(player, "storeMastery.shopsell.line1");
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (player.isOnline()) {
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_AMBIENT, 1.0f, 1.0f);
-                player.sendMessage("§e§lShopSell §8> §fYour goal is simple: rob floating items around the store using your tool, store them in your backpack, and bring them back to sell them to me with §a/sellrob§f!");
+                Messages.send(player, "storeMastery.shopsell.line2");
             }
         }, 3 * 20L);
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (player.isOnline()) {
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_AMBIENT, 1.0f, 1.0f);
-                player.sendMessage("§e§lShopSell §8> §fEvery item you steal levels up your §dStore Mastery§f! Mastering stores grants permanent money multipliers, steal speed bonuses, robbery XP, and unlocks secret areas!");
+                Messages.send(player, "storeMastery.shopsell.line3");
             }
         }, 6 * 20L);
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (player.isOnline()) {
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_AMBIENT, 1.0f, 1.0f);
-                player.sendMessage("§e§lShopSell §8> §fTo inspect item values, robbery XP, completionist progress, and Store Mastery rewards, just right-click me anytime to open the Catalog!");
+                Messages.send(player, "storeMastery.shopsell.line4");
             }
         }, 9 * 20L);
 

@@ -79,7 +79,7 @@ public class PlayerStatsGUI implements Listener {
             }
 
             if (cfg == null) {
-                viewer.sendMessage("§cNo statistics found for player " + name + "!");
+                robbery.messages.Messages.sendFormatted(viewer, "storeMastery.stats.no-stats-found", "player", name);
                 return;
             }
 
@@ -100,7 +100,7 @@ public class PlayerStatsGUI implements Listener {
         if (!isSelf && !isOp) {
             String privacy = pd.getProfilePrivacy();
             if (privacy.equalsIgnoreCase("PRIVATE")) {
-                viewer.sendMessage("§cThis player's profile is set to Private!");
+                robbery.messages.Messages.send(viewer, "storeMastery.stats.privacy-private");
                 viewer.playSound(viewer.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
                 return;
             }
@@ -111,7 +111,7 @@ public class PlayerStatsGUI implements Listener {
                     inSameHideout = plugin.getHideoutManager().areInSameHideout(viewer, targetUuid);
                 }
                 if (!inSameHideout) {
-                    viewer.sendMessage("§cThis player's profile is set to Hideout Members Only!");
+                    robbery.messages.Messages.send(viewer, "storeMastery.stats.privacy-hideout");
                     viewer.playSound(viewer.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
                     return;
                 }
