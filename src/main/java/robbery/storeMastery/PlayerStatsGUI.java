@@ -105,11 +105,7 @@ public class PlayerStatsGUI implements Listener {
                 return;
             }
             if (privacy.equalsIgnoreCase("HIDEOUT")) {
-                // Check hideout membership if hideout manager present
-                boolean inSameHideout = false;
-                if (plugin.getHideoutManager() != null && viewer.isOnline()) {
-                    inSameHideout = plugin.getHideoutManager().areInSameHideout(viewer, targetUuid);
-                }
+                boolean inSameHideout = areInSameHideout(viewer, targetUuid);
                 if (!inSameHideout) {
                     robbery.messages.Messages.send(viewer, "storeMastery.stats.privacy-hideout");
                     viewer.playSound(viewer.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
@@ -470,5 +466,23 @@ public class PlayerStatsGUI implements Listener {
             clicker.playSound(clicker.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
             openGUI(clicker, targetPlayer);
         }
+    }
+
+    private boolean areInSameHideout(Player viewer, UUID targetUuid) {
+        if (viewer == null || targetUuid == null) return false;
+        try {
+            if (Bukkit.getPluginManager().isPluginEnabled("SuperiorSkyblock2")) {
+                com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer spViewer = com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI.getPlayer(viewer);
+                com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer spTarget = com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI.getPlayer(targetUuid);
+                if (spViewer != null && spTarget != null) {
+                    com.bgsoftware.superiorskyblock.api.island.Island islandViewer = spViewer.getIsland();
+                    com.bgsoftware.superiorskyblock.api.island.Island islandTarget = spTarget.getIsland();
+                    if (islandViewer != null && islandTarget != null && islandViewer.equals(islandTarget)) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Throwable ignored) {}
+        return false;
     }
 }
