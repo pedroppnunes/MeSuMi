@@ -280,10 +280,10 @@ public class OutpostManager {
         long delayMillis = 4L * 60 * 60 * 1000; // 4 hours
         ownershipExpiryMillis = System.currentTimeMillis() + delayMillis;
 
-        // give owner 20 minutes of immunity
+        // give owner 10 minutes of immunity
         ownerImmunityExpiryMillis = System.currentTimeMillis() + OWNER_IMMUNITY_MILLIS;
         Bukkit.broadcastMessage(Messages.getFormatted("events.outpost.immunity_started",
-                Map.of("island_name", capturingIsland.getName(), "time", "20m")));
+                Map.of("island_name", capturingIsland.getName(), "time", "10m")));
 
         // reset state so new captures start fresh
         currentIsland = null;

@@ -71,6 +71,7 @@ public class CryptoCommand implements CommandExecutor {
             PlayerData pd = PlayerDataManager.getPlayerData(target);
             if (pd != null) {
                 pd.setTalkedToCryptoNPC(false);
+                pd.setTalkedToCryptoBatteryNPC(false);
                 Robbery.getInstance().getPlayerEventListener().savePlayerData(target, pd);
                 target.sendMessage(Messages.colorize("&aYour Crypto NPC dialogue has been reset!"));
                 sender.sendMessage(Messages.colorize("&aReset NPC dialogue for " + target.getName()));
@@ -84,7 +85,20 @@ public class CryptoCommand implements CommandExecutor {
                 Messages.send(sender, "global.no-permission");
                 return true;
             }
-            if (args.length < 3) return true;
+            if (args.length < 3) {
+                sender.sendMessage(Messages.colorize("&cAdmin Commands:"));
+                sender.sendMessage(Messages.colorize("&e/crypto admin resetnpc <player>"));
+                sender.sendMessage(Messages.colorize("&e/crypto admin givemachine <player> [force]"));
+                sender.sendMessage(Messages.colorize("&e/crypto admin check <player>"));
+                sender.sendMessage(Messages.colorize("&e/crypto admin upgradespeed <player>"));
+                sender.sendMessage(Messages.colorize("&e/crypto admin upgradefueltime <player>"));
+                sender.sendMessage(Messages.colorize("&e/crypto admin upgradebatterytime <player>"));
+                sender.sendMessage(Messages.colorize("&e/crypto admin upgradereward <player>"));
+                sender.sendMessage(Messages.colorize("&e/crypto admin addstoredfuel <player> <quality>"));
+                sender.sendMessage(Messages.colorize("&e/crypto admin addstoredbattery <player> <quality>"));
+                sender.sendMessage(Messages.colorize("&e/crypto admin sacrifice <player>"));
+                return true;
+            }
 
             String action = args[1];
             Player target = Bukkit.getPlayer(args[2]);
@@ -97,6 +111,7 @@ public class CryptoCommand implements CommandExecutor {
                 PlayerData pd = PlayerDataManager.getPlayerData(target);
                 if (pd != null) {
                     pd.setTalkedToCryptoNPC(false);
+                    pd.setTalkedToCryptoBatteryNPC(false);
                     Robbery.getInstance().getPlayerEventListener().savePlayerData(target, pd);
                     target.sendMessage(Messages.colorize("&aYour Crypto NPC dialogue has been reset!"));
                     sender.sendMessage(Messages.colorize("&aReset NPC dialogue for " + target.getName()));
@@ -146,11 +161,20 @@ public class CryptoCommand implements CommandExecutor {
             } else if (action.equalsIgnoreCase("sacrifice")) {
                 PlayerData pd = PlayerDataManager.getPlayerData(target);
                 if (pd == null) return true;
-
-
-
                 new CryptoSacrificeGUI(plugin).open(target);
                 Messages.sendFormatted(sender, "crypto.admin-open-sacrifice", "player", target.getName());
+            } else if (action.equalsIgnoreCase("check")) {
+                sender.sendMessage(Messages.colorize("&8[&dCrypto Admin&8] &a" + target.getName() + "'s Machine Stats:"));
+                sender.sendMessage(Messages.colorize(" &7- &fStatus: " + (machine.getFuelTicks() > 0 ? (target.isOnline() ? "&aActive &7(&a+20% Online Buff&7)" : "&aActive") : "&cInactive")));
+                sender.sendMessage(Messages.colorize(" &7- &fUnclaimed Money: &e$" + robbery.number.NumberFormatter.formatDoubleNumber((double) machine.getUnclaimedMoney())));
+                sender.sendMessage(Messages.colorize(" &7- &fFuel Remaining: &e" + CryptoMachine.getFuelDurationFormattedForTicks(machine.getFuelTicks())));
+                if (machine.getFuelTicks() > 0) {
+                    sender.sendMessage(Messages.colorize(" &7- &fCurrent Fuel Quality: &e" + String.format("%.1f%%", machine.getFuelQuality())));
+                }
+                sender.sendMessage(Messages.colorize(" &7- &fSpeed Level: &a" + machine.getSpeedLevel() + "&8/&a" + CryptoUpgradeManager.MAX_LEVEL));
+                sender.sendMessage(Messages.colorize(" &7- &fBattery Time Level: &a" + machine.getFuelTimeLevel() + "&8/&a" + CryptoUpgradeManager.MAX_LEVEL));
+                sender.sendMessage(Messages.colorize(" &7- &fReward Level: &a" + machine.getRewardLevel() + "&8/&a" + CryptoUpgradeManager.MAX_LEVEL));
+                sender.sendMessage(Messages.colorize(" &7- &fStored Batteries: &e" + machine.getStoredFuels().size() + "&8/&a36"));
             }
             return true;
         }

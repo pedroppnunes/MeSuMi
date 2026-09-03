@@ -107,6 +107,7 @@ public class PickingTask extends BukkitRunnable {
 
             main.getMasteryManager().incrementMastery(player, storeId);
             p.addItemsStolen(1);
+            p.incrementItemStolenCount(item.getId(), storeId);
 
             Booster booster = BoosterManager.getRandomBoosterWithChance(itemStoreNum, p);
             if (booster != null) {

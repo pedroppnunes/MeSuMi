@@ -131,6 +131,14 @@ public class Robbery extends JavaPlugin implements Listener {
     public robbery.crypto.CryptoBatteryStorageGUI getCryptoBatteryStorageGUI() { return cryptoBatteryStorageGUI; }
     public robbery.crypto.SacrificeManager getSacrificeManager() { return sacrificeManager; }
     public robbery.backpacks.BackpackGUI getBackpackGUI() { return backpackGUI; }
+
+    private robbery.storeMastery.StoreCatalogGUI storeCatalogGUI;
+    private robbery.storeMastery.StorePlaytimeTask storePlaytimeTask;
+    private robbery.storeMastery.PlayerStatsGUI playerStatsGUI;
+
+    public robbery.storeMastery.StoreCatalogGUI getStoreCatalogGUI() { return storeCatalogGUI; }
+    public robbery.storeMastery.StorePlaytimeTask getStorePlaytimeTask() { return storePlaytimeTask; }
+    public robbery.storeMastery.PlayerStatsGUI getPlayerStatsGUI() { return playerStatsGUI; }
     
     private robbery.database.DatabaseManager databaseManager;
     private robbery.database.PlayerDataDao playerDataDao;
@@ -247,13 +255,29 @@ public class Robbery extends JavaPlugin implements Listener {
         this.cryptoBatteryStorageGUI = new robbery.crypto.CryptoBatteryStorageGUI(this);
         this.sacrificeManager = new robbery.crypto.SacrificeManager();
         this.backpackGUI = new robbery.backpacks.BackpackGUI(this);
+        this.storeCatalogGUI = new robbery.storeMastery.StoreCatalogGUI(this);
+        this.storePlaytimeTask = new robbery.storeMastery.StorePlaytimeTask(this);
+        this.playerStatsGUI = new robbery.storeMastery.PlayerStatsGUI(this);
+        this.storePlaytimeTask.runTaskTimer(this, 20L, 20L);
 
         getServer().getPluginManager().registerEvents(fuelRouletteGUI, this);
         getServer().getPluginManager().registerEvents(cryptoSacrificeGUI, this);
         getServer().getPluginManager().registerEvents(cryptoBatteryStorageGUI, this);
         getServer().getPluginManager().registerEvents(backpackGUI, this);
+        getServer().getPluginManager().registerEvents(storeCatalogGUI, this);
+        getServer().getPluginManager().registerEvents(playerStatsGUI, this);
+        getServer().getPluginManager().registerEvents(new robbery.storeMastery.StoreNPCListener(this), this);
         getServer().getPluginManager().registerEvents(new robbery.crypto.CryptoListener(this), this);
         getServer().getPluginManager().registerEvents(new robbery.crypto.CryptoNPCListener(this), this);
+
+        robbery.storeMastery.StoreCatalogCommand catalogCmd = new robbery.storeMastery.StoreCatalogCommand(this);
+        if (getCommand("catalog") != null) {
+            getCommand("catalog").setExecutor(catalogCmd);
+            getCommand("catalog").setTabCompleter(catalogCmd);
+        }
+        if (getCommand("stats") != null) {
+            getCommand("stats").setExecutor(catalogCmd);
+        }
 
         Objects.requireNonNull(getCommand("crypto")).setExecutor(new robbery.crypto.CryptoCommand(this));
         if (getCommand("backpack") != null) {

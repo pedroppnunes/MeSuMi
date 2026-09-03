@@ -59,6 +59,14 @@ public class PlayerData {
     private double itemStreakBonus = 0.0;
     private long lastItemStolenTimestamp = 0;
 
+    private final Map<String, Integer> itemStolenCounts = new HashMap<>();
+    private int bustedCount = 0;
+    private final Map<String, Long> storePlaytime = new HashMap<>();
+    private final Map<Integer, Long> prestigePlaytime = new HashMap<>();
+    private final Map<String, Long> prestigeStorePlaytime = new HashMap<>();
+    private final Map<Integer, Integer> prestigeItemsStolen = new HashMap<>();
+    private final Map<String, Integer> prestigeStoreItemsStolen = new HashMap<>();
+
     private final List<String> offeredDailyQuests = new ArrayList<>();
     private final Set<String> acceptedDailyQuests = new HashSet<>();
     private int dailyQuestsCompleted = 0;
@@ -276,6 +284,7 @@ public class PlayerData {
 
     public void busted() {
         this.getBackpack().emptyBackpack();
+        this.incrementBustedCount();
     }
 
     public void setBackpack(Backpacks b) {
@@ -652,6 +661,164 @@ public int getStoreItems(String storeId) {
 
     public void setItemsStolen(int amount) {
         this.itemsStolen = amount;
+    }
+
+    // --- Statistics & Completionist Methods ---
+
+    public int getItemStolenCount(String itemId) {
+        if (itemId == null) return 0;
+        return itemStolenCounts.getOrDefault(itemId.toLowerCase(), 0);
+    }
+
+    public void incrementItemStolenCount(String itemId, String storeId) {
+        if (itemId == null) return;
+        String key = itemId.toLowerCase();
+        itemStolenCounts.put(key, itemStolenCounts.getOrDefault(key, 0) + 1);
+
+        // Track per-prestige item stats
+        int pLevel = getPrestige();
+        prestigeItemsStolen.put(pLevel, prestigeItemsStolen.getOrDefault(pLevel, 0) + 1);
+        if (storeId != null && !storeId.isEmpty()) {
+            String pStoreKey = "p" + pLevel + "_" + storeId.toLowerCase();
+            prestigeStoreItemsStolen.put(pStoreKey, prestigeStoreItemsStolen.getOrDefault(pStoreKey, 0) + 1);
+        }
+    }
+
+    public Map<String, Integer> getItemStolenCountsMap() {
+        return itemStolenCounts;
+    }
+
+    public void setItemStolenCountsMap(Map<String, Integer> map) {
+        itemStolenCounts.clear();
+        if (map != null) itemStolenCounts.putAll(map);
+    }
+
+    public int getBustedCount() {
+        return bustedCount;
+    }
+
+    public void incrementBustedCount() {
+        this.bustedCount++;
+    }
+
+    public void setBustedCount(int count) {
+        this.bustedCount = Math.max(0, count);
+    }
+
+    public long getStorePlaytime(String storeId) {
+        if (storeId == null) return 0L;
+        return storePlaytime.getOrDefault(storeId.toLowerCase(), 0L);
+    }
+
+    public void addStorePlaytime(String storeId, long seconds) {
+        if (storeId == null || storeId.isEmpty() || seconds <= 0) return;
+        String sId = storeId.toLowerCase();
+        storePlaytime.put(sId, storePlaytime.getOrDefault(sId, 0L) + seconds);
+
+        int pLevel = getPrestige();
+        prestigePlaytime.put(pLevel, prestigePlaytime.getOrDefault(pLevel, 0L) + seconds);
+
+        String pStoreKey = "p" + pLevel + "_" + sId;
+        prestigeStorePlaytime.put(pStoreKey, prestigeStorePlaytime.getOrDefault(pStoreKey, 0L) + seconds);
+    }
+
+    public Map<String, Long> getStorePlaytimeMap() {
+        return storePlaytime;
+    }
+
+    public void setStorePlaytimeMap(Map<String, Long> map) {
+        storePlaytime.clear();
+        if (map != null) storePlaytime.putAll(map);
+    }
+
+    public long getPrestigePlaytime(int prestige) {
+        return prestigePlaytime.getOrDefault(prestige, 0L);
+    }
+
+    public Map<Integer, Long> getPrestigePlaytimeMap() {
+        return prestigePlaytime;
+    }
+
+    public void setPrestigePlaytimeMap(Map<Integer, Long> map) {
+        prestigePlaytime.clear();
+        if (map != null) prestigePlaytime.putAll(map);
+    }
+
+    public long getPrestigeStorePlaytime(int prestige, String storeId) {
+        if (storeId == null) return 0L;
+        String key = "p" + prestige + "_" + storeId.toLowerCase();
+        return prestigeStorePlaytime.getOrDefault(key, 0L);
+    }
+
+    public Map<String, Long> getPrestigeStorePlaytimeMap() {
+        return prestigeStorePlaytime;
+    }
+
+    public void setPrestigeStorePlaytimeMap(Map<String, Long> map) {
+        prestigeStorePlaytime.clear();
+        if (map != null) prestigeStorePlaytime.putAll(map);
+    }
+
+    public int getPrestigeItemsStolen(int prestige) {
+        return prestigeItemsStolen.getOrDefault(prestige, 0);
+    }
+
+    public Map<Integer, Integer> getPrestigeItemsStolenMap() {
+        return prestigeItemsStolen;
+    }
+
+    public void setPrestigeItemsStolenMap(Map<Integer, Integer> map) {
+        prestigeItemsStolen.clear();
+        if (map != null) prestigeItemsStolen.putAll(map);
+    }
+
+    public int getPrestigeStoreItemsStolen(int prestige, String storeId) {
+        if (storeId == null) return 0;
+        String key = "p" + prestige + "_" + storeId.toLowerCase();
+        return prestigeStoreItemsStolen.getOrDefault(key, 0);
+    }
+
+    public Map<String, Integer> getPrestigeStoreItemsStolenMap() {
+        return prestigeStoreItemsStolen;
+    }
+
+    public void setPrestigeStoreItemsStolenMap(Map<String, Integer> map) {
+        prestigeStoreItemsStolen.clear();
+        if (map != null) prestigeStoreItemsStolen.putAll(map);
+    }
+
+    /**
+     * Finds which store has taken the most playtime during a specific prestige level.
+     * @param prestige the prestige level
+     * @return String representation formatted as "StoreName (FormattedTime)" or "None"
+     */
+    public String getMostTimeConsumingStore(int prestige) {
+        String maxStoreId = null;
+        long maxTime = 0L;
+
+        for (int i = 1; i <= 12; i++) {
+            String sId = "store" + i;
+            long time = getPrestigeStorePlaytime(prestige, sId);
+            if (time > maxTime) {
+                maxTime = time;
+                maxStoreId = sId;
+            }
+        }
+
+        if (maxStoreId == null || maxTime <= 0) return "None";
+        String storeName = robbery.keys.KeyManager.getStoreN(maxStoreId);
+        if (storeName == null) storeName = maxStoreId;
+        return storeName + " (" + formatSeconds(maxTime) + ")";
+    }
+
+    private String formatSeconds(long seconds) {
+        if (seconds <= 0) return "0s";
+        long h = seconds / 3600;
+        long m = (seconds % 3600) / 60;
+        long s = seconds % 60;
+        if (h > 0) return h + "h " + m + "m";
+        if (m > 0) return m + "m " + s + "s";
+        return s + "s";
     }
 
     public int getStoreMastery(String storeId) {

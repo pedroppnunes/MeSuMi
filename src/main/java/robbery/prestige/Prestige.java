@@ -109,6 +109,17 @@ public class Prestige implements CommandExecutor {
         }
 
         PlayerData p = PlayerDataManager.getPlayerData(player);
+        if (p == null) {
+            player.sendMessage(Messages.colorize("&cYour data is still loading, please wait!"));
+            return true;
+        }
+        
+        robbery.crypto.CryptoMachine machine = Robbery.getInstance().getCryptoManager().getMachine(player.getUniqueId());
+        if (machine == null) {
+            player.sendMessage(Messages.colorize("&cYour crypto data is still loading, please wait!"));
+            return true;
+        }
+
         Economy econ = Robbery.getEconomy();
         double balance = econ.getBalance(player);
         int prestige = p.getPrestige();
@@ -124,6 +135,13 @@ public class Prestige implements CommandExecutor {
             PrestigeLeaderboard.updateLeaderboard(player);
             // Remove from store regions
             KeyManager.removePlayerFromAllRegions(player);
+
+            // Reset crypto machine unclaimed money to prevent store skipping
+            machine.setUnclaimedMoney(0);
+            machine.setLastUpdated(System.currentTimeMillis());
+            machine.updateHologram();
+            
+            player.closeInventory();
 
             // Broadcast prestige message
             String border = Messages.colorize("&c&l■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");

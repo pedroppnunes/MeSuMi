@@ -106,7 +106,6 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
                 case "xp" -> handleXp(sender, subArgs);
                 case "sp", "skillpoints" -> handleSp(sender, subArgs);
                 case "itemsstolen", "items_stolen", "stolenitems", "stolen" -> handleItemsStolen(sender, subArgs);
-                case "additems", "additem" -> handleAddItems(sender, subArgs);
                 case "reload" -> handleReload(sender);
                 default -> sendHelp(sender);
             }
@@ -312,28 +311,15 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
 
     // --- ItemsStolen Category ---
     private void handleItemsStolen(CommandSender sender, String[] args) {
-        if (args.length < 1) {
-            sender.sendMessage(ChatColor.RED + "Usage: /robbery admin itemsstolen <give|set|remove|reset> <player> [amount]");
+        if (args.length < 3) {
+            sender.sendMessage(ChatColor.RED + "Usage: /robbery admin itemsstolen <give|set|remove|reset> <store> <player> [amount]");
             return;
         }
 
         String action = args[0].toLowerCase();
-        String targetName;
-        String amountStr = null;
-
-        Player directPlayer = Bukkit.getPlayer(args[0]);
-        if (directPlayer != null && directPlayer.isOnline() && args.length >= 2) {
-            targetName = args[0];
-            action = args[1].toLowerCase();
-            if (args.length >= 3) amountStr = args[2];
-        } else {
-            if (args.length < 2) {
-                sender.sendMessage(ChatColor.RED + "Usage: /robbery admin itemsstolen " + action + " <player> [amount]");
-                return;
-            }
-            targetName = args[1];
-            if (args.length >= 3) amountStr = args[2];
-        }
+        String storeId = args[1].toLowerCase();
+        String targetName = args[2];
+        String amountStr = (args.length >= 4) ? args[3] : null;
 
         Player target = Bukkit.getPlayer(targetName);
         if (target == null || !target.isOnline()) {
@@ -348,35 +334,37 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
             switch (action) {
                 case "give" -> {
                     if (amountStr == null) {
-                        sender.sendMessage(ChatColor.RED + "Usage: /robbery admin itemsstolen give <player> <amount>");
+                        sender.sendMessage(ChatColor.RED + "Usage: /robbery admin itemsstolen give <store> <player> <amount>");
                         return;
                     }
                     int amount = Integer.parseInt(amountStr);
+                    pd.addStoreItems(storeId, amount);
                     pd.addItemsStolen(amount);
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aAdded &e" + amount + " &aItems Stolen to &f" + target.getName() + " &7(Total: &e" + pd.getItemsStolen() + "&7)."));
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aAdded &e" + amount + " &aItems Stolen to &f" + target.getName() + " &afor &e" + storeId + " &7(Store Total: &e" + pd.getStoreItems(storeId) + "&7, Global: &e" + pd.getItemsStolen() + "&7)."));
                 }
                 case "set" -> {
                     if (amountStr == null) {
-                        sender.sendMessage(ChatColor.RED + "Usage: /robbery admin itemsstolen set <player> <amount>");
+                        sender.sendMessage(ChatColor.RED + "Usage: /robbery admin itemsstolen set <store> <player> <amount>");
                         return;
                     }
                     int amount = Integer.parseInt(amountStr);
-                    pd.setItemsStolen(amount);
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aSet &f" + target.getName() + "'s &aItems Stolen to &e" + pd.getItemsStolen() + "&a."));
+                    pd.getStoreItemsMap().put(storeId, amount);
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aSet &f" + target.getName() + "'s &aItems Stolen for &e" + storeId + " &ato &e" + amount + "&a."));
                 }
                 case "remove" -> {
                     if (amountStr == null) {
-                        sender.sendMessage(ChatColor.RED + "Usage: /robbery admin itemsstolen remove <player> <amount>");
+                        sender.sendMessage(ChatColor.RED + "Usage: /robbery admin itemsstolen remove <store> <player> <amount>");
                         return;
                     }
                     int amount = Integer.parseInt(amountStr);
-                    int newStolen = Math.max(0, pd.getItemsStolen() - amount);
-                    pd.setItemsStolen(newStolen);
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aRemoved &e" + amount + " &aItems Stolen from &f" + target.getName() + " &7(New: &e" + newStolen + "&7)."));
+                    int newStolen = Math.max(0, pd.getStoreItems(storeId) - amount);
+                    pd.getStoreItemsMap().put(storeId, newStolen);
+                    pd.setItemsStolen(Math.max(0, pd.getItemsStolen() - amount));
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aRemoved &e" + amount + " &aItems Stolen from &f" + target.getName() + " &afor &e" + storeId + " &7(New Store Total: &e" + newStolen + "&7)."));
                 }
                 case "reset" -> {
-                    pd.setItemsStolen(0);
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aReset &f" + target.getName() + "'s &aItems Stolen to 0."));
+                    pd.getStoreItemsMap().put(storeId, 0);
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aReset &f" + target.getName() + "'s &aItems Stolen for &e" + storeId + " &ato 0."));
                 }
                 default -> sender.sendMessage(ChatColor.RED + "Unknown itemsstolen action: " + action + " (Available: give, set, remove, reset)");
             }
@@ -385,74 +373,7 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
         }
     }
 
-    // --- AddItems Category ---
-    private void handleAddItems(CommandSender sender, String[] args) {
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(ChatColor.RED + "This command can only be run by players in-game.");
-            return;
-        }
 
-        if (args.length < 1) {
-            player.sendMessage(ChatColor.RED + "Usage: /robbery admin additems <itemName>");
-            if (Robbery.getItemsMap() != null && !Robbery.getItemsMap().isEmpty()) {
-                player.sendMessage(ChatColor.GRAY + "Available items: " + ChatColor.YELLOW + String.join(", ", Robbery.getItemsMap().keySet()));
-            }
-            return;
-        }
-
-        String itemName = args[0].toLowerCase();
-        Items template = Robbery.getItemsMap() != null ? Robbery.getItemsMap().get(itemName) : null;
-
-        if (template == null) {
-            player.sendMessage(ChatColor.RED + "Item '" + itemName + "' not found!");
-            if (Robbery.getItemsMap() != null) {
-                player.sendMessage(ChatColor.GRAY + "Available: " + ChatColor.YELLOW + String.join(", ", Robbery.getItemsMap().keySet()));
-            }
-            return;
-        }
-
-        Items selectedItem = new Items(template);
-        spawnFloatingItem(player, selectedItem);
-        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aSuccessfully spawned floating &e" + selectedItem.getName() + "&a!"));
-    }
-
-    public Item spawnFloatingItem(Player player, Items item) {
-        Location spawnLoc = player.getLocation();
-        spawnLoc.setX(spawnLoc.getBlockX() + 0.5);
-        spawnLoc.setZ(spawnLoc.getBlockZ() + 0.5);
-
-        World world = player.getWorld();
-        item.setPosition(spawnLoc.clone());
-        ItemStack skull = item.getSkull();
-
-        ArmorStand stand = world.spawn(spawnLoc.clone(), ArmorStand.class);
-        stand.setInvisible(true);
-        stand.setHealth(20);
-        stand.setArms(false);
-        stand.setBasePlate(false);
-        stand.setSmall(true);
-        stand.setGravity(false);
-        stand.setCustomNameVisible(false);
-        stand.setCustomName(item.getUniqueId().toString());
-        stand.setRotation(player.getLocation().getYaw(), player.getLocation().getPitch());
-
-        NamespacedKey key = new NamespacedKey("robbery", "item_uuid");
-        PersistentDataContainer dataContainer = stand.getPersistentDataContainer();
-        dataContainer.set(key, PersistentDataType.STRING, item.getUniqueId().toString());
-
-        Item droppedItem = world.spawn(spawnLoc.clone(), Item.class);
-        droppedItem.setItemStack(skull);
-        droppedItem.setPickupDelay(Integer.MAX_VALUE);
-        droppedItem.setUnlimitedLifetime(true);
-        droppedItem.setVelocity(new Vector(0, 0, 0));
-        droppedItem.setGravity(false);
-        droppedItem.setCustomName(item.getUniqueId().toString());
-
-        item.setDroppedItem(droppedItem);
-        main.addItems(item);
-
-        return droppedItem;
-    }
 
     public void reloadAddItems() {
         int updated = ItemsReloader.reloadAndSync(main);
@@ -464,8 +385,7 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
         sender.sendMessage("§d/robbery reload §7- Reload plugin data & items");
         sender.sendMessage("§d/robbery admin xp <give|set|remove|setlevel|reset> <player> [amount] §7- Manage player XP");
         sender.sendMessage("§d/robbery admin sp <give|set|remove|reset> <player> [amount] §7- Manage Skill Points");
-        sender.sendMessage("§d/robbery admin itemsstolen <give|set|remove|reset> <player> [amount] §7- Manage Items Stolen");
-        sender.sendMessage("§d/robbery admin additems <itemName> §7- Spawn floating store item");
+        sender.sendMessage("§d/robbery admin itemsstolen <give|set|remove|reset> <store> <player> [amount] §7- Manage Items Stolen");
         sender.sendMessage("§d/robbery admin reload §7- Reload plugin data & items");
         sender.sendMessage("§8=================================");
     }
@@ -482,7 +402,7 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 2 && args[0].equalsIgnoreCase("admin")) {
-            completions.addAll(List.of("xp", "sp", "itemsstolen", "additems", "reload"));
+            completions.addAll(List.of("xp", "sp", "itemsstolen", "reload"));
             return filter(completions, args[1]);
         }
 
@@ -491,23 +411,32 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
             switch (cat) {
                 case "xp" -> completions.addAll(List.of("give", "set", "remove", "setlevel", "reset", "calculate"));
                 case "sp", "itemsstolen" -> completions.addAll(List.of("give", "set", "remove", "reset"));
-                case "additems", "additem" -> {
-                    if (Robbery.getItemsMap() != null) {
-                        completions.addAll(Robbery.getItemsMap().keySet());
-                    }
-                }
             }
             return filter(completions, args[2]);
         }
 
         if (args.length == 4 && args[0].equalsIgnoreCase("admin")) {
             String cat = args[1].toLowerCase();
-            if (cat.equals("xp") || cat.equals("sp") || cat.equals("itemsstolen")) {
+            if (cat.equals("itemsstolen")) {
+                for (int i = 1; i <= 12; i++) {
+                    completions.add("store" + i);
+                }
+            } else if (cat.equals("xp") || cat.equals("sp")) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     completions.add(p.getName());
                 }
             }
             return filter(completions, args[3]);
+        }
+        
+        if (args.length == 5 && args[0].equalsIgnoreCase("admin")) {
+            String cat = args[1].toLowerCase();
+            if (cat.equals("itemsstolen")) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    completions.add(p.getName());
+                }
+            }
+            return filter(completions, args[4]);
         }
 
         return Collections.emptyList();

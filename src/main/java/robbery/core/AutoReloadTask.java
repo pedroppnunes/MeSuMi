@@ -24,20 +24,20 @@ public class AutoReloadTask extends BukkitRunnable {
         int second = now.getSecond();
 
         if ((hour == 11 && minute == 55 && second == 0) || (hour == 23 && minute == 55 && second == 0)) {
-            broadcast("&c&lServer reload in &6&l5 minutes!");
+            broadcast("&c&lServer restart in &6&l5 minutes!");
         }
 
         if ((hour == 11 && minute == 59 && second == 0) || (hour == 23 && minute == 59 && second == 0)) {
-            broadcast("&c&lServer reload in &6&l1 minute!");
+            broadcast("&c&lServer restart in &6&l1 minute!");
         }
 
         if ((hour == 11 && minute == 59 && second == 50) || (hour == 23 && minute == 59 && second == 50)) {
-            broadcast("&c&lServer reload in &6&l10 seconds!");
+            broadcast("&c&lServer restart in &6&l10 seconds!");
         }
 
         if ((hour == 12 && minute == 0 && second == 0) || (hour == 0 && minute == 0 && second == 0)) {
-            broadcast("&c&lReloading server now!");
-            Bukkit.getScheduler().runTask(plugin, Bukkit::reload);
+            broadcast("&c&lRestarting server now!");
+            // The linux server wrapper handles the actual shutdown/restart.
         }
     }
 

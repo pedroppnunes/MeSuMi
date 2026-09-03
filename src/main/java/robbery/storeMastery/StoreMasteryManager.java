@@ -169,7 +169,7 @@ public class StoreMasteryManager {
     }
 
     private void unlockRegion(Player player, String regionId) {
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rg addmember " + regionId + " " + player.getName());
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rg addmember -w world " + regionId + " " + player.getName());
     }
 
     public String getRewardDisplay(String storeId, int milestone) {
@@ -180,9 +180,9 @@ public class StoreMasteryManager {
             case 1 -> "§a+10% Money Multiplier";
             case 2 -> {
                 if (storeId.equalsIgnoreCase("store11")) {
-                    yield "§aUnlock middle area of " + storeName;
+                    yield "§aUnlock middle area of " + storeName + " & +10% Steal Speed";
                 } else if (storeId.equalsIgnoreCase("store12")) {
-                    yield "§aUnlock higher area of " + storeName;
+                    yield "§aUnlock higher area of " + storeName + " & +10% Steal Speed";
                 } else {
                     yield "§a+10% Steal Speed";
                 }

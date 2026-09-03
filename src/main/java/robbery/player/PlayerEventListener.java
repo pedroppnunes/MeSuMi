@@ -133,10 +133,28 @@ public class PlayerEventListener implements Listener {
         cfg.set("stats.rank", memory.getRank());
         cfg.set("stats.prestige", memory.getPrestige());
 
-        // Store robbery stats
+        // Store robbery stats & detailed statistics
         cfg.set("stats.itemsStolen", memory.getItemsStolen());
+        cfg.set("stats.bustedCount", memory.getBustedCount());
         cfg.set("stats.storeItems", memory.getStoreItemsMap());
         cfg.set("stats.storeMilestones", memory.getStoreMilestoneMap());
+        cfg.set("stats.itemStolenCounts", memory.getItemStolenCountsMap());
+        cfg.set("stats.storePlaytime", memory.getStorePlaytimeMap());
+
+        // Per-prestige statistics
+        Map<String, Object> pPlaytimeMap = new HashMap<>();
+        for (Map.Entry<Integer, Long> entry : memory.getPrestigePlaytimeMap().entrySet()) {
+            pPlaytimeMap.put(String.valueOf(entry.getKey()), entry.getValue());
+        }
+        cfg.set("stats.prestigePlaytime", pPlaytimeMap);
+        cfg.set("stats.prestigeStorePlaytime", memory.getPrestigeStorePlaytimeMap());
+
+        Map<String, Object> pStolenMap = new HashMap<>();
+        for (Map.Entry<Integer, Integer> entry : memory.getPrestigeItemsStolenMap().entrySet()) {
+            pStolenMap.put(String.valueOf(entry.getKey()), entry.getValue());
+        }
+        cfg.set("stats.prestigeItemsStolen", pStolenMap);
+        cfg.set("stats.prestigeStoreItemsStolen", memory.getPrestigeStoreItemsStolenMap());
 
         // Backpack & Tools & Keys
         cfg.set("stats.backpack", memory.getBackpackString());
@@ -272,8 +290,17 @@ public class PlayerEventListener implements Listener {
 
         // Stats & store
         memory.setItemsStolen(cfg.getInt("stats.itemsStolen", 0));
+        memory.setBustedCount(cfg.getInt("stats.bustedCount", 0));
         loadMap(cfg, "stats.storeItems", memory::setStoreItemsMap);
         loadMap(cfg, "stats.storeMilestones", memory::setStoreMilestoneMap);
+        loadMap(cfg, "stats.itemStolenCounts", memory::setItemStolenCountsMap);
+        loadMapLong(cfg, "stats.storePlaytime", memory::setStorePlaytimeMap);
+
+        // Prestige detailed stats loading
+        loadMapIntKeyLong(cfg, "stats.prestigePlaytime", memory::setPrestigePlaytimeMap);
+        loadMapLong(cfg, "stats.prestigeStorePlaytime", memory::setPrestigeStorePlaytimeMap);
+        loadMapIntKeyInt(cfg, "stats.prestigeItemsStolen", memory::setPrestigeItemsStolenMap);
+        loadMap(cfg, "stats.prestigeStoreItemsStolen", memory::setPrestigeStoreItemsStolenMap);
 
         // Skill tree
         if (cfg.contains("skilltree.levels")) {
@@ -356,6 +383,37 @@ public class PlayerEventListener implements Listener {
         for (Map.Entry<String, Object> e : cfg.getConfigurationSection(path).getValues(false).entrySet()) {
             target.put(e.getKey(), ((Number) e.getValue()).doubleValue());
         }
+    }
+
+    private void loadMapLong(FileConfiguration cfg, String path, java.util.function.Consumer<Map<String, Long>> consumer) {
+        if (!cfg.contains(path)) return;
+        Map<String, Long> map = new HashMap<>();
+        for (String key : cfg.getConfigurationSection(path).getKeys(false)) {
+            map.put(key, cfg.getLong(path + "." + key));
+        }
+        consumer.accept(map);
+    }
+
+    private void loadMapIntKeyLong(FileConfiguration cfg, String path, java.util.function.Consumer<Map<Integer, Long>> consumer) {
+        if (!cfg.contains(path)) return;
+        Map<Integer, Long> map = new HashMap<>();
+        for (String key : cfg.getConfigurationSection(path).getKeys(false)) {
+            try {
+                map.put(Integer.parseInt(key), cfg.getLong(path + "." + key));
+            } catch (NumberFormatException ignored) {}
+        }
+        consumer.accept(map);
+    }
+
+    private void loadMapIntKeyInt(FileConfiguration cfg, String path, java.util.function.Consumer<Map<Integer, Integer>> consumer) {
+        if (!cfg.contains(path)) return;
+        Map<Integer, Integer> map = new HashMap<>();
+        for (String key : cfg.getConfigurationSection(path).getKeys(false)) {
+            try {
+                map.put(Integer.parseInt(key), cfg.getInt(path + "." + key));
+            } catch (NumberFormatException ignored) {}
+        }
+        consumer.accept(map);
     }
 
     private void teleportPlayerFromConfig(Player player, FileConfiguration cfg) {

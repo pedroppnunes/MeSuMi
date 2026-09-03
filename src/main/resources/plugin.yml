@@ -172,6 +172,13 @@ commands:
     description: Alias for hideout
     usage: /ho
     aliases: [h]
+  catalog:
+    description: Opens the store completionist item catalog
+    usage: /catalog [store]
+    aliases: [storecatalog]
+  stats:
+    description: View detailed GUI player robbery statistics
+    usage: /stats [player]
 
 permissions:
   robbery.op:
