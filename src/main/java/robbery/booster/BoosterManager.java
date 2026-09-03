@@ -131,7 +131,9 @@ public class BoosterManager {
         double t = Math.max(0.0, Math.min(1.0, (store - 1) / 12.0));
         double baseChance = startChance + (endChance - startChance) * t;
 
-        double bonusMultiplier = 1.0 + pd.getOutBoosterChance() + pd.getPerkValue(PERK_BOOST1);
+        double pBoostVal = pd.getPerkValue(PERK_BOOST1);
+        double pBoost = pBoostVal >= 0.1 ? pBoostVal / 100.0 : pBoostVal;
+        double bonusMultiplier = 1.0 + pd.getOutBoosterChance() + pBoost;
         double finalChance = baseChance * bonusMultiplier;
 
         return (int) Math.max(1, Math.round(1.0 / finalChance));

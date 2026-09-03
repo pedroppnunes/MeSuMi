@@ -32,6 +32,19 @@ public class Items {
     private Item droppedItem;
     private final String id;
     private final int time;
+    private final java.util.Set<UUID> attemptedInstaStealPlayers = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
+
+    public boolean hasAttemptedInstaSteal(UUID playerUuid) {
+        return playerUuid != null && attemptedInstaStealPlayers.contains(playerUuid);
+    }
+
+    public void recordInstaStealAttempt(UUID playerUuid) {
+        if (playerUuid != null) attemptedInstaStealPlayers.add(playerUuid);
+    }
+
+    public void clearInstaStealAttempts() {
+        attemptedInstaStealPlayers.clear();
+    }
 
     public Items(double hp, int value, String name, String playername, int time, String id){
         this.hp = hp;
@@ -192,6 +205,7 @@ public class Items {
 
 
     public void resetspawn(int delayInSeconds) {
+        clearInstaStealAttempts();
         if (Robbery.getInstance().isEnabled()) {
             respawning = true;
             Location itemLocation = position != null ? position.clone() : (droppedItem != null ? droppedItem.getLocation() : null);

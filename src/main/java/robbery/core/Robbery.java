@@ -199,6 +199,7 @@ public class Robbery extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new VoteListener(main), main);
         BlockCraftListener blockCraft = new BlockCraftListener();
         Messages.init(main);
+        robbery.messages.ActionBarManager.init(main);
         addItemstoMap();
         new AutoReloadTask(this).runTaskTimerAsynchronously(this, 0L, 20L);
         getServer().getPluginManager().registerEvents(new InventoryLockListener(), main);
@@ -398,6 +399,10 @@ public class Robbery extends JavaPlugin implements Listener {
             }
             player.kick(Component.text(Messages.get("reload.player-kick")));
         }
+        if (cryptoManager != null) {
+            cryptoManager.saveAllSync();
+        }
+        Rcrate.saveAllRewards();
         Bukkit.getScheduler().cancelTasks(this);
         saveItems();
         if (databaseManager != null) {

@@ -178,7 +178,16 @@ public class CryptoMachineDao {
     }
 
     public void saveMachine(CryptoMachine machine) {
-        CompletableFuture.runAsync(() -> {
+        saveMachine(machine, false);
+    }
+
+    public void saveMachineSync(CryptoMachine machine) {
+        saveMachine(machine, true);
+    }
+
+    public void saveMachine(CryptoMachine machine, boolean sync) {
+        if (machine == null) return;
+        Runnable task = () -> {
             String query = "INSERT INTO crypto_machines (uuid, world, x, y, z, unclaimed_money, fuel_ticks, fuel_quality, speed_level, fuel_time_level, reward_level, last_updated, stored_fuels) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
                     "ON DUPLICATE KEY UPDATE world=?, x=?, y=?, z=?, unclaimed_money=?, fuel_ticks=?, fuel_quality=?, speed_level=?, fuel_time_level=?, reward_level=?, last_updated=?, stored_fuels=?";
@@ -225,6 +234,12 @@ public class CryptoMachineDao {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        });
+        };
+
+        if (sync || !plugin.isEnabled()) {
+            task.run();
+        } else {
+            CompletableFuture.runAsync(task);
+        }
     }
 }

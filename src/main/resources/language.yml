@@ -391,7 +391,7 @@ storeMastery:
     privacy-hideout: "&5&lRobbery &8> &cThis player's profile is set to Hideout Members Only!"
     no-stats-found: "&5&lRobbery &8> &cNo statistics found for player %player%!"
   shopsell:
-    line1: "&e&lShopSell &8> &fHey there! Welcome to the &aSupermarket&f! I'm the Shop Manager."
-    line2: "&e&lShopSell &8> &fYour goal is simple: rob floating items around the store using your tool, store them in your backpack, and bring them back to sell them to me&f!"
-    line3: "&e&lShopSell &8> &fEvery item you steal levels up your &dStore Mastery&f! Mastering stores grants boosts for that Store!"
-    line4: "&e&lShopSell &8> &fTo inspect item values, robbery XP, completionist progress, and Store Mastery rewards, just right-click me anytime to open the Catalog!"
+    line1: "&e&lShop Manager &8> &fWelcome to the &cSupermarket&f!"
+    line2: "&e&lShop Manager &8> &fUse your tool to &esteal items&f around the store, then bring them back to me to &asell&f them!"
+    line3: "&e&lShop Manager &8> &fClick me anytime to open the menu and check your stolen items and &dStore Masteries&f!"
+    line4: "&e&lShop Manager &8> &fMasteries give you &dboosts&f for that store. You can also upgrade your &bTool&f, &bBackpack&f, and unlock the &bnext store&f at the Mall!"

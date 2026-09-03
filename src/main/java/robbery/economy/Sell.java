@@ -99,6 +99,7 @@ public class Sell implements CommandExecutor {
         long totalXp = computeXpFromItems(backpack.getItems(),p);
 
         double chance = p.getPerkValue(PERK_DOUBLE_INV1);
+        double chanceProb = chance / 100.0;
         long amountToAdd = p.getBackpack().sell();
         if (amountToAdd == 0)
             return true;
@@ -108,14 +109,14 @@ public class Sell implements CommandExecutor {
 
         boolean lucky = false;
 
-        if (chance > 0 && random.nextDouble() < chance) {
+        if (chanceProb > 0 && random.nextDouble() < chanceProb) {
                 lucky = true;
 
                 long newAmount = amountToAdd * 2;
                 econ.depositPlayer(player, newAmount);
 
                 title = "&aYou sold your items for &2" + NumberFormatter.formatDoubleNumber(newAmount) + "$";
-                subtitle = "&6You got Lucky! &e+" + (int) (chance * 100) + "% Bonus!";
+                subtitle = "&6You got Lucky! &e+" + String.format("%.1f", chance) + "% Bonus!";
         }
 
         if (!lucky) {
@@ -132,10 +133,36 @@ public class Sell implements CommandExecutor {
 
         Messages.sendFormatted(player, "command.sell.sold", placeholders);
 
+        long finalMoneyEarned = lucky ? (amountToAdd * 2) : amountToAdd;
+        double hideoutValue = (double) finalMoneyEarned / 1000.0;
+
+        // Deposit Hideout Value to SuperiorSkyblock2 Hideout
+        try {
+            if (Bukkit.getPluginManager().isPluginEnabled("SuperiorSkyblock2")) {
+                com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer sp = com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI.getPlayer(player);
+                if (sp != null && sp.getIsland() != null) {
+                    com.bgsoftware.superiorskyblock.api.island.Island hideout = sp.getIsland();
+                    java.math.BigDecimal valBD = java.math.BigDecimal.valueOf(hideoutValue);
+                    try {
+                        hideout.setBonusWorth(hideout.getBonusWorth().add(valBD));
+                    } catch (Throwable t) {
+                        try {
+                            hideout.setBonusLevel(hideout.getBonusLevel().add(valBD));
+                        } catch (Throwable ignored) {}
+                    }
+                }
+            }
+        } catch (Throwable ignored) {}
+
+        // Track player's personal contribution
+        p.addHideoutValueContributed(hideoutValue);
+
         if (lucky) {
-            Map<String, String> luckyPlaceholders = Map.of("bonus", String.valueOf((int) (chance * 100)));
+            Map<String, String> luckyPlaceholders = Map.of("bonus", String.format("%.1f", chance));
             Messages.sendFormatted(player, "command.sell.lucky", luckyPlaceholders);
         }
+
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&a+&e" + NumberFormatter.formatDoubleNumber(hideoutValue) + " &aHideout Value contributed to your Hideout!"));
 
         if (totalXp > 0) {
             try {

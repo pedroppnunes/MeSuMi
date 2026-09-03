@@ -56,7 +56,10 @@ public class PlayerSkillTreeGUI implements Listener {
         SkullMeta headMeta = (SkullMeta) head.getItemMeta();
         if (headMeta != null) {
             if (targetUuid != null) headMeta.setOwningPlayer(Bukkit.getOfflinePlayer(targetUuid));
-            headMeta.displayName(Component.text("[" + targetData.getLevel() + "] " + targetName).color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+            headMeta.displayName(Component.text("[").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(String.valueOf(targetData.getLevel())).color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
+                    .append(Component.text("] ").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false))
+                    .append(Component.text(targetName).color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
             headMeta.lore(List.of(
                     Component.text("Total XP: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                             .append(Component.text(NumberFormatter.formatDoubleNumber((double) targetData.getXp()) + " XP").color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)),

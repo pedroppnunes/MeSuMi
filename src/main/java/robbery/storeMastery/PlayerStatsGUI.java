@@ -124,7 +124,7 @@ public class PlayerStatsGUI implements Listener {
 
         // Dark Gray title format: "Stats: PlayerName"
         String titleStr = "Stats: " + targetName;
-        Inventory inv = Bukkit.createInventory(null, 27, Component.text(titleStr).color(NamedTextColor.DARK_GRAY));
+        Inventory inv = Bukkit.createInventory(null, 36, Component.text(titleStr).color(NamedTextColor.DARK_GRAY));
 
         // Background Glass
         ItemStack glass = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
@@ -133,12 +133,11 @@ public class PlayerStatsGUI implements Listener {
             glassMeta.displayName(Component.text(" "));
             glass.setItemMeta(glassMeta);
         }
-        for (int i = 0; i < 27; i++) {
+        for (int i = 0; i < 36; i++) {
             inv.setItem(i, glass);
         }
 
-        // 1. Header Skull (Slot 4) - "[Level] PlayerName"
-        // 1. Target Skull Header (Slot 4)
+        // 1. Header Player Head (Slot 4 - Centered Top)
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta headMeta = (SkullMeta) head.getItemMeta();
         if (headMeta != null) {
@@ -152,7 +151,7 @@ public class PlayerStatsGUI implements Listener {
         }
         inv.setItem(4, head);
 
-        // 2. Overview & Account Card (Slot 10 - Chest)
+        // 2. Overview & Account Card (Slot 11 - Row 1 Center Left)
         ItemStack overviewItem = new ItemStack(Material.CHEST);
         ItemMeta oMeta = overviewItem.getItemMeta();
         if (oMeta != null) {
@@ -177,13 +176,15 @@ public class PlayerStatsGUI implements Listener {
                     .append(Component.text(String.valueOf(pd.getItemsStolen())).color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Total Times Busted: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text(String.valueOf(pd.getBustedCount())).color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)));
+            lore.add(Component.text("Hideout Value Contributed: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(NumberFormatter.formatDoubleNumber(pd.getHideoutValueContributed()) + " Value").color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
             oMeta.lore(lore);
             overviewItem.setItemMeta(oMeta);
         }
-        inv.setItem(10, overviewItem);
+        inv.setItem(11, overviewItem);
 
-        // 3. Attributes & Boosts Card (Slot 12 - Beacon)
+        // 3. Attributes & Boosts Card (Slot 13 - Row 1 Center)
         ItemStack attrItem = new ItemStack(Material.BEACON);
         ItemMeta aMeta = attrItem.getItemMeta();
         if (aMeta != null) {
@@ -200,19 +201,24 @@ public class PlayerStatsGUI implements Listener {
                     .append(Component.text("+" + String.format("%.2f", pd.getPerkValue(PERK_CHANCE_SP1)) + "%").color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Extra Backpack Slots: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text("+" + pd.getExtraSlots()).color(NamedTextColor.DARK_AQUA).decoration(TextDecoration.ITALIC, false)));
+
+            double doubleVal = pd.getPerkValue(PERK_DOUBLE_ITEM1);
+            double tripleVal = pd.getPerkValue(PERK_TRIPLE_ITEM1);
+            double instaVal = pd.getPerkValue(PERK_INSTA_STEAL1);
+
             lore.add(Component.text("Double Item Chance: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text("+" + String.format("%.1f", pd.getPerkValue(PERK_DOUBLE_ITEM1)) + "%").color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false)));
+                    .append(Component.text("+" + String.format("%.1f", doubleVal) + "%").color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Triple Item Chance: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text("+" + String.format("%.1f", pd.getPerkValue(PERK_TRIPLE_ITEM1)) + "%").color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false)));
+                    .append(Component.text("+" + String.format("%.1f", tripleVal) + "%").color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Insta-Steal Chance: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text("+" + String.format("%.1f", pd.getPerkValue(PERK_INSTA_STEAL1)) + "%").color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false)));
+                    .append(Component.text("+" + String.format("%.1f", instaVal) + "%").color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
             aMeta.lore(lore);
             attrItem.setItemMeta(aMeta);
         }
-        inv.setItem(12, attrItem);
+        inv.setItem(13, attrItem);
 
-        // 4. Equipment & Unlocks Card (Slot 14 - Diamond Pickaxe)
+        // 4. Equipment & Unlocks Card (Slot 15 - Row 1 Center Right)
         ItemStack equipItem = new ItemStack(Material.DIAMOND_PICKAXE);
         ItemMeta eMeta = equipItem.getItemMeta();
         if (eMeta != null) {
@@ -220,19 +226,23 @@ public class PlayerStatsGUI implements Listener {
             List<Component> lore = new ArrayList<>();
             lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 
-            // Backpack name without (Cap.5)
             String backName = pd.getBackpack() != null ? pd.getBackpack().getName() : "Cloth Backpack";
             lore.add(Component.text("Current Backpack: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text(backName).color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 
-            // Real Tool Display Name formatted in White
             String toolId = pd.getToolString();
             Tools toolObj = ToolManager.getToolsName(toolId);
             String toolName = toolObj != null ? ChatColor.stripColor(toolObj.getColorname()) : toolId;
             lore.add(Component.text("Current Tool: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text(toolName).color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 
-            // Highest Achieved Store
+            robbery.booster.Booster activeB = pd.getActiveboost();
+            double activeMult = (activeB != null && activeB.getMultiplier() > 0 && !activeB.getName().equalsIgnoreCase("None")) ? activeB.getMultiplier() : pd.getBoostx();
+            String boosterDisplay = activeMult > 0 ? "+" + String.format("%.2f", activeMult) + "x Money Multiplier" : "None";
+
+            lore.add(Component.text("Active Booster: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(boosterDisplay).color(activeMult > 0 ? NamedTextColor.GREEN : NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+
             int highestKeyTier = pd.getHighestOwnedStoreTier();
             String highestStoreName = KeyManager.getStoreN("store" + highestKeyTier);
             if (highestStoreName == null) highestStoreName = "Store " + highestKeyTier;
@@ -240,7 +250,6 @@ public class PlayerStatsGUI implements Listener {
             lore.add(Component.text("Highest Achieved Store: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text(highestStoreName).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
 
-            // Current Store with Milestone in gray in front: e.g. "Supermarket (M1)"
             String currentStoreId = pd.getKey() != null ? pd.getKey().getId() : "store1";
             Keys curKey = KeyManager.getStoreName(currentStoreId);
             String curStoreName = curKey != null ? curKey.getName() : "Supermarket";
@@ -248,9 +257,8 @@ public class PlayerStatsGUI implements Listener {
 
             lore.add(Component.text("Current Store: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text(curStoreName + " ").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
-                    .append(Component.text("(M" + curMastery + ")").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
+                    .append(Component.text("(M" + curMastery + ")").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)));
 
-            // Total Backpacks & Tools Unlocked
             int totalBackpacksUnlocked = pd.getBackpackUnlocked();
             int totalToolsUnlocked = pd.getToolsUnlocked();
             lore.add(Component.text("Total Backpacks Unlocked: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
@@ -262,9 +270,9 @@ public class PlayerStatsGUI implements Listener {
             eMeta.lore(lore);
             equipItem.setItemMeta(eMeta);
         }
-        inv.setItem(14, equipItem);
+        inv.setItem(15, equipItem);
 
-        // 6. Privacy Dye Button (Slot 20 - Dye, only interactive for self)
+        // 5. Profile Privacy Dye Button (Slot 20 - Row 2 Left)
         String currentPrivacy = pd.getProfilePrivacy();
         ItemStack dyeItem;
         String dyeName;
@@ -304,7 +312,7 @@ public class PlayerStatsGUI implements Listener {
         }
         inv.setItem(20, dyeItem);
 
-        // 7. Store Item Catalog Button (Slot 22 - Writable Book)
+        // 6. Store Item Catalog Button (Slot 22 - Row 2 Center)
         ItemStack catalogButton = new ItemStack(Material.WRITABLE_BOOK);
         ItemMeta cMeta = catalogButton.getItemMeta();
         if (cMeta != null) {
@@ -316,43 +324,50 @@ public class PlayerStatsGUI implements Listener {
         }
         inv.setItem(22, catalogButton);
 
-        // 8. Close Button (Slot 24 - Barrier)
+        // 7. Store Masteries Paper Button (Slot 24 - Row 2 Right, only for self)
+        if (isSelf) {
+            ItemStack masteriesPaper = new ItemStack(Material.PAPER);
+            ItemMeta pMeta = masteriesPaper.getItemMeta();
+            if (pMeta != null) {
+                pMeta.displayName(Component.text("View Store Masteries").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+                pMeta.lore(List.of(
+                        Component.text("Click to open Store Masteries!").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                ));
+                masteriesPaper.setItemMeta(pMeta);
+            }
+            inv.setItem(24, masteriesPaper);
+        }
+
+        // 8. Close Button (Slot 31 - Centered Bottom)
         ItemStack closeItem = new ItemStack(Material.BARRIER);
         ItemMeta closeMeta = closeItem.getItemMeta();
         if (closeMeta != null) {
             closeMeta.displayName(Component.text("Close").color(NamedTextColor.RED).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
             closeItem.setItemMeta(closeMeta);
         }
-        inv.setItem(24, closeItem);
-
-        // 9. Target Head Indicator at Bottom Right (Slot 26)
-        ItemStack targetIndicatorHead = new ItemStack(Material.PLAYER_HEAD);
-        SkullMeta tiMeta = (SkullMeta) targetIndicatorHead.getItemMeta();
-        if (tiMeta != null) {
-            if (targetUuid != null) tiMeta.setOwningPlayer(Bukkit.getOfflinePlayer(targetUuid));
-            tiMeta.displayName(Component.text("Inspecting: ").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text(targetName).color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
-            targetIndicatorHead.setItemMeta(tiMeta);
-        }
-        inv.setItem(26, targetIndicatorHead);
+        inv.setItem(31, closeItem);
 
         viewer.openInventory(inv);
     }
 
     private String getFormattedRank(UUID targetUuid, PlayerData pd) {
         String r = pd.getRank();
-        if (r == null || r.equalsIgnoreCase("NONE") || r.equalsIgnoreCase("rank0")) {
-            if (targetUuid != null) {
-                Player p = Bukkit.getPlayer(targetUuid);
-                if (p != null) {
-                    for (int i = 7; i >= 1; i--) {
-                        if (p.hasPermission("robbery.rank" + i)) return "Rank " + i;
+        robbery.ranks.Rank rankObj = robbery.ranks.RankManager.getRank(r);
+        if (rankObj != null && !rankObj.name().isEmpty()) {
+            return rankObj.name();
+        }
+        if (targetUuid != null) {
+            Player p = Bukkit.getPlayer(targetUuid);
+            if (p != null) {
+                for (int i = 7; i >= 1; i--) {
+                    if (p.hasPermission("robbery.rank" + i)) {
+                        robbery.ranks.Rank rPerm = robbery.ranks.RankManager.getRank("rank" + i);
+                        return rPerm != null && !rPerm.name().isEmpty() ? rPerm.name() : "Rank " + i;
                     }
                 }
             }
-            return "Burglar";
         }
-        return r;
+        return "Burglar";
     }
 
     @EventHandler
@@ -384,7 +399,7 @@ public class PlayerStatsGUI implements Listener {
             OfflinePlayer offTarget = Bukkit.getOfflinePlayer(targetName);
             PlayerData targetPd = (offTarget.isOnline() && offTarget.getPlayer() != null) ? PlayerDataManager.getPlayerData(offTarget.getPlayer()) : null;
 
-            if (clicked.getType() == Material.ENCHANTED_BOOK) {
+            if (clicked.getType() == Material.PAPER || clicked.getType() == Material.ENCHANTED_BOOK) {
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
                 if (targetPd != null) {
                     plugin.getPlayerSkillTreeGUI().openGUI(player, targetPd, targetName, offTarget.getUniqueId(), 1);
@@ -427,6 +442,23 @@ public class PlayerStatsGUI implements Listener {
         }
     }
 
+    private static final java.util.Map<UUID, Long> recentPlayerClicks = new java.util.concurrent.ConcurrentHashMap<>();
+
+    public static void recordPlayerClick(UUID uuid) {
+        if (uuid != null) recentPlayerClicks.put(uuid, System.currentTimeMillis());
+    }
+
+    public static boolean isRecentPlayerClick(UUID uuid) {
+        if (uuid == null) return false;
+        Long last = recentPlayerClicks.get(uuid);
+        if (last == null) return false;
+        if (System.currentTimeMillis() - last < 500L) {
+            return true;
+        }
+        recentPlayerClicks.remove(uuid);
+        return false;
+    }
+
     @EventHandler
     public void onPlayerRightClickPlayer(PlayerInteractEntityEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
@@ -442,6 +474,7 @@ public class PlayerStatsGUI implements Listener {
         PersistentDataContainer data = meta.getPersistentDataContainer();
         if (data.has(mainmenuKey, PersistentDataType.BYTE)) {
             event.setCancelled(true);
+            recordPlayerClick(clicker.getUniqueId());
             clicker.playSound(clicker.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
             openGUI(clicker, targetPlayer);
         }
@@ -462,6 +495,7 @@ public class PlayerStatsGUI implements Listener {
         PersistentDataContainer data = meta.getPersistentDataContainer();
         if (data.has(mainmenuKey, PersistentDataType.BYTE)) {
             event.setCancelled(true);
+            recordPlayerClick(clicker.getUniqueId());
             clicker.playSound(clicker.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
             openGUI(clicker, targetPlayer);
         }
@@ -483,5 +517,11 @@ public class PlayerStatsGUI implements Listener {
             }
         } catch (Throwable ignored) {}
         return false;
+    }
+
+    private static double formatPercentagePerk(double val) {
+        if (val <= 0.0) return 0.0;
+        if (val <= 1.0) return val * 100.0;
+        return val;
     }
 }

@@ -20,6 +20,7 @@ import robbery.booster.BoosterManager;
 import robbery.core.RewardHolder;
 import robbery.messages.Messages;
 import robbery.player.PlayerDataManager;
+import net.kyori.adventure.text.Component;
 import robbery.ranks.RankPaper;
 import robbery.ranks.RankUpdate;
 
@@ -29,7 +30,16 @@ import java.util.*;
 public class Rcrate implements CommandExecutor,Listener {
     private static final Map<UUID, Map<Material, Integer>> pendingRewards = new HashMap<>();
     private static final Map<UUID, Map<String, Integer>> pendingRankRewards = new HashMap<>();
+    private static final Map<UUID, Integer> pendingCryptoMachines = new HashMap<>();
     private static final Robbery main = Robbery.getInstance();
+
+    public static Map<UUID, Integer> getPendingCryptoMachines() {
+        return pendingCryptoMachines;
+    }
+
+    public static void addPendingCryptoMachine(UUID uuid) {
+        pendingCryptoMachines.merge(uuid, 1, Integer::sum);
+    }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
@@ -152,21 +162,25 @@ public class Rcrate implements CommandExecutor,Listener {
         if (List.of("SuperiorWorld","world").contains(p.getWorld().getName())) {
             Map<Material, Integer> rewards = pendingRewards.get(p.getUniqueId());
             Map<String, Integer> rankRewards = pendingRankRewards.get(p.getUniqueId());
+            int cryptoCount = pendingCryptoMachines.getOrDefault(p.getUniqueId(), 0);
 
             boolean hasItemRewards = rewards != null && !rewards.isEmpty();
             boolean hasRankRewards = rankRewards != null && !rankRewards.isEmpty();
+            boolean hasCryptoRewards = cryptoCount > 0;
 
-            if (hasItemRewards || hasRankRewards) {
+            if (hasItemRewards || hasRankRewards || hasCryptoRewards) {
                 Messages.send(p, "command.rcrate.notify-claim");
             }
         }
     }
+
     public static void openRewardGUI(Player player) {
         UUID uuid = player.getUniqueId();
         Map<Material, Integer> materialRewards = pendingRewards.getOrDefault(uuid, new HashMap<>());
         Map<String, Integer> rankRewards = pendingRankRewards.getOrDefault(uuid, new HashMap<>());
+        int cryptoCount = pendingCryptoMachines.getOrDefault(uuid, 0);
 
-        int totalRewards = materialRewards.size() + rankRewards.size();
+        int totalRewards = materialRewards.size() + rankRewards.size() + (cryptoCount > 0 ? 1 : 0);
         if (totalRewards == 0) {
             Messages.send(player, "command.claim.no-rewards");
             return;
@@ -178,6 +192,22 @@ public class Rcrate implements CommandExecutor,Listener {
         Inventory gui = Bukkit.createInventory(holder, guiSize, title);
 
         int index = 0;
+
+        // Render Crypto Machine reward if available
+        if (cryptoCount > 0 && index < guiSize - 9) {
+            ItemStack cryptoItem = robbery.crypto.CryptoItemHelper.createMachineItem(main);
+            ItemMeta meta = cryptoItem.getItemMeta();
+            if (meta != null) {
+                List<Component> lore = new ArrayList<>();
+                if (meta.hasLore() && meta.lore() != null) {
+                    lore.addAll(meta.lore());
+                }
+                lore.add(net.kyori.adventure.text.Component.text("§7Amount: §ex" + cryptoCount));
+                meta.lore(lore);
+                cryptoItem.setItemMeta(meta);
+            }
+            gui.setItem(index++, cryptoItem);
+        }
 
         for (Map.Entry<Material, Integer> entry : materialRewards.entrySet()) {
             if (index >= guiSize - 9) break;
@@ -241,35 +271,84 @@ public class Rcrate implements CommandExecutor,Listener {
     }
 
     public static void saveRewards(UUID uuid) {
-        File f=new File(main.getDataFolder(), "player/"+uuid+"/rewards.yml");
+        File f = new File(main.getDataFolder(), "player/" + uuid + "/rewards.yml");
         if (!f.getParentFile().exists()) f.getParentFile().mkdirs();
 
-        Map<Material,Integer> rewards=pendingRewards.getOrDefault(uuid,Map.of());
-        YamlConfiguration cfg=new YamlConfiguration();
-        for (var e:rewards.entrySet()) {
-            cfg.set("rewards."+e.getKey().name(), e.getValue());
+        YamlConfiguration cfg = new YamlConfiguration();
+
+        Map<Material, Integer> rewards = pendingRewards.getOrDefault(uuid, Map.of());
+        for (var e : rewards.entrySet()) {
+            cfg.set("rewards." + e.getKey().name(), e.getValue());
         }
-        try { cfg.save(f); }
-        catch (Exception x){ x.printStackTrace(); }
+
+        Map<String, Integer> rankRewards = pendingRankRewards.getOrDefault(uuid, Map.of());
+        for (var e : rankRewards.entrySet()) {
+            cfg.set("rank_rewards." + e.getKey(), e.getValue());
+        }
+
+        int cryptoCount = pendingCryptoMachines.getOrDefault(uuid, 0);
+        if (cryptoCount > 0) {
+            cfg.set("crypto_machines", cryptoCount);
+        }
+
+        try {
+            cfg.save(f);
+        } catch (Exception x) {
+            x.printStackTrace();
+        }
+    }
+
+    public static void saveAllRewards() {
+        Set<UUID> allUuids = new HashSet<>();
+        allUuids.addAll(pendingRewards.keySet());
+        allUuids.addAll(pendingRankRewards.keySet());
+        allUuids.addAll(pendingCryptoMachines.keySet());
+        for (UUID uuid : allUuids) {
+            saveRewards(uuid);
+        }
     }
 
     public static void loadRewards(UUID uuid) {
-        File f=new File(main.getDataFolder(), "player/"+uuid+"/rewards.yml");
+        File f = new File(main.getDataFolder(), "player/" + uuid + "/rewards.yml");
         if (!f.exists()) return;
-        YamlConfiguration cfg=YamlConfiguration.loadConfiguration(f);
-        Map<Material,Integer> rewards=new HashMap<>();
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(f);
+
+        Map<Material, Integer> rewards = new HashMap<>();
         if (cfg.isConfigurationSection("rewards")) {
-            for (String key: Objects.requireNonNull(cfg.getConfigurationSection("rewards")).getKeys(false)) {
-                Material m=Material.matchMaterial(key);
-                if (m!=null) rewards.put(m, cfg.getInt("rewards."+key));
+            for (String key : Objects.requireNonNull(cfg.getConfigurationSection("rewards")).getKeys(false)) {
+                Material m = Material.matchMaterial(key);
+                if (m != null) rewards.put(m, cfg.getInt("rewards." + key));
             }
         }
-        pendingRewards.put(uuid,rewards);
+        if (!rewards.isEmpty()) {
+            pendingRewards.put(uuid, rewards);
+        } else {
+            pendingRewards.remove(uuid);
+        }
+
+        Map<String, Integer> rankRewards = new HashMap<>();
+        if (cfg.isConfigurationSection("rank_rewards")) {
+            for (String key : Objects.requireNonNull(cfg.getConfigurationSection("rank_rewards")).getKeys(false)) {
+                rankRewards.put(key, cfg.getInt("rank_rewards." + key));
+            }
+        }
+        if (!rankRewards.isEmpty()) {
+            pendingRankRewards.put(uuid, rankRewards);
+        } else {
+            pendingRankRewards.remove(uuid);
+        }
+
+        int cryptoCount = cfg.getInt("crypto_machines", 0);
+        if (cryptoCount > 0) {
+            pendingCryptoMachines.put(uuid, cryptoCount);
+        } else {
+            pendingCryptoMachines.remove(uuid);
+        }
     }
 
-    public static Map<UUID, Map<Material, Integer>> getPendingItemRewards() {return pendingRewards;}
+    public static Map<UUID, Map<Material, Integer>> getPendingItemRewards() { return pendingRewards; }
 
-    public static Map<UUID, Map<String, Integer>> getPendingRankRewards() {return pendingRankRewards;}
+    public static Map<UUID, Map<String, Integer>> getPendingRankRewards() { return pendingRankRewards; }
 
 }
 

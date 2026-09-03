@@ -39,7 +39,16 @@ public class StoreCatalogGUI implements Listener {
     }
 
     public void openGUI(Player player, String storeId, int page) {
-        PlayerData pd = PlayerDataManager.getPlayerData(player);
+        openGUI(player, player.getName(), player.getUniqueId(), storeId, page);
+    }
+
+    public void openGUI(Player viewer, String targetName, UUID targetUuid, String storeId, int page) {
+        if (viewer == null) return;
+        if (targetName == null) targetName = viewer.getName();
+        if (targetUuid == null) targetUuid = viewer.getUniqueId();
+
+        PlayerData pd = getPlayerData(targetUuid);
+        if (pd == null) pd = PlayerDataManager.getPlayerData(viewer);
         if (pd == null) return;
 
         if (storeId == null || storeId.isEmpty()) storeId = "store1";
@@ -47,33 +56,31 @@ public class StoreCatalogGUI implements Listener {
         if (storeName == null) storeName = "Store Catalog";
 
         List<Items> storeItemList = getItemsForStore(storeId);
-        // Sort items from lowest value to highest value
         storeItemList.sort(Comparator.comparingInt(Items::getValue));
         int totalItems = storeItemList.size();
 
-        // Calculate dynamic inventory size for small/medium/large stores
         int itemsPerPage;
         int invSize;
         int[] itemSlots;
 
         if (totalItems <= 7) {
-            invSize = 27; // 3 rows
+            invSize = 27;
             itemSlots = new int[]{10, 11, 12, 13, 14, 15, 16};
         } else if (totalItems <= 14) {
-            invSize = 36; // 4 rows
+            invSize = 36;
             itemSlots = new int[]{
                     10, 11, 12, 13, 14, 15, 16,
                     19, 20, 21, 22, 23, 24, 25
             };
         } else if (totalItems <= 21) {
-            invSize = 45; // 5 rows
+            invSize = 45;
             itemSlots = new int[]{
                     10, 11, 12, 13, 14, 15, 16,
                     19, 20, 21, 22, 23, 24, 25,
                     28, 29, 30, 31, 32, 33, 34
             };
         } else {
-            invSize = 54; // 6 rows
+            invSize = 54;
             itemSlots = new int[]{
                     10, 11, 12, 13, 14, 15, 16,
                     19, 20, 21, 22, 23, 24, 25,
@@ -88,11 +95,9 @@ public class StoreCatalogGUI implements Listener {
         if (page < 1) page = 1;
         if (page > maxPages) page = maxPages;
 
-        // Title format: Dark Gray "Catalog (1/2)"
         String title = "Catalog (" + page + "/" + maxPages + ")";
         Inventory inv = Bukkit.createInventory(null, invSize, Component.text(title).color(NamedTextColor.DARK_GRAY));
 
-        // Background Glass
         ItemStack glass = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         ItemMeta glassMeta = glass.getItemMeta();
         if (glassMeta != null) {
@@ -105,10 +110,13 @@ public class StoreCatalogGUI implements Listener {
 
         // Header Player Skull (Slot 4)
         ItemStack pHead = new ItemStack(Material.PLAYER_HEAD);
-        org.bukkit.inventory.meta.SkullMeta pMeta = (org.bukkit.inventory.meta.SkullMeta) pHead.getItemMeta();
+        SkullMeta pMeta = (SkullMeta) pHead.getItemMeta();
         if (pMeta != null) {
-            pMeta.setOwningPlayer(player);
-            pMeta.displayName(Component.text("[" + pd.getLevel() + "] " + player.getName()).color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+            pMeta.setOwningPlayer(Bukkit.getOfflinePlayer(targetUuid));
+            pMeta.displayName(Component.text("[").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(String.valueOf(pd.getLevel())).color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
+                    .append(Component.text("] ").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false))
+                    .append(Component.text(targetName).color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
             pMeta.lore(List.of(
                     Component.text("Inspecting Store Catalog: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                             .append(Component.text(storeName).color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
@@ -117,7 +125,6 @@ public class StoreCatalogGUI implements Listener {
         }
         inv.setItem(4, pHead);
 
-        // Count unlocked items for completion calculation
         int unlockedCount = 0;
         for (Items itemObj : storeItemList) {
             if (pd.getItemStolenCount(itemObj.getId()) > 0) {
@@ -185,12 +192,12 @@ public class StoreCatalogGUI implements Listener {
             inv.setItem(targetSlot, headStack);
         }
 
-        // --- Bottom Controls & Statistics Panel (Dynamically placed on the bottom row) ---
+        // --- Bottom Controls & Statistics Panel ---
         int bottomRowStart = invSize - 9;
 
         // 1. Prev Arrow (invSize - 9)
         if (page > 1) {
-            ItemStack prevItem = createNavButton("Previous Page (" + (page - 1) + ")", storeId, page - 1);
+            ItemStack prevItem = createNavButton("Previous Page (" + (page - 1) + ")", storeId, page - 1, targetName, targetUuid);
             inv.setItem(bottomRowStart, prevItem);
         }
 
@@ -234,6 +241,7 @@ public class StoreCatalogGUI implements Listener {
             switcherMeta.lore(List.of(
                     Component.text("Click to browse catalog for other stores.").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
             ));
+            attachTargetData(switcherMeta, targetName, targetUuid);
             switcherItem.setItemMeta(switcherMeta);
         }
         inv.setItem(invSize - 6, switcherItem);
@@ -247,8 +255,8 @@ public class StoreCatalogGUI implements Listener {
         }
         inv.setItem(invSize - 5, closeItem);
 
-        // 5. Store Masteries Button (invSize - 4) - Only for self
-        boolean isSelf = player.getUniqueId().equals(player.getUniqueId()); // always self since openGUI takes the player directly
+        // 5. Store Masteries Button (invSize - 4) - ONLY FOR SELF PROFILE
+        boolean isSelf = viewer.getUniqueId().equals(targetUuid);
         if (isSelf) {
             int storeNum = extractStoreNum(storeId);
             ItemStack masteryItem = new ItemStack(Material.PAPER);
@@ -268,11 +276,11 @@ public class StoreCatalogGUI implements Listener {
 
         // 6. Next Arrow (invSize - 1)
         if (page < maxPages) {
-            ItemStack nextItem = createNavButton("Next Page (" + (page + 1) + ")", storeId, page + 1);
+            ItemStack nextItem = createNavButton("Next Page (" + (page + 1) + ")", storeId, page + 1, targetName, targetUuid);
             inv.setItem(invSize - 1, nextItem);
         }
 
-        player.openInventory(inv);
+        viewer.openInventory(inv);
     }
 
     public void openStoreSelectorGUI(Player player) {
@@ -280,9 +288,14 @@ public class StoreCatalogGUI implements Listener {
     }
 
     public void openStoreSelectorGUI(Player viewer, String targetName, UUID targetUuid) {
-        // Dark Gray title, 36 slots (4 lines)
+        if (viewer == null) return;
+        if (targetName == null) targetName = viewer.getName();
+        if (targetUuid == null) targetUuid = viewer.getUniqueId();
+
+        PlayerData pd = getPlayerData(targetUuid);
+        if (pd == null) pd = PlayerDataManager.getPlayerData(viewer);
+
         Inventory inv = Bukkit.createInventory(null, 36, Component.text("Select Store Catalog").color(NamedTextColor.DARK_GRAY));
-        PlayerData pd = targetUuid != null ? (Bukkit.getPlayer(targetUuid) != null ? PlayerDataManager.getPlayerData(Bukkit.getPlayer(targetUuid)) : null) : PlayerDataManager.getPlayerData(viewer);
 
         ItemStack glass = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         ItemMeta gMeta = glass.getItemMeta();
@@ -296,12 +309,12 @@ public class StoreCatalogGUI implements Listener {
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta headMeta = (SkullMeta) head.getItemMeta();
         if (headMeta != null) {
-            if (targetUuid != null) headMeta.setOwningPlayer(Bukkit.getOfflinePlayer(targetUuid));
+            headMeta.setOwningPlayer(Bukkit.getOfflinePlayer(targetUuid));
             int level = pd != null ? pd.getLevel() : 1;
             headMeta.displayName(Component.text("[").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text(String.valueOf(level)).color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
                     .append(Component.text("] ").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false))
-                    .append(Component.text(targetName != null ? targetName : viewer.getName()).color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
+                    .append(Component.text(targetName).color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
             headMeta.lore(null);
             head.setItemMeta(headMeta);
         }
@@ -332,14 +345,16 @@ public class StoreCatalogGUI implements Listener {
                             .append(Component.text(unlocked + "/" + storeItems.size()).color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)));
                     lore.add(Component.text("Playtime: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                             .append(Component.text(formatSeconds(pd.getStorePlaytime(sId))).color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)));
+                    // Make M1 etc red instead of pink
                     lore.add(Component.text("Mastery Level: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                            .append(Component.text("M" + pd.getStoreMasteryLevel(sId)).color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false)));
+                            .append(Component.text("M" + pd.getStoreMasteryLevel(sId)).color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)));
                 }
                 lore.add(Component.text("Click to view store catalog & masteries!").color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
                 meta.lore(lore);
 
                 NamespacedKey key = new NamespacedKey(plugin, "catalog_store_id");
                 meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, sId);
+                attachTargetData(meta, targetName, targetUuid);
                 book.setItemMeta(meta);
             }
             if (i - 1 < slots.length) {
@@ -359,7 +374,38 @@ public class StoreCatalogGUI implements Listener {
         viewer.openInventory(inv);
     }
 
-    private ItemStack createNavButton(String name, String storeId, int targetPage) {
+    private PlayerData getPlayerData(UUID uuid) {
+        if (uuid == null) return null;
+        Player online = Bukkit.getPlayer(uuid);
+        if (online != null && online.isOnline()) {
+            return PlayerDataManager.getPlayerData(online);
+        }
+        org.bukkit.configuration.file.YamlConfiguration cfg = plugin.getPlayerDataDao().loadPlayerData(uuid);
+        if (cfg == null) {
+            java.io.File f = new java.io.File(plugin.getDataFolder(), "Playerdata/" + uuid + ".yml");
+            if (f.exists()) cfg = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(f);
+        }
+        if (cfg != null) {
+            PlayerData data = new PlayerData(null);
+            plugin.getPlayerEventListener().loadPlayerDataFromDB(null, data, cfg);
+            return data;
+        }
+        return null;
+    }
+
+    private void attachTargetData(ItemMeta meta, String targetName, UUID targetUuid) {
+        if (meta == null) return;
+        if (targetName != null) {
+            NamespacedKey nKey = new NamespacedKey(plugin, "catalog_target_name");
+            meta.getPersistentDataContainer().set(nKey, PersistentDataType.STRING, targetName);
+        }
+        if (targetUuid != null) {
+            NamespacedKey uKey = new NamespacedKey(plugin, "catalog_target_uuid");
+            meta.getPersistentDataContainer().set(uKey, PersistentDataType.STRING, targetUuid.toString());
+        }
+    }
+
+    private ItemStack createNavButton(String name, String storeId, int targetPage, String targetName, UUID targetUuid) {
         ItemStack item = new ItemStack(Material.ARROW);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
@@ -368,6 +414,7 @@ public class StoreCatalogGUI implements Listener {
             NamespacedKey pKey = new NamespacedKey(plugin, "catalog_nav_page");
             meta.getPersistentDataContainer().set(sKey, PersistentDataType.STRING, storeId);
             meta.getPersistentDataContainer().set(pKey, PersistentDataType.INTEGER, targetPage);
+            attachTargetData(meta, targetName, targetUuid);
             item.setItemMeta(meta);
         }
         return item;
@@ -394,7 +441,20 @@ public class StoreCatalogGUI implements Listener {
                 return;
             }
 
-            // Handle Store Masteries Paper click -> open DeluxeMenus
+            NamespacedKey nKey = new NamespacedKey(plugin, "catalog_target_name");
+            NamespacedKey uKey = new NamespacedKey(plugin, "catalog_target_uuid");
+            String targetName = meta.getPersistentDataContainer().get(nKey, PersistentDataType.STRING);
+            String targetUuidStr = meta.getPersistentDataContainer().get(uKey, PersistentDataType.STRING);
+
+            if (targetName == null) targetName = player.getName();
+            UUID targetUuid = player.getUniqueId();
+            if (targetUuidStr != null) {
+                try {
+                    targetUuid = UUID.fromString(targetUuidStr);
+                } catch (IllegalArgumentException ignored) {}
+            }
+
+            // Handle Store Masteries Paper click -> open DeluxeMenus (Self only)
             NamespacedKey masteryKey = new NamespacedKey(plugin, "catalog_mastery_store");
             if (clicked.getType() == Material.PAPER && meta.getPersistentDataContainer().has(masteryKey, PersistentDataType.INTEGER)) {
                 int storeNum = meta.getPersistentDataContainer().getOrDefault(masteryKey, PersistentDataType.INTEGER, 1);
@@ -411,7 +471,7 @@ public class StoreCatalogGUI implements Listener {
                 String targetStore = meta.getPersistentDataContainer().get(sKey, PersistentDataType.STRING);
                 int targetPage = meta.getPersistentDataContainer().getOrDefault(pKey, PersistentDataType.INTEGER, 1);
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
-                openGUI(player, targetStore, targetPage);
+                openGUI(player, targetName, targetUuid, targetStore, targetPage);
                 return;
             }
 
@@ -420,13 +480,13 @@ public class StoreCatalogGUI implements Listener {
             if (meta.getPersistentDataContainer().has(selKey, PersistentDataType.STRING)) {
                 String targetStore = meta.getPersistentDataContainer().get(selKey, PersistentDataType.STRING);
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
-                openGUI(player, targetStore, 1);
+                openGUI(player, targetName, targetUuid, targetStore, 1);
                 return;
             }
 
             if (clicked.getType() == Material.BOOK) {
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
-                openStoreSelectorGUI(player);
+                openStoreSelectorGUI(player, targetName, targetUuid);
             }
         }
     }

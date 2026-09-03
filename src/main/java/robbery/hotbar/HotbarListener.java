@@ -38,12 +38,17 @@ public class HotbarListener implements Listener {
     public void onPlayerUse(PlayerInteractEvent event) {
         if (!event.getAction().isRightClick()) return;
 
+        Player player = event.getPlayer();
+        if (robbery.storeMastery.PlayerStatsGUI.isRecentPlayerClick(player.getUniqueId())) {
+            event.setCancelled(true);
+            return;
+        }
+
         ItemStack item = event.getItem();
         if (item == null || item.getType() != Material.NETHER_STAR) return;
         PersistentDataContainer data = item.getItemMeta().getPersistentDataContainer();
         if (!data.has(key, PersistentDataType.BYTE)) return;
 
-        Player player = event.getPlayer();
         String menuName = "general_menu";
 
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "dm open " + menuName + " " + player.getName());

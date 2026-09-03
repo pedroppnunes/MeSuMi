@@ -104,6 +104,15 @@ public class CryptoManager {
         }
     }
 
+    public void saveAllSync() {
+        for (CryptoMachine machine : activeMachines.values()) {
+            if (machine != null) {
+                machine.removeHologram();
+                dao.saveMachineSync(machine);
+            }
+        }
+    }
+
     private void startTask() {
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             long now = System.currentTimeMillis();

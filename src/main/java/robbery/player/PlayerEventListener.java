@@ -88,6 +88,7 @@ public class PlayerEventListener implements Listener {
         }
 
         Rcrate.loadRewards(player.getUniqueId());
+        plugin.getCryptoManager().loadPlayer(player);
         PlayerDataManager.setPlayerData(player, memory);
         PrestigeLeaderboard.updateLeaderboard(player);
 
@@ -101,6 +102,7 @@ public class PlayerEventListener implements Listener {
         if (!plugin.getIsBackup()) {
             PlayerData memory = PlayerDataManager.getPlayerData(event.getPlayer());
             Player player = event.getPlayer();
+            robbery.messages.ActionBarManager.clearPlayer(player.getUniqueId());
 
             if (player.hasPermission("robbery.rank7") || player.hasPermission("robbery.staff")) {
                 String prefix = getLuckPermsPrefix(player);
@@ -116,6 +118,8 @@ public class PlayerEventListener implements Listener {
                 memory.stopBoosters();
             }
 
+            plugin.getCryptoManager().unloadPlayer(player);
+            Rcrate.saveRewards(player.getUniqueId());
             savePlayerData(player, memory, true);
             PlayerDataManager.setPlayerData(player, null);
             PlayerDataManager.setPlayerData(event.getPlayer(), null);
@@ -144,6 +148,7 @@ public class PlayerEventListener implements Listener {
         // Store robbery stats & detailed statistics
         cfg.set("stats.itemsStolen", memory.getItemsStolen());
         cfg.set("stats.bustedCount", memory.getBustedCount());
+        cfg.set("stats.hideoutValueContributed", memory.getHideoutValueContributed());
         cfg.set("stats.storeItems", memory.getStoreItemsMap());
         cfg.set("stats.storeMilestones", memory.getStoreMilestoneMap());
         cfg.set("stats.itemStolenCounts", memory.getItemStolenCountsMap());
@@ -308,6 +313,7 @@ public class PlayerEventListener implements Listener {
         // Stats & store
         memory.setItemsStolen(cfg.getInt("stats.itemsStolen", 0));
         memory.setBustedCount(cfg.getInt("stats.bustedCount", 0));
+        memory.setHideoutValueContributed(cfg.getDouble("stats.hideoutValueContributed", 0.0));
         loadMap(cfg, "stats.storeItems", memory::setStoreItemsMap);
         loadMap(cfg, "stats.storeMilestones", memory::setStoreMilestoneMap);
         loadMap(cfg, "stats.itemStolenCounts", memory::setItemStolenCountsMap);

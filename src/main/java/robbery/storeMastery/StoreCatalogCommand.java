@@ -52,7 +52,7 @@ public class StoreCatalogCommand implements CommandExecutor, TabCompleter {
                 plugin.getPlayerStatsGUI().openGUI(player, specified);
             } else {
                 org.bukkit.OfflinePlayer offTarget = Bukkit.getOfflinePlayer(targetName);
-                if (offTarget != null && (offTarget.hasPlayedBefore() || offTarget.isOnline())) {
+                if (offTarget != null) {
                     plugin.getPlayerStatsGUI().openGUIForOfflinePlayer(player, offTarget);
                 } else {
                     Messages.send(sender, "global.player-not-found");

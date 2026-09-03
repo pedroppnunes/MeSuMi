@@ -43,7 +43,7 @@ public class CryptoCommand implements CommandExecutor {
                     return true;
                 }
 
-                if (pd != null && !pd.hasTalkedToCryptoNPC()) {
+                if (!pd.hasTalkedToCryptoNPC()) {
                     Messages.send(p, "crypto.must-talk-npc");
                     return true;
                 }
@@ -122,25 +122,27 @@ public class CryptoCommand implements CommandExecutor {
                 return true;
             }
 
-            CryptoMachine machine = plugin.getCryptoManager().getMachine(target.getUniqueId());
-            if (machine == null) {
-                Messages.send(sender, "global.player-not-found");
-                return true;
-            }
-
             if (action.equalsIgnoreCase("givemachine") || action.equalsIgnoreCase("givereward")) {
-                boolean force = args.length >= 3 && args[2].equalsIgnoreCase("force");
+                boolean force = args.length >= 4 && args[3].equalsIgnoreCase("force");
                 if (!force && CryptoItemHelper.playerAlreadyHasMachine(target, plugin)) {
                     Messages.send(sender, "crypto.already-possess");
                     return true;
                 }
-                ItemStack machineItem = CryptoItemHelper.createMachineItem(plugin);
-                if (target.getInventory().firstEmpty() != -1) {
-                    target.getInventory().addItem(machineItem);
-                } else {
-                    target.getWorld().dropItemNaturally(target.getLocation(), machineItem);
-                }
+                plugin.getCryptoManager().getOrCreateMachine(target.getUniqueId());
+                robbery.keys.Rcrate.addPendingCryptoMachine(target.getUniqueId());
+                robbery.keys.Rcrate.saveRewards(target.getUniqueId());
+
                 Messages.sendFormatted(sender, "crypto.admin-give-machine", "player", target.getName());
+                if (target.isOnline()) {
+                    Messages.send(target, "command.rcrate.notify-claim");
+                }
+                return true;
+            }
+
+            CryptoMachine machine = plugin.getCryptoManager().getMachine(target.getUniqueId());
+            if (machine == null) {
+                Messages.send(sender, "global.player-not-found");
+                return true;
             } else if (action.equalsIgnoreCase("upgradespeed")) {
                 int newLvl = Math.min(CryptoUpgradeManager.MAX_LEVEL, machine.getSpeedLevel() + 1);
                 machine.setSpeedLevel(newLvl);

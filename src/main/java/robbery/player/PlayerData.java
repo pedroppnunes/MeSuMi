@@ -120,6 +120,7 @@ public class PlayerData {
     private int prestige;
     private double boostx = 0.0;
     private boolean doubleJump = true;
+    private double hideoutValueContributed = 0.0;
 
     public PlayerData(Player p) {
         this.backpack = BACK1;
@@ -133,6 +134,21 @@ public class PlayerData {
         this.skillpoints = 0;
         this.rank = NONE;
         this.itemsStolen = 0;
+        this.hideoutValueContributed = 0.0;
+    }
+
+    public double getHideoutValueContributed() {
+        return hideoutValueContributed;
+    }
+
+    public void setHideoutValueContributed(double value) {
+        this.hideoutValueContributed = value;
+    }
+
+    public void addHideoutValueContributed(double amount) {
+        if (amount > 0) {
+            this.hideoutValueContributed += amount;
+        }
     }
 
 //Backpacks
@@ -957,35 +973,35 @@ public int getStoreItems(String storeId) {
         setPerkValue(ATTR_MONEY_MULT, mult);
     }
 
+    public double getBoostx() {
+        return boostx;
+    }
+
     public double getOutBoosterChance() {
-        return getPerkValue(PERK_OUT_BUFF1) == 0 ? getPerkValue(ATTR_BOOSTER_CHANCE) : getPerkValue(ATTR_BOOSTER_CHANCE)*(1+getPerkValue(PERK_OUT_BUFF1));
+        double mult = getPerkValue(PERK_OUT_BUFF1) / 100.0;
+        return getPerkValue(ATTR_BOOSTER_CHANCE) * (1.0 + mult);
     }
 
     public double getOutSpChance() {
-        return getPerkValue(PERK_OUT_BUFF1) == 0 ? getPerkValue(ATTR_SKILLPOINT_CHANCE) : getPerkValue(ATTR_SKILLPOINT_CHANCE)*(1+getPerkValue(PERK_OUT_BUFF1));
+        double mult = getPerkValue(PERK_OUT_BUFF1) / 100.0;
+        return getPerkValue(ATTR_SKILLPOINT_CHANCE) * (1.0 + mult);
     }
 
     public double getOutSpeedBonus(){
-        return getPerkValue(PERK_OUT_BUFF1) == 0 ? getPerkValue(ATTR_SPEED_BONUS) : getPerkValue(ATTR_SPEED_BONUS)*(1+getPerkValue(PERK_OUT_BUFF1));
+        double mult = getPerkValue(PERK_OUT_BUFF1) / 100.0;
+        return getPerkValue(ATTR_SPEED_BONUS) * (1.0 + mult);
     }
 
     private double getOutMoneyMult() {
-        return getPerkValue(PERK_OUT_BUFF1) == 0 ? getPerkValue(ATTR_MONEY_MULT) : getPerkValue(ATTR_MONEY_MULT)*(1+getPerkValue(PERK_OUT_BUFF1));
+        double mult = getPerkValue(PERK_OUT_BUFF1) / 100.0;
+        return getPerkValue(ATTR_MONEY_MULT) * (1.0 + mult);
     }
 //Attributes
     public void setPerkValue(String perkId, double value) {
         if (value == 0) {
             perkValues.remove(perkId);
         } else {
-            double finalValue;
-
-            if (PERCENTAGE_PERKS.contains(perkId)) {
-                double decimal = value / 100.0;
-                finalValue = Math.round(decimal * 100000.0) / 100000.0;
-            } else {
-                finalValue = Math.round(value * 1000.0) / 1000.0;
-            }
-
+            double finalValue = Math.round(value * 1000.0) / 1000.0;
             perkValues.put(perkId, finalValue);
         }
         if (perkId.equals(PERK_BACK_SLOTS1)) {
@@ -1016,7 +1032,25 @@ public int getStoreItems(String storeId) {
     }
 
     public double getPerkValue(String perkId) {
-        return perkValues.getOrDefault(perkId, 0.0);
+        if (perkId == null) return 0.0;
+        Double val = perkValues.get(perkId);
+        if (val != null && val > 0.0) {
+            if (PERCENTAGE_PERKS.contains(perkId) && val <= 1.0) {
+                val = val * 100.0;
+                perkValues.put(perkId, val);
+            }
+            return val;
+        }
+        int lvl = getSkillTreeLevel(perkId);
+        if (lvl > 0 && robbery.core.Robbery.getSkillTreeConfig() != null) {
+            robbery.skilltree.SkillPerk perk = robbery.core.Robbery.getSkillTreeConfig().getTier(perkId);
+            if (perk != null) {
+                double calculated = perk.valueForLevel(lvl);
+                perkValues.put(perkId, calculated);
+                return calculated;
+            }
+        }
+        return val != null ? val : 0.0;
     }
 
     public boolean hasPerk(String perkId) {

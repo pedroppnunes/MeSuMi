@@ -53,14 +53,17 @@ public class CryptoListener implements Listener {
                 }
             }
             
-            // Check if in SuperiorSkyblock island and if they are a member of it
-            Island islandAtLoc = SuperiorSkyblockAPI.getIslandAt(event.getBlock().getLocation());
-            com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(p);
-            
-            if (islandAtLoc == null || sp.getIsland() == null || !islandAtLoc.equals(sp.getIsland())) {
-                Messages.send(p, "crypto.only-island");
-                event.setCancelled(true);
-                return;
+            // Check if in SuperiorSkyblock island and if they are a member of it (OP players bypass)
+            boolean isOp = p.isOp() || p.hasPermission("robbery.op") || p.hasPermission("robbery.admin");
+            if (!isOp) {
+                Island islandAtLoc = SuperiorSkyblockAPI.getIslandAt(event.getBlock().getLocation());
+                com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(p);
+                
+                if (islandAtLoc == null || sp.getIsland() == null || !islandAtLoc.equals(sp.getIsland())) {
+                    Messages.send(p, "crypto.only-island");
+                    event.setCancelled(true);
+                    return;
+                }
             }
 
             // Set custom player head texture on the placed block
@@ -128,7 +131,7 @@ public class CryptoListener implements Listener {
             }
             
             if (event.isShiftClick() && event.getClickedInventory() == p.getInventory()) {
-                if (event.getView().getTopInventory() != null && event.getView().getTopInventory() != p.getInventory()) {
+                if (event.getView().getTopInventory() != p.getInventory()) {
                     event.setCancelled(true);
                     Messages.send(p, "crypto.cannot-store");
                     return;
@@ -181,7 +184,7 @@ public class CryptoListener implements Listener {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             if (event.getHand() != org.bukkit.inventory.EquipmentSlot.HAND) return;
             Block block = event.getClickedBlock();
-            if (block != null && isHeadBlock(block)) {
+            if (isHeadBlock(block)) {
                 if (isCryptoMachine(block)) {
                     event.setCancelled(true);
                     

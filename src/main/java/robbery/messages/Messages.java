@@ -181,8 +181,11 @@ public class Messages {
      */
     public static void sendActionBar(Player player, String path) {
         String message = get(path);
-        Component component = LegacyComponentSerializer.legacy('&').deserialize(message);
-        player.sendActionBar(component);
+        if (path != null && path.contains("progress_bar")) {
+            ActionBarManager.sendDirect(player, message);
+        } else {
+            ActionBarManager.enqueue(player, message);
+        }
     }
 
     /**
@@ -194,8 +197,11 @@ public class Messages {
      */
     public static void sendActionBarFormatted(Player player, String path, Map<String, String> placeholders) {
         String message = getFormatted(path, placeholders);
-        Component component = LegacyComponentSerializer.legacy('&').deserialize(message);
-        player.sendActionBar(component);
+        if (path != null && path.contains("progress_bar")) {
+            ActionBarManager.sendDirect(player, message);
+        } else {
+            ActionBarManager.enqueue(player, message);
+        }
     }
 
     /**

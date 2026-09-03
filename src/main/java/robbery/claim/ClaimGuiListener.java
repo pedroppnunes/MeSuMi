@@ -8,9 +8,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import robbery.core.RewardHolder;
+import robbery.core.Robbery;
 import robbery.keys.Rcrate;
 import robbery.messages.Messages;
 import robbery.ranks.RankPaper;
+import robbery.crypto.CryptoItemHelper;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -32,6 +34,7 @@ public class ClaimGuiListener implements Listener {
      * - Handles "Claim All" button (LIME_WOOL) to give as many rewards as possible.
      * - Handles individual reward clicks:
      *   - Rank vouchers are processed via RankPaper.
+     *   - Crypto Machines are given as custom player head items.
      *   - Other items are added based on inventory space and stack size.
      * - Updates pending reward maps and saves after each claim.
      * - Reopens GUI if rewards remain; closes if empty or inventory full.
@@ -61,6 +64,7 @@ public class ClaimGuiListener implements Listener {
                 claimAllName.equals(clicked.getItemMeta().getDisplayName())) {
 
             claimAllRankRewards(p, rankRewards);
+            claimAllCryptoMachineRewards(p);
             claimAllItemRewards(p, itemRewards);
 
             Rcrate.saveRewards(uuid);
@@ -73,7 +77,10 @@ public class ClaimGuiListener implements Listener {
         claimSingleRankOrItem(p, clicked, rankRewards, itemRewards);
 
         // Reopen GUI if rewards remain, otherwise close
-        boolean empty = (itemRewards == null || itemRewards.isEmpty()) && (rankRewards == null || rankRewards.isEmpty());
+        int remainingCrypto = Rcrate.getPendingCryptoMachines().getOrDefault(uuid, 0);
+        boolean empty = (itemRewards == null || itemRewards.isEmpty())
+                && (rankRewards == null || rankRewards.isEmpty())
+                && remainingCrypto <= 0;
         if (empty) p.closeInventory();
         else Rcrate.openRewardGUI(p);
     }
@@ -152,6 +159,33 @@ public class ClaimGuiListener implements Listener {
     }
 
     /**
+     * Helper method to claim all pending Crypto Machine rewards, respecting inventory space.
+     */
+    private void claimAllCryptoMachineRewards(Player p) {
+        UUID uuid = p.getUniqueId();
+        int count = Rcrate.getPendingCryptoMachines().getOrDefault(uuid, 0);
+        if (count <= 0) return;
+
+        Robbery plugin = Robbery.getInstance();
+        int given = 0;
+        for (int i = 0; i < count; i++) {
+            if (p.getInventory().firstEmpty() == -1) break;
+            ItemStack machineItem = CryptoItemHelper.createMachineItem(plugin);
+            p.getInventory().addItem(machineItem);
+            given++;
+        }
+
+        if (given > 0) {
+            int left = count - given;
+            if (left <= 0) {
+                Rcrate.getPendingCryptoMachines().remove(uuid);
+            } else {
+                Rcrate.getPendingCryptoMachines().put(uuid, left);
+            }
+        }
+    }
+
+    /**
      * Helper method to claim all item rewards, respecting inventory space and stack size.
      */
     private void claimAllItemRewards(Player p, Map<Material,Integer> itemRewards) {
@@ -182,9 +216,38 @@ public class ClaimGuiListener implements Listener {
     }
 
     /**
-     * Helper method to claim a single rank voucher or item when clicked in the GUI.
+     * Helper method to claim a single rank voucher, Crypto Machine, or item when clicked in the GUI.
      */
     private void claimSingleRankOrItem(Player p, ItemStack clicked, Map<String,Integer> rankRewards, Map<Material,Integer> itemRewards) {
+        Robbery plugin = Robbery.getInstance();
+
+        // 1. Check if clicked item is a Crypto Machine
+        if (CryptoItemHelper.isCryptoMachineItem(clicked, plugin)) {
+            int pending = Rcrate.getPendingCryptoMachines().getOrDefault(p.getUniqueId(), 0);
+            if (pending <= 0) return;
+
+            if (p.getInventory().firstEmpty() == -1) {
+                Messages.send(p, "command.claim.inv-full");
+                p.closeInventory();
+                return;
+            }
+
+            ItemStack machineItem = CryptoItemHelper.createMachineItem(plugin);
+            p.getInventory().addItem(machineItem);
+
+            int left = pending - 1;
+            if (left <= 0) {
+                Rcrate.getPendingCryptoMachines().remove(p.getUniqueId());
+            } else {
+                Rcrate.getPendingCryptoMachines().put(p.getUniqueId(), left);
+            }
+
+            Rcrate.saveRewards(p.getUniqueId());
+            Messages.sendFormatted(p, "command.claim.claimed-one", Map.of("amount", "1", "material", "Crypto Machine"));
+            return;
+        }
+
+        // 2. Check if rank voucher
         String rankKey = RankPaper.getRankKey(clicked);
         if (rankKey != null && rankRewards != null && rankRewards.containsKey(rankKey)) {
             if (!giveOneRank(p, rankKey)) {

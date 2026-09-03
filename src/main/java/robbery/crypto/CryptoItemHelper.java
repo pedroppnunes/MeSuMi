@@ -111,7 +111,7 @@ public class CryptoItemHelper {
         }
 
         // 4. Pending in /claim?
-        var pending = robbery.keys.Rcrate.getPendingItemRewards().get(uuid);
-        return pending != null && (pending.getOrDefault(Material.LOOM, 0) > 0 || pending.getOrDefault(Material.PLAYER_HEAD, 0) > 0);
+        int pendingCrypto = robbery.keys.Rcrate.getPendingCryptoMachines().getOrDefault(uuid, 0);
+        return pendingCrypto > 0;
     }
 }

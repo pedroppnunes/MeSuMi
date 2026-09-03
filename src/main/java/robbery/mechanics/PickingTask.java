@@ -35,6 +35,8 @@ public class PickingTask extends BukkitRunnable {
     private final Random random = new Random();
     private final Runnable onFinish;
 
+    private boolean isFirstTick = true;
+
     public PickingTask(Player player, Items item, ArmorStand stand, Tools tool, Robbery main, Runnable onFinish) {
         this.player = player;
         this.item = item;
@@ -57,7 +59,7 @@ public class PickingTask extends BukkitRunnable {
 
             // --- M8: Mastery Double Item Chance (store-specific) ---
             double masteryDoubleChance = p.getStoreMasteryDoubleItemChance(storeId);
-            boolean masteryDoubled = !p.getBackpack().isFull() && masteryDoubleChance > 0 && random.nextDouble() < masteryDoubleChance;
+            double masteryDoubleProb = masteryDoubleChance >= 0.1 ? masteryDoubleChance / 100.0 : masteryDoubleChance;
 
             double effectiveBoost = p.getBoost(storeId);
             p.addItemToBackpack(item, storeId);
@@ -81,22 +83,25 @@ public class PickingTask extends BukkitRunnable {
 
             double doubleChance = p.getPerkValue(PERK_DOUBLE_ITEM1);
             double tripleChance = p.getPerkValue(PERK_TRIPLE_ITEM1);
+
+            double tripleProb = tripleChance / 100.0;
+            double doubleProb = doubleChance / 100.0;
+
             if (!p.getBackpack().isFull()) {
-                if (tripleChance > 0 && random.nextDouble() < tripleChance) {
+                if (tripleProb > 0 && random.nextDouble() < tripleProb) {
                     p.addItemToBackpack(item, storeId);
                     p.addItemToBackpack(item, storeId);
                     Messages.sendActionBarFormatted(player, "events.picking.triple_item", Map.of(
                             "item", itemName,
                             "value", NumberFormatter.formatDoubleNumber(baseValue * 2) + "$"
                     ));
-                } else if (doubleChance > 0 && random.nextDouble() < doubleChance) {
+                } else if (doubleProb > 0 && random.nextDouble() < doubleProb) {
                     p.addItemToBackpack(item, storeId);
                     Messages.sendActionBarFormatted(player, "events.picking.double_item", Map.of(
                             "item", itemName,
                             "value", NumberFormatter.formatDoubleNumber(baseValue) + "$"
                     ));
-                } else if (masteryDoubled) {
-                    // M8: mastery double item
+                } else if (masteryDoubleProb > 0 && random.nextDouble() < masteryDoubleProb) {
                     p.addItemToBackpack(item, storeId);
                     Messages.sendActionBarFormatted(player, "events.picking.double_item", Map.of(
                             "item", itemName,
@@ -117,7 +122,7 @@ public class PickingTask extends BukkitRunnable {
 
             // --- Skill Point chance: base perk + M4 mastery ---
             double baseChance = 1.0 / 1000.0;
-            double buff = p.getPerkValue(PERK_CHANCE_SP1) + p.getOutSpChance() + p.getStoreMasterySkillPointChance(storeId);
+            double buff = (p.getPerkValue(PERK_CHANCE_SP1) / 100.0) + p.getOutSpChance() + p.getStoreMasterySkillPointChance(storeId);
             double finalChance = baseChance * (1 + buff);
             if (random.nextDouble() < finalChance) {
                 player.sendTitle(
@@ -129,7 +134,7 @@ public class PickingTask extends BukkitRunnable {
             }
 
             double abilityChance = p.getPerkValue(PERK_ABILITY_MONEYMULT1);
-            if (abilityChance == 1 && !p.hasTemporaryPerk(PERK_ABILITY_MONEYMULT1)) {
+            if (abilityChance > 0 && !p.hasTemporaryPerk(PERK_ABILITY_MONEYMULT1)) {
                 if (random.nextDouble() < 0.05) {
                     p.setTemporaryPerk(PERK_ABILITY_MONEYMULT1, 10.0);
                     Messages.sendActionBar(player, "events.picking.boost_ability_proc");
@@ -137,7 +142,7 @@ public class PickingTask extends BukkitRunnable {
             }
 
             double stealSpeedChance = p.getPerkValue(PERK_ABILITY_STEALSPEED1);
-            if (stealSpeedChance == 1 && !p.hasTemporaryPerk(PERK_ABILITY_STEALSPEED1)) {
+            if (stealSpeedChance > 0 && !p.hasTemporaryPerk(PERK_ABILITY_STEALSPEED1)) {
                 if (random.nextDouble() < 0.05) {
                     p.setTemporaryPerk(PERK_ABILITY_STEALSPEED1, 10.0);
                     Messages.sendActionBar(player, "events.picking.stealspeed_proc");
@@ -149,7 +154,8 @@ public class PickingTask extends BukkitRunnable {
             }
 
             double keyChance = p.getPerkValue(PERK_SPECIAL_KEYCHANCE);
-            if (keyChance > 0 && random.nextDouble() < keyChance) {
+            double keyProb = keyChance / 100.0;
+            if (keyProb > 0 && random.nextDouble() < keyProb) {
                 String[] keyTypes = {"boosters_key", "epic", "vote", "legendary"};
                 String keyType = keyTypes[random.nextInt(keyTypes.length)];
                 player.sendTitle(
@@ -174,18 +180,33 @@ public class PickingTask extends BukkitRunnable {
             return;
         }
 
-        // --- M9: Mastery Insta-Steal Chance (store-specific) ---
         int itemStoreNumPick = extractStoreNumber(item.getId());
         if (itemStoreNumPick > 11) itemStoreNumPick = 12;
         String storeIdPick = getStoreId(itemStoreNumPick);
-        double masteryInstaSteal = p.getStoreMasteryInstaStealChance(storeIdPick);
 
-        double instaSteal = p.getPerkValue(PERK_INSTA_STEAL1);
-        if ((instaSteal > 0 && random.nextDouble() < instaSteal) ||
-                (masteryInstaSteal > 0 && random.nextDouble() < masteryInstaSteal))
-            item.setHp(0);
-        else
-            item.setHp(item.getHp() - (tool.getDamage() * (1.0 + p.getExtraDamage(storeIdPick) / 100.0)));
+        // --- Check Insta-Steal ONLY on the first touch (first tick), AND only once per player per item spawn cycle ---
+        if (isFirstTick) {
+            isFirstTick = false;
+            java.util.UUID playerUuid = player.getUniqueId();
+            if (!item.hasAttemptedInstaSteal(playerUuid)) {
+                item.recordInstaStealAttempt(playerUuid);
+
+                double masteryInstaSteal = p.getStoreMasteryInstaStealChance(storeIdPick);
+                double instaSteal = p.getPerkValue(PERK_INSTA_STEAL1);
+
+                double instaProb = instaSteal / 100.0;
+                double masteryInstaProb = masteryInstaSteal;
+
+                if ((instaProb > 0 && random.nextDouble() < instaProb) ||
+                        (masteryInstaProb > 0 && random.nextDouble() < masteryInstaProb)) {
+                    item.setHp(0);
+                    sendProgressBar(player, item.getHp(), item.getInitialhp());
+                    return;
+                }
+            }
+        }
+
+        item.setHp(item.getHp() - (tool.getDamage() * (1.0 + p.getExtraDamage(storeIdPick) / 100.0)));
         sendProgressBar(player, item.getHp(), item.getInitialhp());
 
     }
