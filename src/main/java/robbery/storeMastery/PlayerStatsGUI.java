@@ -250,24 +250,19 @@ public class PlayerStatsGUI implements Listener {
                     .append(Component.text(curStoreName + " ").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
                     .append(Component.text("(M" + curMastery + ")").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 
+            // Total Backpacks & Tools Unlocked
+            int totalBackpacksUnlocked = pd.getBackpackunlucked() != null ? pd.getBackpackunlucked().size() : 1;
+            int totalToolsUnlocked = pd.getToolsunlucked() != null ? pd.getToolsunlucked().size() : 1;
+            lore.add(Component.text("Total Backpacks Unlocked: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(totalBackpacksUnlocked + "/20").color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)));
+            lore.add(Component.text("Total Tools Unlocked: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(totalToolsUnlocked + "/20").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)));
+
             lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
             eMeta.lore(lore);
             equipItem.setItemMeta(eMeta);
         }
         inv.setItem(14, equipItem);
-
-        // 5. Skill Tree Button (Slot 16 - Enchanted Book)
-        ItemStack skillTreeBtn = new ItemStack(Material.ENCHANTED_BOOK);
-        ItemMeta stMeta = skillTreeBtn.getItemMeta();
-        if (stMeta != null) {
-            stMeta.displayName(Component.text("Skill Tree Progress").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-            stMeta.lore(List.of(
-                    Component.text("Click to view " + targetName + "'s full Skill Tree").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
-                    Component.text("and tier-by-tier perk upgrades!").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-            ));
-            skillTreeBtn.setItemMeta(stMeta);
-        }
-        inv.setItem(16, skillTreeBtn);
 
         // 6. Privacy Dye Button (Slot 20 - Dye, only interactive for self)
         String currentPrivacy = pd.getProfilePrivacy();
@@ -401,7 +396,7 @@ public class PlayerStatsGUI implements Listener {
 
             if (clicked.getType() == Material.WRITABLE_BOOK) {
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
-                plugin.getStoreCatalogGUI().openStoreSelectorGUI(player);
+                plugin.getStoreCatalogGUI().openStoreSelectorGUI(player, targetName, offTarget != null ? offTarget.getUniqueId() : player.getUniqueId());
                 return;
             }
 

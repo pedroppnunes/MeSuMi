@@ -542,7 +542,17 @@ public class PlayerEventListener implements Listener {
         }
     }
 
-    @EventHandler
+    private final Map<UUID, org.bukkit.GameMode> preTeleportGameModes = new java.util.concurrent.ConcurrentHashMap<>();
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onStaffTeleport(org.bukkit.event.player.PlayerTeleportEvent event) {
+        Player p = event.getPlayer();
+        if (p.isOp() || p.hasPermission("robbery.op") || p.hasPermission("robbery.staff")) {
+            preTeleportGameModes.put(p.getUniqueId(), p.getGameMode());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onWorldChange(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
 
@@ -550,6 +560,17 @@ public class PlayerEventListener implements Listener {
             hasLoaded = true;
             Bukkit.getScheduler().runTaskLater(plugin, plugin::updateDailyNPC, 20L);
             Bukkit.getScheduler().runTaskLater(plugin, plugin::loadItems, 40L);
+        }
+
+        if (player.isOp() || player.hasPermission("robbery.op") || player.hasPermission("robbery.staff")) {
+            org.bukkit.GameMode savedMode = preTeleportGameModes.get(player.getUniqueId());
+            if (savedMode != null) {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    if (player.isOnline()) {
+                        player.setGameMode(savedMode);
+                    }
+                }, 2L);
+            }
         }
     }
 

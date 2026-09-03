@@ -259,7 +259,7 @@ events:
     neutralized_broadcast: "&6&lOutpost &8> &eOutpost neutralized by &b%island_name%&e!"
     capturing_broadcast: "&6&lOutpost &8> &cOutpost being captured by &b%island_name%&c!"
     owner_immunity: "&cOwner &6%owner% &ehas immunity for &e%time%&c - you cannot capture now."
-    immunity_started: "&6&lOutpost &8> &b%island_name% &chas a 20m immunity after capturing the Outpost!"
+    immunity_started: "&6&lOutpost &8> &b%island_name% &chas a 10m immunity after capturing the Outpost!"
     status-lore-immunity: "&cOwner immunity: &b%time%"
   skilltree:
     purchased: "&5&lRobbery &8> &aYou purchased %tiername% for &6%cost% Skillpoints"

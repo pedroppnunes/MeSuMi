@@ -14,7 +14,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
+import me.clip.placeholderapi.PlaceholderAPI;
 import robbery.core.Robbery;
 import robbery.items.Items;
 import robbery.keys.KeyManager;
@@ -265,11 +267,9 @@ public class StoreCatalogGUI implements Listener {
             mLore.add(Component.text("Mastery Rewards & Perks:").color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 
             for (int lvl = 1; lvl <= 10; lvl++) {
-                String rewardDesc = plugin.getMasteryManager().getRewardDisplay(storeId, lvl);
-                boolean unlocked = currentMasteryLevel >= lvl;
-                NamedTextColor tagColor = (lvl == 10) ? (unlocked ? NamedTextColor.LIGHT_PURPLE : NamedTextColor.DARK_PURPLE) : (unlocked ? NamedTextColor.GREEN : NamedTextColor.GRAY);
-                Component line = Component.text("M" + lvl + ": ").color(tagColor).decoration(TextDecoration.ITALIC, false)
-                        .append(Component.text(rewardDesc).color(unlocked ? NamedTextColor.WHITE : NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+                int storeNum = extractStoreNum(storeId);
+                String rawTag = PlaceholderAPI.setPlaceholders(player, "%robbery_store_reward_" + storeNum + "_" + lvl + "%");
+                Component line = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand().deserialize(rawTag).decoration(TextDecoration.ITALIC, false);
                 mLore.add(line);
             }
             mLore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
@@ -288,9 +288,13 @@ public class StoreCatalogGUI implements Listener {
     }
 
     public void openStoreSelectorGUI(Player player) {
+        openStoreSelectorGUI(player, player.getName(), player.getUniqueId());
+    }
+
+    public void openStoreSelectorGUI(Player viewer, String targetName, UUID targetUuid) {
         // Dark Gray title, 36 slots (4 lines)
         Inventory inv = Bukkit.createInventory(null, 36, Component.text("Select Store Catalog").color(NamedTextColor.DARK_GRAY));
-        PlayerData pd = PlayerDataManager.getPlayerData(player);
+        PlayerData pd = targetUuid != null ? (Bukkit.getPlayer(targetUuid) != null ? PlayerDataManager.getPlayerData(Bukkit.getPlayer(targetUuid)) : null) : PlayerDataManager.getPlayerData(viewer);
 
         ItemStack glass = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         ItemMeta gMeta = glass.getItemMeta();
@@ -300,16 +304,35 @@ public class StoreCatalogGUI implements Listener {
         }
         for (int i = 0; i < 36; i++) inv.setItem(i, glass);
 
-        int[] slots = {10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23};
+        // Header Skull at Slot 4 (Top row middle)
+        ItemStack head = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta headMeta = (SkullMeta) head.getItemMeta();
+        if (headMeta != null) {
+            if (targetUuid != null) headMeta.setOwningPlayer(Bukkit.getOfflinePlayer(targetUuid));
+            int level = pd != null ? pd.getLevel() : 1;
+            headMeta.displayName(Component.text("[").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(String.valueOf(level)).color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
+                    .append(Component.text("] ").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false))
+                    .append(Component.text(targetName != null ? targetName : viewer.getName()).color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
+            headMeta.lore(null);
+            head.setItemMeta(headMeta);
+        }
+        inv.setItem(4, head);
+
+        // Centralized Store Item Slots: Row 1 (10..16), Row 2 (20..24)
+        int[] slots = {10, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24};
         for (int i = 1; i <= 12; i++) {
             String sId = "store" + i;
-            Keys k = KeyManager.getStoreName(sId);
-            String name = k != null ? k.getName() : sId;
+            String colorName = PlaceholderAPI.setPlaceholders(viewer, "%robbery_colorname_key_" + i + "%");
+            if (colorName == null || colorName.startsWith("%")) {
+                Keys k = KeyManager.getStoreName(sId);
+                colorName = k != null ? k.getName() : sId;
+            }
 
             ItemStack book = new ItemStack(Material.BOOK);
             ItemMeta meta = book.getItemMeta();
             if (meta != null) {
-                meta.displayName(Component.text(name).color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+                meta.displayName(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand().deserialize(colorName).decoration(TextDecoration.ITALIC, false));
                 List<Component> lore = new ArrayList<>();
                 if (pd != null) {
                     List<Items> storeItems = getItemsForStore(sId);
@@ -345,7 +368,7 @@ public class StoreCatalogGUI implements Listener {
         }
         inv.setItem(31, closeItem);
 
-        player.openInventory(inv);
+        viewer.openInventory(inv);
     }
 
     private ItemStack createNavButton(String name, String storeId, int targetPage) {
