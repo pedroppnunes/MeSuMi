@@ -187,6 +187,7 @@ public class PlayerEventListener implements Listener {
         cfg.set("dailyQuests.talkedToNPC", memory.hasTalkedToQuestNPC());
         cfg.set("crypto.talkedToNPC", memory.hasTalkedToCryptoNPC());
         cfg.set("crypto.talkedToBatteryNPC", memory.hasTalkedToCryptoBatteryNPC());
+        cfg.set("stats.talkedToShopSellNPC", memory.hasTalkedToShopSellNPC());
 
         // Quest progress
         Map<String, Map<String, Object>> progressMap = new HashMap<>();
@@ -339,6 +340,7 @@ public class PlayerEventListener implements Listener {
         memory.setTalkedToQuestNPC(cfg.getBoolean("dailyQuests.talkedToNPC", false));
         memory.setTalkedToCryptoNPC(cfg.getBoolean("crypto.talkedToNPC", false));
         memory.setTalkedToCryptoBatteryNPC(cfg.getBoolean("crypto.talkedToBatteryNPC", false));
+        memory.setTalkedToShopSellNPC(cfg.getBoolean("stats.talkedToShopSellNPC", false));
 
         // FIXED: Quest progress (Casting fix)
         if (cfg.contains("dailyQuests.progress")) {

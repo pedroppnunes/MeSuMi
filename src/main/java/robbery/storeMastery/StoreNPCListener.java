@@ -1,6 +1,9 @@
 package robbery.storeMastery;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,10 +13,11 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import robbery.core.Robbery;
 import robbery.keys.KeyManager;
+import robbery.messages.Messages;
+import robbery.player.PlayerData;
+import robbery.player.PlayerDataManager;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +25,7 @@ public class StoreNPCListener implements Listener {
 
     private final Robbery plugin;
     private final Map<UUID, Long> lastClickMap = new HashMap<>();
+    private final Set<UUID> talkingPlayers = new HashSet<>();
 
     public StoreNPCListener(Robbery plugin) {
         this.plugin = plugin;
@@ -57,7 +62,65 @@ public class StoreNPCListener implements Listener {
         }
 
         lastClickMap.put(uuid, now);
+        PlayerData pd = PlayerDataManager.getPlayerData(player);
+        if (pd == null) return;
+
+        // Special handling for the first store NPC "ShopSell"
+        if (isShopSellNPC(normalizedName, detectedStore)) {
+            if (!pd.hasTalkedToShopSellNPC()) {
+                if (talkingPlayers.contains(uuid)) return;
+                startShopSellTutorial(player, pd);
+                return;
+            }
+        }
+
+        // Standard interaction: Open Catalog GUI for detected store
         plugin.getStoreCatalogGUI().openGUI(player, detectedStore, 1);
+    }
+
+    private boolean isShopSellNPC(String name, String storeId) {
+        if (name == null) name = "";
+        String lower = name.toLowerCase();
+        return lower.contains("shopsell") || lower.contains("shop sell") || lower.contains("sell") || (storeId.equalsIgnoreCase("store1") && lower.contains("clerk"));
+    }
+
+    private void startShopSellTutorial(Player player, PlayerData pd) {
+        UUID uuid = player.getUniqueId();
+        talkingPlayers.add(uuid);
+
+        player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_AMBIENT, 1.0f, 1.0f);
+        player.sendMessage("§e§lShopSell §8> §fHey there! Welcome to the §aSupermarket§f! I'm the store clerk here.");
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (player.isOnline()) {
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_AMBIENT, 1.0f, 1.0f);
+                player.sendMessage("§e§lShopSell §8> §fYour goal is simple: rob floating items around the store using your tool, store them in your backpack, and bring them back to sell them to me with §a/sellrob§f!");
+            }
+        }, 3 * 20L);
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (player.isOnline()) {
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_AMBIENT, 1.0f, 1.0f);
+                player.sendMessage("§e§lShopSell §8> §fEvery item you steal levels up your §dStore Mastery§f! Mastering stores grants permanent money multipliers, steal speed bonuses, robbery XP, and unlocks secret areas!");
+            }
+        }, 6 * 20L);
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (player.isOnline()) {
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_AMBIENT, 1.0f, 1.0f);
+                player.sendMessage("§e§lShopSell §8> §fTo inspect item values, robbery XP, completionist progress, and Store Mastery rewards, just right-click me anytime to open the Catalog!");
+            }
+        }, 9 * 20L);
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            talkingPlayers.remove(uuid);
+            if (player.isOnline()) {
+                player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.0f);
+                pd.setTalkedToShopSellNPC(true);
+                plugin.getPlayerEventListener().savePlayerData(player, pd);
+                plugin.getStoreCatalogGUI().openGUI(player, "store1", 1);
+            }
+        }, 12 * 20L);
     }
 
     private String getStoreFromNPCNameOrLocation(String name, Entity entity, Player player) {
@@ -79,13 +142,13 @@ public class StoreNPCListener implements Listener {
             }
         }
 
-        // 3. Keywords in NPC name e.g. "clerk", "catalog", "completionist", "merchant", "vendor", "item catalog"
-        boolean isStoreNPC = lowerName.contains("clerk") || lowerName.contains("catalog") ||
-                lowerName.contains("completionist") || lowerName.contains("merchant") ||
-                lowerName.contains("vendor") || lowerName.contains("shopkeeper");
+        // 3. Keywords in NPC name e.g. "shopsell", "clerk", "catalog", "completionist", "merchant", "vendor"
+        boolean isStoreNPC = lowerName.contains("shopsell") || lowerName.contains("clerk") ||
+                lowerName.contains("catalog") || lowerName.contains("completionist") ||
+                lowerName.contains("merchant") || lowerName.contains("vendor") ||
+                lowerName.contains("shopkeeper") || lowerName.contains("sell");
 
         if (isStoreNPC) {
-            // Detect store from NPC location / player location
             String storeAtLoc = plugin.getStorePlaytimeTask().detectStore(player);
             if (storeAtLoc != null) return storeAtLoc;
             return "store1"; // Fallback to store 1

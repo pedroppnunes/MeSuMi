@@ -45,22 +45,50 @@ public class StoreCatalogGUI implements Listener {
         if (storeName == null) storeName = "Store Catalog";
 
         List<Items> storeItemList = getItemsForStore(storeId);
+        // Sort items from lowest value to highest value
+        storeItemList.sort(Comparator.comparingInt(Items::getValue));
         int totalItems = storeItemList.size();
 
-        int[] itemSlots = {
-                10, 11, 12, 13, 14, 15, 16,
-                19, 20, 21, 22, 23, 24, 25,
-                28, 29, 30, 31, 32, 33, 34,
-                37, 38, 39, 40, 41, 42, 43
-        };
-        int itemsPerPage = itemSlots.length;
+        // Calculate dynamic inventory size for small/medium/large stores
+        int itemsPerPage;
+        int invSize;
+        int[] itemSlots;
+
+        if (totalItems <= 7) {
+            invSize = 27; // 3 rows
+            itemSlots = new int[]{10, 11, 12, 13, 14, 15, 16};
+        } else if (totalItems <= 14) {
+            invSize = 36; // 4 rows
+            itemSlots = new int[]{
+                    10, 11, 12, 13, 14, 15, 16,
+                    19, 20, 21, 22, 23, 24, 25
+            };
+        } else if (totalItems <= 21) {
+            invSize = 45; // 5 rows
+            itemSlots = new int[]{
+                    10, 11, 12, 13, 14, 15, 16,
+                    19, 20, 21, 22, 23, 24, 25,
+                    28, 29, 30, 31, 32, 33, 34
+            };
+        } else {
+            invSize = 54; // 6 rows
+            itemSlots = new int[]{
+                    10, 11, 12, 13, 14, 15, 16,
+                    19, 20, 21, 22, 23, 24, 25,
+                    28, 29, 30, 31, 32, 33, 34,
+                    37, 38, 39, 40, 41, 42, 43
+            };
+        }
+
+        itemsPerPage = itemSlots.length;
         int maxPages = (int) Math.ceil((double) totalItems / itemsPerPage);
         if (maxPages == 0) maxPages = 1;
         if (page < 1) page = 1;
         if (page > maxPages) page = maxPages;
 
-        String title = storeName + " - Catalog (P." + page + "/" + maxPages + ")";
-        Inventory inv = Bukkit.createInventory(null, 54, Component.text(title).color(NamedTextColor.GOLD));
+        // Title format: Dark Gray "Catalog (1/2)"
+        String title = "Catalog (" + page + "/" + maxPages + ")";
+        Inventory inv = Bukkit.createInventory(null, invSize, Component.text(title).color(NamedTextColor.DARK_GRAY));
 
         // Background Glass
         ItemStack glass = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
@@ -69,7 +97,7 @@ public class StoreCatalogGUI implements Listener {
             glassMeta.displayName(Component.text(" "));
             glass.setItemMeta(glassMeta);
         }
-        for (int i = 0; i < 54; i++) {
+        for (int i = 0; i < invSize; i++) {
             inv.setItem(i, glass);
         }
 
@@ -141,10 +169,17 @@ public class StoreCatalogGUI implements Listener {
             inv.setItem(targetSlot, headStack);
         }
 
-        // Bottom Controls & Statistics Panel
+        // --- Bottom Controls & Statistics Panel (Dynamically placed on the bottom row) ---
+        int bottomRowStart = invSize - 9;
 
-        // 1. Completion & Stats Summary (Slot 49 - Nether Star)
-        ItemStack statsItem = new ItemStack(Material.NETHER_STAR);
+        // 1. Prev Arrow (invSize - 9)
+        if (page > 1) {
+            ItemStack prevItem = createNavButton("Previous Page (" + (page - 1) + ")", storeId, page - 1);
+            inv.setItem(bottomRowStart, prevItem);
+        }
+
+        // 2. Statistics Summary (invSize - 7)
+        ItemStack statsItem = new ItemStack(Material.FEATHER);
         ItemMeta statsMeta = statsItem.getItemMeta();
         if (statsMeta != null) {
             statsMeta.displayName(Component.text(storeName + " Statistics").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
@@ -173,35 +208,73 @@ public class StoreCatalogGUI implements Listener {
             statsMeta.lore(lore);
             statsItem.setItemMeta(statsMeta);
         }
-        inv.setItem(49, statsItem);
+        inv.setItem(invSize - 7, statsItem);
 
-        // 2. Store Switcher Button (Slot 48 - Compass)
-        ItemStack switcherItem = new ItemStack(Material.COMPASS);
+        // 3. Select Store Book (invSize - 6)
+        ItemStack switcherItem = new ItemStack(Material.BOOK);
         ItemMeta switcherMeta = switcherItem.getItemMeta();
         if (switcherMeta != null) {
-            switcherMeta.displayName(Component.text("Select Store").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+            switcherMeta.displayName(Component.text("Select Store Catalog").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
             switcherMeta.lore(List.of(
                     Component.text("Click to browse catalog for other stores.").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
             ));
             switcherItem.setItemMeta(switcherMeta);
         }
-        inv.setItem(48, switcherItem);
+        inv.setItem(invSize - 6, switcherItem);
 
-        // 3. Navigation Buttons (Slots 45 & 53)
-        if (page > 1) {
-            ItemStack prevItem = createNavButton("Previous Page (" + (page - 1) + ")", storeId, page - 1);
-            inv.setItem(45, prevItem);
+        // 4. Close Button (invSize - 5)
+        ItemStack closeItem = new ItemStack(Material.BARRIER);
+        ItemMeta closeMeta = closeItem.getItemMeta();
+        if (closeMeta != null) {
+            closeMeta.displayName(Component.text("Close").color(NamedTextColor.RED).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+            closeItem.setItemMeta(closeMeta);
         }
+        inv.setItem(invSize - 5, closeItem);
+
+        // 5. Store Masteries & Progression Button (invSize - 4)
+        ItemStack masteryItem = new ItemStack(Material.NETHER_STAR);
+        ItemMeta mMeta = masteryItem.getItemMeta();
+        if (mMeta != null) {
+            int currentMasteryLevel = pd.getStoreMasteryLevel(storeId);
+            int currentItemsStolen = pd.getStoreItems(storeId);
+            int nextMilestoneLevel = plugin.getMasteryManager().getNextStoreMilestone(pd, storeId);
+            int reqItemsNext = plugin.getMasteryManager().getItemsRequiredForLevel(storeId, nextMilestoneLevel);
+
+            mMeta.displayName(Component.text(storeName + " Masteries").color(NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+            List<Component> mLore = new ArrayList<>();
+            mLore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+            mLore.add(Component.text("Current Level: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text("Level " + currentMasteryLevel + "/10").color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false)));
+            mLore.add(Component.text("Store Items Stolen: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(currentItemsStolen + (reqItemsNext > 0 ? " / " + reqItemsNext : "")).color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)));
+            mLore.add(Component.text(" ").decoration(TextDecoration.ITALIC, false));
+            mLore.add(Component.text("Mastery Rewards & Perks:").color(NamedTextColor.GOLD).decorate(TextDecoration.ITALIC, false));
+
+            for (int lvl = 1; lvl <= 10; lvl++) {
+                String rewardDesc = plugin.getMasteryManager().getRewardDisplay(storeId, lvl);
+                boolean unlocked = currentMasteryLevel >= lvl;
+                Component line = Component.text("M" + lvl + ": ").color(unlocked ? NamedTextColor.GREEN : NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                        .append(Component.text(rewardDesc).color(unlocked ? NamedTextColor.WHITE : NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+                mLore.add(line);
+            }
+            mLore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+            mMeta.lore(mLore);
+            masteryItem.setItemMeta(mMeta);
+        }
+        inv.setItem(invSize - 4, masteryItem);
+
+        // 6. Next Arrow (invSize - 1)
         if (page < maxPages) {
             ItemStack nextItem = createNavButton("Next Page (" + (page + 1) + ")", storeId, page + 1);
-            inv.setItem(53, nextItem);
+            inv.setItem(invSize - 1, nextItem);
         }
 
         player.openInventory(inv);
     }
 
     public void openStoreSelectorGUI(Player player) {
-        Inventory inv = Bukkit.createInventory(null, 27, Component.text("Select Store Catalog").color(NamedTextColor.DARK_PURPLE));
+        // Dark Gray title, 36 slots (4 lines)
+        Inventory inv = Bukkit.createInventory(null, 36, Component.text("Select Store Catalog").color(NamedTextColor.DARK_GRAY));
         PlayerData pd = PlayerDataManager.getPlayerData(player);
 
         ItemStack glass = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
@@ -210,7 +283,7 @@ public class StoreCatalogGUI implements Listener {
             gMeta.displayName(Component.text(" "));
             glass.setItemMeta(gMeta);
         }
-        for (int i = 0; i < 27; i++) inv.setItem(i, glass);
+        for (int i = 0; i < 36; i++) inv.setItem(i, glass);
 
         int[] slots = {10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23};
         for (int i = 1; i <= 12; i++) {
@@ -233,8 +306,10 @@ public class StoreCatalogGUI implements Listener {
                             .append(Component.text(unlocked + "/" + storeItems.size()).color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)));
                     lore.add(Component.text("Playtime: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                             .append(Component.text(formatSeconds(pd.getStorePlaytime(sId))).color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)));
+                    lore.add(Component.text("Mastery Level: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                            .append(Component.text("M" + pd.getStoreMasteryLevel(sId)).color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false)));
                 }
-                lore.add(Component.text("Click to view store catalog!").color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
+                lore.add(Component.text("Click to view store catalog & masteries!").color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
                 meta.lore(lore);
 
                 NamespacedKey key = new NamespacedKey(plugin, "catalog_store_id");
@@ -245,6 +320,16 @@ public class StoreCatalogGUI implements Listener {
                 inv.setItem(slots[i - 1], book);
             }
         }
+
+        // Close Button (Slot 31 - middle of 4th row)
+        ItemStack closeItem = new ItemStack(Material.BARRIER);
+        ItemMeta cMeta = closeItem.getItemMeta();
+        if (cMeta != null) {
+            cMeta.displayName(Component.text("Close").color(NamedTextColor.RED).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+            closeItem.setItemMeta(cMeta);
+        }
+        inv.setItem(31, closeItem);
+
         player.openInventory(inv);
     }
 
@@ -277,6 +362,12 @@ public class StoreCatalogGUI implements Listener {
             ItemMeta meta = clicked.getItemMeta();
             if (meta == null) return;
 
+            if (clicked.getType() == Material.BARRIER) {
+                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
+                player.closeInventory();
+                return;
+            }
+
             // Handle navigation click
             NamespacedKey sKey = new NamespacedKey(plugin, "catalog_nav_store");
             NamespacedKey pKey = new NamespacedKey(plugin, "catalog_nav_page");
@@ -297,7 +388,7 @@ public class StoreCatalogGUI implements Listener {
                 return;
             }
 
-            if (clicked.getType() == Material.COMPASS) {
+            if (clicked.getType() == Material.BOOK) {
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
                 openStoreSelectorGUI(player);
             }

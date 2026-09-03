@@ -103,6 +103,13 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
     private String handleStaticIdentifier(PlayerData pd, String id, Player p) {
         XPManager xp = main.getXpManager();
         return switch (id) {
+            case "rubies", "rubys" -> {
+                try {
+                    yield String.format("%,d", org.mesumi.mSMRubys.api.RubyAPI.getRubies(p));
+                } catch (Throwable ignored) {
+                    yield "0";
+                }
+            }
             case "backpack_name" -> pd.getBackpack().getColorname();
             case "backpack_capacity" -> String.valueOf(pd.getBackpack().getcapacity());
             case "backpack_size" -> String.valueOf(pd.getBackpack().getSize());

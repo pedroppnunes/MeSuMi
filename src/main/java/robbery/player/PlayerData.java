@@ -82,6 +82,15 @@ public class PlayerData {
 
     private boolean talkedToCryptoNPC = false;
     private boolean talkedToCryptoBatteryNPC = false;
+    private boolean talkedToShopSellNPC = false;
+
+    public boolean hasTalkedToShopSellNPC() {
+        return talkedToShopSellNPC;
+    }
+
+    public void setTalkedToShopSellNPC(boolean talked) {
+        this.talkedToShopSellNPC = talked;
+    }
 
     public boolean hasTalkedToCryptoNPC() {
         return talkedToCryptoNPC;
