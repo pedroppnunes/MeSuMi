@@ -90,7 +90,7 @@ public class PlayerSkillTreeGUI implements Listener {
             String suffix = String.valueOf(tier);
             for (SkillPerk perk : plugin.getSkillTreeConfig().getTiers()) {
                 if (perk == null) continue;
-                if (perk.getId().endsWith(suffix) || (tier == 1 && !perk.getId().matches(".*[2-4]$"))) {
+                if (perk.id().endsWith(suffix) || (tier == 1 && !perk.id().matches(".*[2-4]$"))) {
                     perksInTier.add(perk);
                 }
             }
@@ -102,20 +102,20 @@ public class PlayerSkillTreeGUI implements Listener {
                 SkillPerk perk = perksInTier.get(i);
                 if (perk == null) continue;
 
-                int level = targetData.getSkillTreeLevel(perk.getId());
+                int level = targetData.getSkillTreeLevel(perk.id());
                 boolean unlocked = level > 0;
 
                 ItemStack perkItem = new ItemStack(unlocked ? Material.ENCHANTED_BOOK : Material.BOOK);
                 ItemMeta pMeta = perkItem.getItemMeta();
                 if (pMeta != null) {
-                    pMeta.displayName(Component.text(perk.getName()).color(unlocked ? NamedTextColor.GREEN : NamedTextColor.GRAY).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+                    pMeta.displayName(Component.text(perk.name()).color(unlocked ? NamedTextColor.GREEN : NamedTextColor.GRAY).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
                     List<Component> lore = new ArrayList<>();
                     lore.add(Component.text("Level: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                            .append(Component.text(level + "/" + perk.getMaxLevel()).color(unlocked ? NamedTextColor.YELLOW : NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)));
+                            .append(Component.text(level + "/" + perk.maxLevel()).color(unlocked ? NamedTextColor.YELLOW : NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)));
                     lore.add(Component.text("Description: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                            .append(Component.text(perk.getDescription()).color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+                            .append(Component.text(perk.description()).color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 
-                    double currentBonus = targetData.getPerkValue(perk.getId());
+                    double currentBonus = targetData.getPerkValue(perk.id());
                     lore.add(Component.text("Current Bonus: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                             .append(Component.text("+" + String.format("%.2f", currentBonus)).color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)));
 
