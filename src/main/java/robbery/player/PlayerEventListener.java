@@ -281,7 +281,7 @@ public class PlayerEventListener implements Listener {
             memory.setOutSpeedBonus(0);
         }
     }
-    private void loadPlayerDataFromDB(Player player, PlayerData memory, YamlConfiguration cfg) {
+    public void loadPlayerDataFromDB(Player player, PlayerData memory, YamlConfiguration cfg) {
         if (cfg == null) {
             memory.setRank(getRank(player));
             return;
