@@ -247,36 +247,24 @@ public class StoreCatalogGUI implements Listener {
         }
         inv.setItem(invSize - 5, closeItem);
 
-        // 5. Store Masteries & Progression Button (invSize - 4)
-        ItemStack masteryItem = new ItemStack(Material.NETHER_STAR);
-        ItemMeta mMeta = masteryItem.getItemMeta();
-        if (mMeta != null) {
-            int currentMasteryLevel = pd.getStoreMasteryLevel(storeId);
-            int currentItemsStolen = pd.getStoreItems(storeId);
-            int nextMilestoneLevel = plugin.getMasteryManager().getNextStoreMilestone(pd, storeId);
-            int reqItemsNext = plugin.getMasteryManager().getItemsRequiredForLevel(storeId, nextMilestoneLevel);
-
-            mMeta.displayName(Component.text(storeName + " Masteries").color(NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-            List<Component> mLore = new ArrayList<>();
-            mLore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-            mLore.add(Component.text("Current Level: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text("Level " + currentMasteryLevel + "/10").color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false)));
-            mLore.add(Component.text("Store Items Stolen: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text(currentItemsStolen + (reqItemsNext > 0 ? " / " + reqItemsNext : "")).color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)));
-            mLore.add(Component.text(" ").decoration(TextDecoration.ITALIC, false));
-            mLore.add(Component.text("Mastery Rewards & Perks:").color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
-
-            for (int lvl = 1; lvl <= 10; lvl++) {
-                int storeNum = extractStoreNum(storeId);
-                String rawTag = PlaceholderAPI.setPlaceholders(player, "%robbery_store_reward_" + storeNum + "_" + lvl + "%");
-                Component line = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand().deserialize(rawTag).decoration(TextDecoration.ITALIC, false);
-                mLore.add(line);
+        // 5. Store Masteries Button (invSize - 4) - Only for self
+        boolean isSelf = player.getUniqueId().equals(player.getUniqueId()); // always self since openGUI takes the player directly
+        if (isSelf) {
+            int storeNum = extractStoreNum(storeId);
+            ItemStack masteryItem = new ItemStack(Material.PAPER);
+            ItemMeta mMeta = masteryItem.getItemMeta();
+            if (mMeta != null) {
+                mMeta.displayName(Component.text("Store Masteries").color(NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+                mMeta.lore(List.of(
+                        Component.text("Click to view mastery milestones").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
+                        Component.text("and rewards for this store!").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                ));
+                NamespacedKey masteryKey = new NamespacedKey(plugin, "catalog_mastery_store");
+                mMeta.getPersistentDataContainer().set(masteryKey, PersistentDataType.INTEGER, storeNum);
+                masteryItem.setItemMeta(mMeta);
             }
-            mLore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-            mMeta.lore(mLore);
-            masteryItem.setItemMeta(mMeta);
+            inv.setItem(invSize - 4, masteryItem);
         }
-        inv.setItem(invSize - 4, masteryItem);
 
         // 6. Next Arrow (invSize - 1)
         if (page < maxPages) {
@@ -390,7 +378,7 @@ public class StoreCatalogGUI implements Listener {
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
         Component title = event.getView().title();
-        String titleStr = title.toString();
+        String titleStr = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(title);
 
         if (titleStr.contains("Catalog") || titleStr.contains("Select Store Catalog")) {
             event.setCancelled(true);
@@ -403,6 +391,16 @@ public class StoreCatalogGUI implements Listener {
             if (clicked.getType() == Material.BARRIER) {
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
                 player.closeInventory();
+                return;
+            }
+
+            // Handle Store Masteries Paper click -> open DeluxeMenus
+            NamespacedKey masteryKey = new NamespacedKey(plugin, "catalog_mastery_store");
+            if (clicked.getType() == Material.PAPER && meta.getPersistentDataContainer().has(masteryKey, PersistentDataType.INTEGER)) {
+                int storeNum = meta.getPersistentDataContainer().getOrDefault(masteryKey, PersistentDataType.INTEGER, 1);
+                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
+                player.closeInventory();
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "dm open store" + storeNum + "mastery_menu " + player.getName());
                 return;
             }
 
