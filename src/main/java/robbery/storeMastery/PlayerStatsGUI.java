@@ -251,8 +251,8 @@ public class PlayerStatsGUI implements Listener {
                     .append(Component.text("(M" + curMastery + ")").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 
             // Total Backpacks & Tools Unlocked
-            int totalBackpacksUnlocked = pd.getBackpackunlucked() != null ? pd.getBackpackunlucked().size() : 1;
-            int totalToolsUnlocked = pd.getToolsunlucked() != null ? pd.getToolsunlucked().size() : 1;
+            int totalBackpacksUnlocked = pd.getBackpackUnlocked();
+            int totalToolsUnlocked = pd.getToolsUnlocked();
             lore.add(Component.text("Total Backpacks Unlocked: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text(totalBackpacksUnlocked + "/20").color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Total Tools Unlocked: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
