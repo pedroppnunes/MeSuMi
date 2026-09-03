@@ -21,7 +21,7 @@ public class ActionBarManager {
 
     private static final Map<UUID, Deque<String>> playerQueues = new ConcurrentHashMap<>();
     private static final Map<UUID, Long> lastSentTime = new ConcurrentHashMap<>();
-    private static final long DELAY_MS = 1500L; // 1.5s delay between action bar notifications
+    private static final long DELAY_MS = 600L; // 0.6s fast display delay between notifications
 
     public static void init(Robbery plugin) {
         new BukkitRunnable() {
@@ -52,7 +52,7 @@ public class ActionBarManager {
                     }
                 }
             }
-        }.runTaskTimer(plugin, 5L, 5L);
+        }.runTaskTimer(plugin, 2L, 2L);
     }
 
     public static void enqueue(Player player, String rawMessage) {
