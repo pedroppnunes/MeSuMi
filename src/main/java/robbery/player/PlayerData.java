@@ -83,15 +83,15 @@ public class PlayerData {
     private boolean talkedToCryptoNPC = false;
     private boolean talkedToCryptoBatteryNPC = false;
     private boolean talkedToShopSellNPC = false;
-    private String profilePrivacy = "PUBLIC";
+    private String profilePrivacy = "HIDEOUT";
 
     public String getProfilePrivacy() {
-        if (profilePrivacy == null || profilePrivacy.isEmpty()) return "PUBLIC";
+        if (profilePrivacy == null || profilePrivacy.isEmpty()) return "HIDEOUT";
         return profilePrivacy;
     }
 
     public void setProfilePrivacy(String profilePrivacy) {
-        this.profilePrivacy = profilePrivacy != null ? profilePrivacy.toUpperCase() : "PUBLIC";
+        this.profilePrivacy = profilePrivacy != null ? profilePrivacy.toUpperCase() : "HIDEOUT";
     }
 
     public boolean hasTalkedToShopSellNPC() {

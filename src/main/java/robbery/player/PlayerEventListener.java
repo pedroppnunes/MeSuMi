@@ -355,7 +355,7 @@ public class PlayerEventListener implements Listener {
         memory.setTalkedToCryptoNPC(cfg.getBoolean("crypto.talkedToNPC", false));
         memory.setTalkedToCryptoBatteryNPC(cfg.getBoolean("crypto.talkedToBatteryNPC", false));
         memory.setTalkedToShopSellNPC(cfg.getBoolean("stats.talkedToShopSellNPC", false));
-        memory.setProfilePrivacy(cfg.getString("stats.profilePrivacy", "PUBLIC"));
+        memory.setProfilePrivacy(cfg.getString("stats.profilePrivacy", "HIDEOUT"));
 
         // FIXED: Quest progress (Casting fix)
         if (cfg.contains("dailyQuests.progress")) {
