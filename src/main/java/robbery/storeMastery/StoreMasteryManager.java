@@ -99,7 +99,7 @@ public class StoreMasteryManager {
         return 0;
     }
 
-    private void handleLevelUp(Player player, Keys store, int newLevel) {
+    public void handleLevelUp(Player player, Keys store, int newLevel) {
         PlayerData pd = PlayerDataManager.getPlayerData(player);
         String storeId = store.getId();
         if (pd != null) pd.setStoreMilestone(store.getId(), newLevel);

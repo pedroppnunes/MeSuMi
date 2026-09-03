@@ -338,9 +338,21 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
                         return;
                     }
                     int amount = Integer.parseInt(amountStr);
+                    int oldLevel = main.getMasteryManager().getLevelFromItems(storeId, pd.getStoreItems(storeId));
                     pd.addStoreItems(storeId, amount);
                     pd.addItemsStolen(amount);
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aAdded &e" + amount + " &aItems Stolen to &f" + target.getName() + " &afor &e" + storeId + " &7(Store Total: &e" + pd.getStoreItems(storeId) + "&7, Global: &e" + pd.getItemsStolen() + "&7)."));
+                    int newLevel = main.getMasteryManager().getLevelFromItems(storeId, pd.getStoreItems(storeId));
+
+                    if (newLevel > oldLevel) {
+                        pd.setStoreMilestone(storeId, newLevel);
+                        robbery.keys.Keys store = robbery.keys.KeyManager.getStoreName(storeId);
+                        if (store != null) {
+                            for (int l = oldLevel + 1; l <= newLevel; l++) {
+                                main.getMasteryManager().handleLevelUp(target, store, l);
+                            }
+                        }
+                    }
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aAdded &e" + amount + " &aItems Stolen to &f" + target.getName() + " &afor &e" + storeId + " &7(Store Total: &e" + pd.getStoreItems(storeId) + "&7, Global: &e" + pd.getItemsStolen() + "&7, Mastery: &dM" + pd.getStoreMasteryLevel(storeId) + "&7)."));
                 }
                 case "set" -> {
                     if (amountStr == null) {
@@ -348,8 +360,19 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
                         return;
                     }
                     int amount = Integer.parseInt(amountStr);
+                    int oldLevel = pd.getStoreMasteryLevel(storeId);
                     pd.getStoreItemsMap().put(storeId, amount);
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aSet &f" + target.getName() + "'s &aItems Stolen for &e" + storeId + " &ato &e" + amount + "&a."));
+                    int newLevel = main.getMasteryManager().getLevelFromItems(storeId, amount);
+                    pd.setStoreMilestone(storeId, newLevel);
+                    if (newLevel > oldLevel) {
+                        robbery.keys.Keys store = robbery.keys.KeyManager.getStoreName(storeId);
+                        if (store != null) {
+                            for (int l = oldLevel + 1; l <= newLevel; l++) {
+                                main.getMasteryManager().handleLevelUp(target, store, l);
+                            }
+                        }
+                    }
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aSet &f" + target.getName() + "'s &aItems Stolen for &e" + storeId + " &ato &e" + amount + " &7(Mastery: &dM" + newLevel + "&7)."));
                 }
                 case "remove" -> {
                     if (amountStr == null) {
@@ -360,10 +383,13 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
                     int newStolen = Math.max(0, pd.getStoreItems(storeId) - amount);
                     pd.getStoreItemsMap().put(storeId, newStolen);
                     pd.setItemsStolen(Math.max(0, pd.getItemsStolen() - amount));
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aRemoved &e" + amount + " &aItems Stolen from &f" + target.getName() + " &afor &e" + storeId + " &7(New Store Total: &e" + newStolen + "&7)."));
+                    int newLevel = main.getMasteryManager().getLevelFromItems(storeId, newStolen);
+                    pd.setStoreMilestone(storeId, newLevel);
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aRemoved &e" + amount + " &aItems Stolen from &f" + target.getName() + " &afor &e" + storeId + " &7(New Store Total: &e" + newStolen + "&7, Mastery: &dM" + newLevel + "&7)."));
                 }
                 case "reset" -> {
                     pd.getStoreItemsMap().put(storeId, 0);
+                    pd.setStoreMilestone(storeId, 0);
                     sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aReset &f" + target.getName() + "'s &aItems Stolen for &e" + storeId + " &ato 0."));
                 }
                 default -> sender.sendMessage(ChatColor.RED + "Unknown itemsstolen action: " + action + " (Available: give, set, remove, reset)");
