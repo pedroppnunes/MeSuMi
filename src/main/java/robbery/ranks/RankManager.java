@@ -30,16 +30,18 @@ public class RankManager {
     public static final Rank BURGLAR = new Rank("Burglar", 0.25, 2, 0.1, 0.025,"rank1");
 
     /** Default empty rank for players without a rank. */
-    public static final Rank NONE = new Rank("", 0.0, 0, 0, 0,"rank0");
+    public static final Rank NONE = new Rank("Member", 0.0, 0, 0, 0, "rank0");
 
     /**
      * Returns the {@link Rank} corresponding to the given identifier string.
      *
-     * @param rank the rank identifier (e.g., "rank1", "rank2", ..., "rank7")
+     * @param rank the rank identifier (e.g., "rank0", "rank1", ..., "rank7")
      * @return the corresponding {@link Rank} object, or {@link #NONE} if the identifier is invalid
      */
     public static Rank getRank(String rank) {
-        return switch (rank) {
+        if (rank == null) return NONE;
+        return switch (rank.toLowerCase()) {
+            case "rank0", "none", "" -> NONE;
             case "rank1" -> BURGLAR;
             case "rank2" -> ROBBER;
             case "rank3" -> BANDIT;

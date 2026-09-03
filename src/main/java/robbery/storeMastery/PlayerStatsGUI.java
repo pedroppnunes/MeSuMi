@@ -344,11 +344,6 @@ public class PlayerStatsGUI implements Listener {
     }
 
     private String getFormattedRank(UUID targetUuid, PlayerData pd) {
-        String r = pd.getRank();
-        robbery.ranks.Rank rankObj = robbery.ranks.RankManager.getRank(r);
-        if (rankObj != null && !rankObj.name().isEmpty()) {
-            return rankObj.name();
-        }
         if (targetUuid != null) {
             Player p = Bukkit.getPlayer(targetUuid);
             if (p != null) {
@@ -360,7 +355,12 @@ public class PlayerStatsGUI implements Listener {
                 }
             }
         }
-        return "Burglar";
+        String r = pd.getRank();
+        robbery.ranks.Rank rankObj = robbery.ranks.RankManager.getRank(r);
+        if (rankObj != null && !rankObj.name().isEmpty()) {
+            return rankObj.name();
+        }
+        return "Member";
     }
 
     @EventHandler
