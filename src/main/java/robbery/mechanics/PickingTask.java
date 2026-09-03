@@ -120,11 +120,15 @@ public class PickingTask extends BukkitRunnable {
                 p.addBoosters(booster);
             }
 
-            // --- Skill Point chance: base perk + M4 mastery ---
-            double baseChance = 1.0 / 1000.0;
-            double buff = (p.getPerkValue(PERK_CHANCE_SP1) / 100.0) + p.getOutSpChance() + p.getStoreMasterySkillPointChance(storeId);
-            double finalChance = baseChance * (1 + buff);
-            if (random.nextDouble() < finalChance) {
+            // --- Skill Point chance: base 1% + perk % + outpost % + store mastery % ---
+            double spPerk = p.getPerkValue(PERK_CHANCE_SP1);
+            double outSp = p.getOutSpChance();
+            double masterySp = p.getStoreMasterySkillPointChance(storeId);
+
+            double totalSpPercent = 1.0 + spPerk + outSp + masterySp;
+            double spProbability = Math.min(1.0, totalSpPercent / 100.0);
+
+            if (random.nextDouble() < spProbability) {
                 player.sendTitle(
                         Messages.get("events.picking.skillpoint_reward_title"),
                         Messages.get("events.picking.skillpoint_reward_subtitle"),
