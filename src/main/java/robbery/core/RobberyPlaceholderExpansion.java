@@ -138,7 +138,8 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             }
             case "reward_sp" -> String.valueOf(xp.skillPointsForLevel(pd.getLevel()));
             case "reward_color" -> xp.getLevelColorName(pd.getLevel());
-            case "extraxp" -> String.format("%.2f", pd.getXPBoost() * 100);
+            case "extraxp" -> String.format("%.1f", pd.getXPBoost() * 100);
+            case "extraxp_formatted" -> String.format("%.1f%%", pd.getXPBoost() * 100);
             case "levelcolored" -> xp.colorizeLevel(pd.getLevel());
             case "levelcolor" -> xp.getLevelHexColor(pd.getLevel());
             case "boosterx" -> String.format("%.3f",pd.getBoost());
@@ -151,6 +152,16 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             case "booster_paused" -> String.valueOf(pd.isBoostersPaused());
             case "booster_priority" -> String.valueOf(pd.getActiveboost().getPriority());
             case "skillpoints" -> String.valueOf(pd.getSkillPoints());
+
+            // Chance & Perk Placeholders
+            case "double_item_chance", "doubleitem_chance" -> String.format("%.1f%%", pd.getPerkValue(PERK_DOUBLE_ITEM1));
+            case "triple_item_chance", "tripleitem_chance" -> String.format("%.1f%%", pd.getPerkValue(PERK_TRIPLE_ITEM1));
+            case "insta_steal_chance", "instasteal_chance" -> String.format("%.1f%%", pd.getPerkValue(PERK_INSTA_STEAL1));
+            case "double_inventory_chance", "doubleinventory_chance" -> String.format("%.1f%%", pd.getPerkValue(PERK_DOUBLE_INV1));
+            case "avoid_caught_chance", "avoidbeingcaught_chance" -> String.format("%.1f%%", pd.getPerkValue(PERK_AVOID_CAUGHT1));
+            case "booster_chance" -> String.format("%.1f%%", pd.getPerkValue(PERK_BOOST1));
+            case "outpost_buff", "outpost_buff_percent" -> String.format("%.1f%%", pd.getPerkValue(PERK_OUT_BUFF1));
+
             case "outmaterial" -> main.getOutpostManager().getOutpostMaterial(p);
             case "outstatustitle" -> main.getOutpostManager().getStatusTitle();
             case "outtime" -> main.getOutpostManager().getStatusLoreLine1();
@@ -169,7 +180,7 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             case "skilltreereset_points" -> String.valueOf(pd.getResetSkillTreePoints());
             case "skilltreereset_skillpoints" -> String.valueOf(Robbery.getSkillTreeConfig().calculateTotalRefund(pd));
             case "skillpoint_chance" -> {
-                double totalPercent = 1.0 + pd.getPerkValue(robbery.attribute.Attribute.PERK_CHANCE_SP1) + pd.getOutSpChance();
+                double totalPercent = 1.0 + pd.getPerkValue(PERK_CHANCE_SP1) + pd.getOutSpChance();
                 if (totalPercent >= 100.0) {
                     yield "1/1";
                 } else {
@@ -177,6 +188,7 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                     yield "1/" + denominator;
                 }
             }
+            case "skillpoint_chance_percent" -> String.format("%.1f%%", 1.0 + pd.getPerkValue(PERK_CHANCE_SP1) + pd.getOutSpChance());
 
             case "crypto_has_machine" -> String.valueOf(robbery.crypto.CryptoItemHelper.playerAlreadyHasMachine(p, main));
             case "crypto_is_placed" -> {
