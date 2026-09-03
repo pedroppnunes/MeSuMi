@@ -76,14 +76,56 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             } catch (NumberFormatException ignored) {}
         }
 
+        // %robbery_target_<player>_<placeholder>% or %robbery_other_<player>_<placeholder>%
+        if (id.startsWith("target_") || id.startsWith("other_")) {
+            int firstUnderscore = id.indexOf('_');
+            int secondUnderscore = id.indexOf('_', firstUnderscore + 1);
+            if (secondUnderscore != -1) {
+                String targetName = identifier.substring(firstUnderscore + 1, secondUnderscore);
+                String subIdentifier = identifier.substring(secondUnderscore + 1);
+
+                org.bukkit.OfflinePlayer targetOff = org.bukkit.Bukkit.getOfflinePlayer(targetName);
+                if (targetOff != null) {
+                    PlayerData targetPd = null;
+                    if (targetOff.isOnline() && targetOff.getPlayer() != null) {
+                        targetPd = PlayerDataManager.getPlayerData(targetOff.getPlayer());
+                    } else {
+                        org.bukkit.configuration.file.YamlConfiguration tCfg = main.getPlayerDataDao().loadPlayerData(targetOff.getUniqueId());
+                        if (tCfg != null) {
+                            targetPd = new PlayerData(null);
+                            main.getPlayerEventListener().loadPlayerDataFromDB(null, targetPd, tCfg);
+                        }
+                    }
+                    if (targetPd != null) {
+                        Player targetP = targetOff.isOnline() ? targetOff.getPlayer() : null;
+                        String subId = subIdentifier.toLowerCase();
+                        String match = handleStaticIdentifier(targetPd, subId, targetP);
+                        if (match != null) return match;
+                        String[] subParts = subId.split("_");
+                        if (subParts.length >= 2) {
+                            return handleDynamicIdentifier(targetPd, subParts, subId);
+                        }
+                    }
+                }
+            }
+        }
+
         if (offlinePlayer == null) return null;
         Player player = offlinePlayer.getPlayer();
-        if (player == null) return null;
 
-        PlayerData pd = PlayerDataManager.getPlayerData(player);
+        PlayerData pd = null;
+        if (player != null) {
+            pd = PlayerDataManager.getPlayerData(player);
+        } else {
+            org.bukkit.configuration.file.YamlConfiguration cfg = main.getPlayerDataDao().loadPlayerData(offlinePlayer.getUniqueId());
+            if (cfg != null) {
+                pd = new PlayerData(null);
+                main.getPlayerEventListener().loadPlayerDataFromDB(null, pd, cfg);
+            }
+        }
         if (pd == null) return null;
 
-        // 1. Try static/exact matches first (Prevents total_items_stolen from breaking)
+        // 1. Try static/exact matches first
         String staticMatch = handleStaticIdentifier(pd, id, player);
         if (staticMatch != null) return staticMatch;
 
@@ -535,14 +577,8 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                         case "currentlevel" -> String.valueOf(current);
                         case "maxlevel" -> String.valueOf(max);
                         case "costnextlevel" -> String.valueOf(costNext);
-                        case "currentvalue" -> {
-                            double displayValue = currentValue;
-                            if (PERCENTAGE_PERKS.contains(perkId)) {
-                                displayValue *= 100;
-                            }
-                            yield String.format("%.3f", displayValue);
-                        }
-                        case "nextvalue" -> String.format("%.3f", nextValue);
+                        case "currentvalue" -> String.format("%.1f", currentValue);
+                        case "nextvalue" -> String.format("%.1f", nextValue);
                         case "canupgrade" -> {
                             if (pd.getLevel() < requiredLevel) yield "2";
                             if (!meetReq) yield "4";

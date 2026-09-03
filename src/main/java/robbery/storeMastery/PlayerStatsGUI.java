@@ -306,7 +306,7 @@ public class PlayerStatsGUI implements Listener {
         inv.setItem(20, dyeItem);
 
         // 6. Store Item Catalog Button (Slot 22 - Row 2 Center)
-        ItemStack catalogButton = new ItemStack(Material.WRITABLE_BOOK);
+        ItemStack catalogButton = new ItemStack(Material.ENCHANTED_BOOK);
         ItemMeta cMeta = catalogButton.getItemMeta();
         if (cMeta != null) {
             cMeta.displayName(Component.text("View Store Item Catalog").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
@@ -317,18 +317,18 @@ public class PlayerStatsGUI implements Listener {
         }
         inv.setItem(22, catalogButton);
 
-        // 7. Store Masteries Paper Button (Slot 24 - Row 2 Right, only for self)
+        // 7. View Skill Tree Button (Slot 24 - Row 2 Right, only for self)
         if (isSelf) {
-            ItemStack masteriesPaper = new ItemStack(Material.PAPER);
-            ItemMeta pMeta = masteriesPaper.getItemMeta();
+            ItemStack skillTreeBook = new ItemStack(Material.BOOK);
+            ItemMeta pMeta = skillTreeBook.getItemMeta();
             if (pMeta != null) {
-                pMeta.displayName(Component.text("View Store Masteries").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+                pMeta.displayName(Component.text("View Skill Tree").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
                 pMeta.lore(List.of(
-                        Component.text("Click to open Store Masteries!").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                        Component.text("Click to open your Skill Tree!").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                 ));
-                masteriesPaper.setItemMeta(pMeta);
+                skillTreeBook.setItemMeta(pMeta);
             }
-            inv.setItem(24, masteriesPaper);
+            inv.setItem(24, skillTreeBook);
         }
 
         // 8. Close Button (Slot 31 - Centered Bottom)
@@ -392,17 +392,13 @@ public class PlayerStatsGUI implements Listener {
             OfflinePlayer offTarget = Bukkit.getOfflinePlayer(targetName);
             PlayerData targetPd = (offTarget.isOnline() && offTarget.getPlayer() != null) ? PlayerDataManager.getPlayerData(offTarget.getPlayer()) : null;
 
-            if (clicked.getType() == Material.PAPER || clicked.getType() == Material.ENCHANTED_BOOK) {
+            if (clicked.getType() == Material.BOOK || clicked.getType() == Material.PAPER) {
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
-                if (targetPd != null) {
-                    plugin.getPlayerSkillTreeGUI().openGUI(player, targetPd, targetName, offTarget.getUniqueId(), 1);
-                } else {
-                    openGUIForOfflinePlayer(player, offTarget);
-                }
+                player.performCommand("skilltree");
                 return;
             }
 
-            if (clicked.getType() == Material.WRITABLE_BOOK) {
+            if (clicked.getType() == Material.ENCHANTED_BOOK || clicked.getType() == Material.WRITABLE_BOOK) {
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
                 plugin.getStoreCatalogGUI().openStoreSelectorGUI(player, targetName, offTarget != null ? offTarget.getUniqueId() : player.getUniqueId());
                 return;
