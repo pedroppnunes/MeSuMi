@@ -6,7 +6,7 @@ main: robbery.core.Robbery
 api-version: '26.2'
 authors: [MeSuMi Team]
 
-softdepend: [PlaceholderAPI,VotingPlugin]
+softdepend: [PlaceholderAPI, VotingPlugin, MesumiEconomy, Essentials]
 depend: [Vault]
 libraries:
   - 'com.zaxxer:HikariCP:5.1.0'
