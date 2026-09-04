@@ -75,6 +75,10 @@ commands:
     description: Migrate player data from YAML to SQL database
     usage: /migrate-to-sql
     permission: robbery.op
+  migrate-economy:
+    description: Migrate player balances from Essentials userdata files to MesumiEconomy via Vault
+    usage: /migrate-economy
+    permission: robbery.op
   mute:
     usage: /mute <player> <time> [reason]
     permission: robbery.staff
