@@ -176,6 +176,10 @@ command:
   usebooster:
     usage: "&5&lRobbery &8> &cUsage: /usebooster <booster_name> <player_name>"
     success: "&5&lRobbery &8> &aBooster %boostername% activated for %player%."
+  sell:
+    sold: "&5&lRobbery &8> &aYou sold items for &e$%amount%&a!"
+    lucky: "&6&lLUCKY SELL! &eYou got a 2x money proc (+%bonus%% chance)!"
+    xp-earned: "&5&lRobbery &8> &aYou earned &b+%xp% Robbery XP&a!"
   warn:
     usage: "&5&lRobbery &8> &cUsage: /warn <player> <duration> <reason>"
     success: "&5&lRobbery &8> &aWarned &e%player% &afor &e%duration% &a- Reason: &e%reason%"
@@ -216,6 +220,7 @@ events:
     item_stolen: "&aYou've stolen &e%item%&a for &n&2%value%&r"
     item_stolen_with_boost: "&aYou've stolen &e%item%&a for &n&2%value%&r &a+ &n&2%bonus%&r"
     double_item: "&aYou've got another item &e%item%&a for &n&2%value%&r"
+    triple_item: "&aYou've got 2 extra items &e%item%&a for &n&2%value%&r"
     booster_reward: "&5&lRobbery &8> &eYou've received a &n&6%booster%&r &ebooster!"
     skillpoint_reward_title: "&6You got 1 Skillpoint!"
     skillpoint_reward_subtitle: "&7You can use it in /skillpoints"
