@@ -11,7 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import robbery.formatters.NumberFormatter;
+import robbery.number.NumberFormatter;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 
