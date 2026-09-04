@@ -235,15 +235,20 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             case "skilltreereset_points" -> String.valueOf(pd.getResetSkillTreePoints());
             case "skilltreereset_skillpoints" -> String.valueOf(Robbery.getSkillTreeConfig().calculateTotalRefund(pd));
             case "skillpoint_chance" -> {
-                double totalPercent = 1.0 + pd.getPerkValue(PERK_CHANCE_SP1) + pd.getOutSpChance();
-                if (totalPercent >= 100.0) {
+                double spBonus = pd.getPerkValue(PERK_CHANCE_SP1) + pd.getOutSpChance();
+                double finalProb = 0.001 * (1.0 + spBonus / 100.0);
+                if (finalProb >= 1.0) {
                     yield "1/1";
                 } else {
-                    int denominator = (int) Math.max(1, Math.round(100.0 / totalPercent));
+                    int denominator = (int) Math.max(1, Math.round(1.0 / finalProb));
                     yield "1/" + denominator;
                 }
             }
-            case "skillpoint_chance_percent" -> String.format("%.1f%%", 1.0 + pd.getPerkValue(PERK_CHANCE_SP1) + pd.getOutSpChance());
+            case "skillpoint_chance_percent" -> {
+                double spBonus = pd.getPerkValue(PERK_CHANCE_SP1) + pd.getOutSpChance();
+                double finalPercent = 0.1 * (1.0 + spBonus / 100.0);
+                yield String.format("%.2f%%", finalPercent);
+            }
 
             case "crypto_has_machine" -> String.valueOf(robbery.crypto.CryptoItemHelper.playerAlreadyHasMachine(p, main));
             case "crypto_is_placed" -> {
