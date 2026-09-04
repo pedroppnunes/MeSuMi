@@ -35,8 +35,11 @@ public class HideoutListener implements Listener {
         String message = event.getMessage().toLowerCase().trim();
         Player player = event.getPlayer();
 
-        if (message.equalsIgnoreCase("/ho top") || message.equalsIgnoreCase("/hideout top") ||
-                message.equalsIgnoreCase("/hotop") || message.equalsIgnoreCase("/hideouttop")) {
+        if (message.equalsIgnoreCase("/hocontrib") || message.equalsIgnoreCase("/hideoutcontrib") ||
+                message.equalsIgnoreCase("/hocontributors") || message.equalsIgnoreCase("/hideoutcontributors") ||
+                message.equalsIgnoreCase("/ho contrib") || message.equalsIgnoreCase("/hideout contrib") ||
+                message.equalsIgnoreCase("/ho contributors") || message.equalsIgnoreCase("/hideout contributors") ||
+                message.equalsIgnoreCase("/ho topcontrib") || message.equalsIgnoreCase("/hideout topcontrib")) {
             event.setCancelled(true);
             robbery.core.HideoutTopCommand.sendHideoutTop(player);
             return;
