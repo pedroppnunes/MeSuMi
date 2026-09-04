@@ -155,11 +155,12 @@ public class Robbery extends JavaPlugin implements Listener {
     public void onEnable() {
         getLogger().info("Starting");
         main = this;
-        if (!setupEconomy() || !setupPermissions()) {
-            getLogger().severe("Disabled due to no Vault dependency found!");
+        if (!setupEconomy()) {
+            getLogger().severe("Disabled: Vault or an Economy provider (e.g. Essentials / MesumiEconomy) was not found! Please ensure Vault and an Economy plugin are loaded.");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+        setupPermissions();
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             Bukkit.getPluginManager().registerEvents(this, this);
             RobberyPlaceholderExpansion.registerHook();
@@ -414,13 +415,15 @@ public class Robbery extends JavaPlugin implements Listener {
     public void onDisable() {
         this.isBackingUp = true;
         PrestigeCountManager.save();
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            PlayerData pd = PlayerDataManager.getPlayerData(player);
-            if (pd != null) {
-                pd.stopBoosters();
-                playerEventListener.savePlayerDataSync(player, pd);
+        if (playerEventListener != null) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                PlayerData pd = PlayerDataManager.getPlayerData(player);
+                if (pd != null) {
+                    pd.stopBoosters();
+                    playerEventListener.savePlayerDataSync(player, pd);
+                }
+                player.kick(Component.text(Messages.get("reload.player-kick")));
             }
-            player.kick(Component.text(Messages.get("reload.player-kick")));
         }
         if (cryptoManager != null) {
             cryptoManager.saveAllSync();
@@ -466,7 +469,7 @@ public class Robbery extends JavaPlugin implements Listener {
     }
 
     public void saveItems() {
-        if (!playerEventListener.getHasLoaded())
+        if (playerEventListener == null || !playerEventListener.getHasLoaded())
             return;
 
         File itemsFile = new File(getDataFolder(), "items.yml");
