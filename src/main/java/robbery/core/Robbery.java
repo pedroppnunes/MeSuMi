@@ -291,6 +291,12 @@ public class Robbery extends JavaPlugin implements Listener {
             getCommand("backpacks").setExecutor(new robbery.backpacks.BackpackCommand(this));
         }
         Objects.requireNonNull(getCommand("ho")).setExecutor(new robbery.core.HideoutAliasCommand());
+        if (getCommand("hotop") != null) {
+            getCommand("hotop").setExecutor(new robbery.core.HideoutTopCommand());
+        }
+        if (getCommand("hideouttop") != null) {
+            getCommand("hideouttop").setExecutor(new robbery.core.HideoutTopCommand());
+        }
         Objects.requireNonNull(getCommand("s")).setExecutor(s);
         Objects.requireNonNull(getCommand("ct")).setExecutor(new ChatColorCommand(main));
         Lobby l = new Lobby(main);

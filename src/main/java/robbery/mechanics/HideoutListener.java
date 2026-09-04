@@ -32,14 +32,22 @@ public class HideoutListener implements Listener {
      */
     @EventHandler
     public void onCommandPreprocess(PlayerCommandPreprocessEvent event) {
-        String message = event.getMessage().toLowerCase();
+        String message = event.getMessage().toLowerCase().trim();
         Player player = event.getPlayer();
+
+        if (message.equalsIgnoreCase("/ho top") || message.equalsIgnoreCase("/hideout top") ||
+                message.equalsIgnoreCase("/hotop") || message.equalsIgnoreCase("/hideouttop")) {
+            event.setCancelled(true);
+            robbery.core.HideoutTopCommand.sendHideoutTop(player);
+            return;
+        }
+
         PlayerData pData = PlayerDataManager.getPlayerData(player);
         Backpacks backpack = pData.getBackpack();
         if(player.hasPermission("robbery.bypass")) return;
 
-        //Let people type ho top with backpack items
-        if(message.equalsIgnoreCase("/ho top") || message.equalsIgnoreCase("/ho chat") || message.equalsIgnoreCase("/hideout chat") || message.equalsIgnoreCase("/hideout top")) return;
+        //Let people type ho chat with backpack items
+        if(message.equalsIgnoreCase("/ho chat") || message.equalsIgnoreCase("/hideout chat")) return;
 
         // Block hideout entry or teleport commands if player has items
         if ((message.startsWith("/ho") || message.startsWith("/hideout") || message.contains("/ho") || message.contains("/hideout")) ||

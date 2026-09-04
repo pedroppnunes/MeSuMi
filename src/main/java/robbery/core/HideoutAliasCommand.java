@@ -9,6 +9,10 @@ public class HideoutAliasCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player p) {
+            if (args.length > 0 && args[0].equalsIgnoreCase("top")) {
+                HideoutTopCommand.sendHideoutTop(p);
+                return true;
+            }
             String cmd = "hideout" + (args.length > 0 ? " " + String.join(" ", args) : "");
             p.performCommand(cmd);
         }

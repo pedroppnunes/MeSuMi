@@ -136,11 +136,13 @@ public class Sell implements CommandExecutor {
         long finalMoneyEarned = lucky ? (amountToAdd * 2) : amountToAdd;
         double hideoutValue = (double) finalMoneyEarned / 1000.0;
 
+        boolean hasHideout = false;
         // Deposit Hideout Value to SuperiorSkyblock2 Hideout
         try {
             if (Bukkit.getPluginManager().isPluginEnabled("SuperiorSkyblock2")) {
                 com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer sp = com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI.getPlayer(player);
                 if (sp != null && sp.getIsland() != null) {
+                    hasHideout = true;
                     com.bgsoftware.superiorskyblock.api.island.Island hideout = sp.getIsland();
                     java.math.BigDecimal valBD = java.math.BigDecimal.valueOf(hideoutValue);
                     try {
@@ -154,15 +156,16 @@ public class Sell implements CommandExecutor {
             }
         } catch (Throwable ignored) {}
 
-        // Track player's personal contribution
-        p.addHideoutValueContributed(hideoutValue);
+        if (hasHideout) {
+            // Track player's personal contribution
+            p.addHideoutValueContributed(hideoutValue);
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&a+&e" + NumberFormatter.formatDoubleNumber(hideoutValue) + " &aHideout Value contributed to your Hideout!"));
+        }
 
         if (lucky) {
             Map<String, String> luckyPlaceholders = Map.of("bonus", String.format("%.1f", chance));
             Messages.sendFormatted(player, "command.sell.lucky", luckyPlaceholders);
         }
-
-        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&a+&e" + NumberFormatter.formatDoubleNumber(hideoutValue) + " &aHideout Value contributed to your Hideout!"));
 
         if (totalXp > 0) {
             try {

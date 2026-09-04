@@ -178,6 +178,10 @@ commands:
     description: Alias for hideout
     usage: /ho
     aliases: [h]
+  hotop:
+    description: View top contributors to your hideout
+    usage: /hotop
+    aliases: [hideouttop]
   catalog:
     description: Opens the store completionist item catalog
     usage: /catalog [store]
