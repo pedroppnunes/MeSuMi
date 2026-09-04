@@ -37,6 +37,7 @@ import static robbery.tool.ToolManager.TOOL1;
 
 public class PlayerData {
 
+    private boolean loaded = false;
     private Backpacks backpack;
     private Tools tool;
     private Keys key;
@@ -1035,14 +1036,6 @@ public int getStoreItems(String storeId) {
 
     public double getPerkValue(String perkId) {
         if (perkId == null) return 0.0;
-        Double val = perkValues.get(perkId);
-        if (val != null && val > 0.0) {
-            if (PERCENTAGE_PERKS.contains(perkId) && val <= 1.0) {
-                val = val * 100.0;
-                perkValues.put(perkId, val);
-            }
-            return val;
-        }
         int lvl = getSkillTreeLevel(perkId);
         if (lvl > 0 && robbery.core.Robbery.getSkillTreeConfig() != null) {
             robbery.skilltree.SkillPerk perk = robbery.core.Robbery.getSkillTreeConfig().getTier(perkId);
@@ -1052,6 +1045,7 @@ public int getStoreItems(String storeId) {
                 return calculated;
             }
         }
+        Double val = perkValues.get(perkId);
         return val != null ? val : 0.0;
     }
 
@@ -1169,5 +1163,7 @@ public int getStoreItems(String storeId) {
     public void setTalkedToQuestNPC(boolean talked) { this.talkedToQuestNPC = talked; }
     public int getLastResetDay() { return lastResetDay; }
     public void setLastResetDay(int lastResetDay) { this.lastResetDay = lastResetDay; }
+    public boolean isLoaded() { return loaded; }
+    public void setLoaded(boolean loaded) { this.loaded = loaded; }
 }
 

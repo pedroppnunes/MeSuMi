@@ -74,7 +74,13 @@ public class PlayerEventListener implements Listener {
         YamlConfiguration cfg = tempCache.remove(player.getUniqueId());
 
         handleJoinMessage(player);
-        loadPlayerDataFromDB(player, memory, cfg);
+        try {
+            loadPlayerDataFromDB(player, memory, cfg);
+        } catch (Throwable t) {
+            plugin.getLogger().log(java.util.logging.Level.SEVERE, "Failed to load player data safely for " + player.getName() + " (" + player.getUniqueId() + ")", t);
+            player.kick(net.kyori.adventure.text.Component.text("§cFailed to load your player data safely. Please rejoin or contact server staff. (Your saved data was NOT modified)"));
+            return;
+        }
         applyOutpostPerks(player, memory);
 
         if (!player.hasPermission(NOITEMS_PERMISSION)) {
@@ -130,7 +136,12 @@ public class PlayerEventListener implements Listener {
     }
 
     public void savePlayerData(Player player, PlayerData memory, boolean forceSync) {
-        if (player == null || memory == null) return;
+        if (player == null || memory == null || !memory.isLoaded()) {
+            if (player != null && memory != null && !memory.isLoaded()) {
+                plugin.getLogger().warning("Refusing to save PlayerData for " + player.getName() + " because player data loading was incomplete or failed!");
+            }
+            return;
+        }
         YamlConfiguration cfg = new YamlConfiguration();
 
         // Basic stats
@@ -219,6 +230,16 @@ public class PlayerEventListener implements Listener {
         cfg.set("stats.location.yaw", loc.getYaw());
         cfg.set("stats.location.pitch", loc.getPitch());
 
+        // Also save local file backup on disk for instant recovery if needed
+        try {
+            File backupDir = new File(plugin.getDataFolder(), "player_backups");
+            if (!backupDir.exists()) backupDir.mkdirs();
+            File localBackupFile = new File(backupDir, player.getUniqueId() + ".yml");
+            cfg.save(localBackupFile);
+        } catch (Exception e) {
+            plugin.getLogger().warning("Could not write local player file backup for " + player.getName() + ": " + e.getMessage());
+        }
+
         Runnable saveTask = () -> {
             try {
                 // Save to Database
@@ -279,108 +300,150 @@ public class PlayerEventListener implements Listener {
     public void loadPlayerDataFromDB(Player player, PlayerData memory, YamlConfiguration cfg) {
         if (cfg == null) {
             memory.setRank(getRank(player));
+            memory.setLoaded(true);
             return;
         }
 
-        // Basic stats
-        memory.setRank(cfg.getString("stats.rank"));
-        long loadedXp = Math.max(0L, cfg.getLong("stats.xp", 0L));
-        memory.setXp(loadedXp);
-        memory.setLevel(plugin.getXpManager().getLevelFromXp(loadedXp));
-        memory.setPrestige(cfg.getInt("stats.prestige", 0));
+        // Basic stats (Critical)
+        try {
+            memory.setRank(cfg.getString("stats.rank"));
+            long loadedXp = Math.max(0L, cfg.getLong("stats.xp", 0L));
+            memory.setXp(loadedXp);
+            memory.setLevel(plugin.getXpManager().getLevelFromXp(loadedXp));
+            memory.setPrestige(cfg.getInt("stats.prestige", 0));
+        } catch (Exception e) {
+            plugin.getLogger().log(java.util.logging.Level.SEVERE, "Failed loading basic stats for " + player.getName(), e);
+        }
 
         // Tools & keys
-        memory.setToolsunlocked(cfg.getString("stats.hastool"));
-        memory.setTool(ToolManager.getToolsName(cfg.getString("stats.tool")));
-        memory.setKeys(cfg.getString("stats.haskeys"));
-        memory.setKey(getStoreName(cfg.getString("stats.key")));
+        try {
+            memory.setToolsunlocked(cfg.getString("stats.hastool"));
+            memory.setTool(ToolManager.getToolsName(cfg.getString("stats.tool")));
+            memory.setKeys(cfg.getString("stats.haskeys"));
+            memory.setKey(getStoreName(cfg.getString("stats.key")));
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed loading tools/keys section for " + player.getName() + ": " + e.getMessage());
+        }
 
-        //Skillpoints
-        memory.setSP(cfg.getString("stats.skillpoints"));
+        // Skillpoints
+        try {
+            memory.setSP(cfg.getString("stats.skillpoints"));
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed loading skillpoints section for " + player.getName() + ": " + e.getMessage());
+        }
 
         // Stats & store
-        memory.setItemsStolen(cfg.getInt("stats.itemsStolen", 0));
-        memory.setBustedCount(cfg.getInt("stats.bustedCount", 0));
-        memory.setHideoutValueContributed(cfg.getDouble("stats.hideoutValueContributed", 0.0));
-        loadMap(cfg, "stats.storeItems", memory::setStoreItemsMap);
-        loadMap(cfg, "stats.storeMilestones", memory::setStoreMilestoneMap);
-        loadMap(cfg, "stats.itemStolenCounts", memory::setItemStolenCountsMap);
-        loadMapLong(cfg, "stats.storePlaytime", memory::setStorePlaytimeMap);
+        try {
+            memory.setItemsStolen(cfg.getInt("stats.itemsStolen", 0));
+            memory.setBustedCount(cfg.getInt("stats.bustedCount", 0));
+            memory.setHideoutValueContributed(cfg.getDouble("stats.hideoutValueContributed", 0.0));
+            loadMap(cfg, "stats.storeItems", memory::setStoreItemsMap);
+            loadMap(cfg, "stats.storeMilestones", memory::setStoreMilestoneMap);
+            loadMap(cfg, "stats.itemStolenCounts", memory::setItemStolenCountsMap);
+            loadMapLong(cfg, "stats.storePlaytime", memory::setStorePlaytimeMap);
 
-        // Prestige detailed stats loading
-        loadMapIntKeyLong(cfg, "stats.prestigePlaytime", memory::setPrestigePlaytimeMap);
-        loadMapLong(cfg, "stats.prestigeStorePlaytime", memory::setPrestigeStorePlaytimeMap);
-        loadMapIntKeyInt(cfg, "stats.prestigeItemsStolen", memory::setPrestigeItemsStolenMap);
-        loadMap(cfg, "stats.prestigeStoreItemsStolen", memory::setPrestigeStoreItemsStolenMap);
+            // Prestige detailed stats loading
+            loadMapIntKeyLong(cfg, "stats.prestigePlaytime", memory::setPrestigePlaytimeMap);
+            loadMapLong(cfg, "stats.prestigeStorePlaytime", memory::setPrestigeStorePlaytimeMap);
+            loadMapIntKeyInt(cfg, "stats.prestigeItemsStolen", memory::setPrestigeItemsStolenMap);
+            loadMap(cfg, "stats.prestigeStoreItemsStolen", memory::setPrestigeStoreItemsStolenMap);
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed loading stats/store section for " + player.getName() + ": " + e.getMessage());
+        }
 
         // Skill tree
-        if (cfg.contains("skilltree.levels")) {
-            ConfigurationSection levelSec = cfg.getConfigurationSection("skilltree.levels");
-            for (String key : levelSec.getKeys(false)) {
-                memory.getAllSkillTreeLevels().put(key, levelSec.getInt(key));
+        try {
+            if (cfg.contains("skilltree.levels")) {
+                ConfigurationSection levelSec = cfg.getConfigurationSection("skilltree.levels");
+                if (levelSec != null) {
+                    for (String key : levelSec.getKeys(false)) {
+                        memory.getAllSkillTreeLevels().put(key, levelSec.getInt(key));
+                    }
+                }
             }
+            loadMapDouble(cfg, "skilltree.perks", memory.getAllPerkValues());
+            memory.setResetSkillTreePoints(cfg.getInt("skilltree.reset", 0));
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed loading skilltree section for " + player.getName() + ": " + e.getMessage());
         }
-        loadMapDouble(cfg, "skilltree.perks", memory.getAllPerkValues());
-        memory.setResetSkillTreePoints(cfg.getInt("skilltree.reset", 0));
 
         // Backpack
-        memory.setBackpack(BackpackManager.toBackpack(cfg.getString("stats.backpack"), cfg.getString("stats.material"),
-                cfg.getString("stats.itemsbackpack"), cfg.getString("stats.colorbackpack")));
-        memory.setBackpackunlucked(cfg.getString("stats.hasbackpack"));
+        try {
+            memory.setBackpack(BackpackManager.toBackpack(cfg.getString("stats.backpack"), cfg.getString("stats.material"),
+                    cfg.getString("stats.itemsbackpack"), cfg.getString("stats.colorbackpack")));
+            memory.setBackpackunlucked(cfg.getString("stats.hasbackpack"));
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed loading backpack section for " + player.getName() + ": " + e.getMessage());
+        }
 
         // Boosters
-        boolean wasPaused = cfg.getBoolean("stats.boosterpaused", false);
-        memory.setBoostersPaused(false);
-        memory.setActiveBooster(cfg.getString("stats.booster"));
-        memory.setBoostersFromString(cfg.getString("stats.hasbooster"));
-        if (wasPaused) {
-            memory.stopBoosters();
+        try {
+            boolean wasPaused = cfg.getBoolean("stats.boosterpaused", false);
+            memory.setBoostersPaused(false);
+            memory.setActiveBooster(cfg.getString("stats.booster"));
+            memory.setBoostersFromString(cfg.getString("stats.hasbooster"));
+            if (wasPaused) {
+                memory.stopBoosters();
+            }
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed loading boosters section for " + player.getName() + " (resetting boosters for player): " + e.getMessage());
         }
 
         // Daily Quests
-        if (cfg.contains("dailyQuests.offered"))
-            memory.getOfferedDailyQuests().addAll(cfg.getStringList("dailyQuests.offered"));
-        if (cfg.contains("dailyQuests.accepted"))
-            memory.getAcceptedDailyQuests().addAll(cfg.getStringList("dailyQuests.accepted"));
-        if (cfg.contains("dailyQuests.lastPick"))
-            memory.setLastDailyQuestPick(cfg.getLong("dailyQuests.lastPick"));
+        try {
+            if (cfg.contains("dailyQuests.offered"))
+                memory.getOfferedDailyQuests().addAll(cfg.getStringList("dailyQuests.offered"));
+            if (cfg.contains("dailyQuests.accepted"))
+                memory.getAcceptedDailyQuests().addAll(cfg.getStringList("dailyQuests.accepted"));
+            if (cfg.contains("dailyQuests.lastPick"))
+                memory.setLastDailyQuestPick(cfg.getLong("dailyQuests.lastPick"));
 
-        memory.setDailyQuestsCompleted(cfg.getInt("dailyQuests.completedCount", 0));
-        memory.setLastResetDay(cfg.getInt("dailyQuests.lastResetDay", -1));
-        memory.setTalkedToQuestNPC(cfg.getBoolean("dailyQuests.talkedToNPC", false));
-        memory.setTalkedToCryptoNPC(cfg.getBoolean("crypto.talkedToNPC", false));
-        memory.setTalkedToCryptoBatteryNPC(cfg.getBoolean("crypto.talkedToBatteryNPC", false));
-        memory.setTalkedToShopSellNPC(cfg.getBoolean("stats.talkedToShopSellNPC", false));
-        memory.setProfilePrivacy(cfg.getString("stats.profilePrivacy", "HIDEOUT"));
+            memory.setDailyQuestsCompleted(cfg.getInt("dailyQuests.completedCount", 0));
+            memory.setLastResetDay(cfg.getInt("dailyQuests.lastResetDay", -1));
+            memory.setTalkedToQuestNPC(cfg.getBoolean("dailyQuests.talkedToNPC", false));
+            memory.setTalkedToCryptoNPC(cfg.getBoolean("crypto.talkedToNPC", false));
+            memory.setTalkedToCryptoBatteryNPC(cfg.getBoolean("crypto.talkedToBatteryNPC", false));
+            memory.setTalkedToShopSellNPC(cfg.getBoolean("stats.talkedToShopSellNPC", false));
+            memory.setProfilePrivacy(cfg.getString("stats.profilePrivacy", "HIDEOUT"));
 
-        // FIXED: Quest progress (Casting fix)
-        if (cfg.contains("dailyQuests.progress")) {
-            ConfigurationSection progressSec = cfg.getConfigurationSection("dailyQuests.progress");
-            for (String questId : progressSec.getKeys(false)) {
-                // We use ConfigurationSection here, NOT FileConfiguration
-                ConfigurationSection section = progressSec.getConfigurationSection(questId);
-                if (section != null) {
-                    QuestProgress pr = new QuestProgress(questId);
-                    pr.setItemsCompleted(section.getInt("itemsStolen", 0));
-                    pr.setHalfRewardGiven(section.getBoolean("halfRewardGiven", false));
-                    pr.setCompleted(section.getBoolean("completed", false));
-                    memory.getQuestProgressMap().put(questId, pr);
+            if (cfg.contains("dailyQuests.progress")) {
+                ConfigurationSection progressSec = cfg.getConfigurationSection("dailyQuests.progress");
+                if (progressSec != null) {
+                    for (String questId : progressSec.getKeys(false)) {
+                        ConfigurationSection section = progressSec.getConfigurationSection(questId);
+                        if (section != null) {
+                            QuestProgress pr = new QuestProgress(questId);
+                            pr.setItemsCompleted(section.getInt("itemsStolen", 0));
+                            pr.setHalfRewardGiven(section.getBoolean("halfRewardGiven", false));
+                            pr.setCompleted(section.getBoolean("completed", false));
+                            memory.getQuestProgressMap().put(questId, pr);
+                        }
+                    }
                 }
             }
-        }
 
-        // Quest active flags
-        if (cfg.contains("dailyQuests.active")) {
-            ConfigurationSection activeSec = cfg.getConfigurationSection("dailyQuests.active");
-            for (String questId : activeSec.getKeys(false)) {
-                memory.getAcceptedDailyQuests().add(questId);
+            if (cfg.contains("dailyQuests.active")) {
+                ConfigurationSection activeSec = cfg.getConfigurationSection("dailyQuests.active");
+                if (activeSec != null) {
+                    for (String questId : activeSec.getKeys(false)) {
+                        memory.getAcceptedDailyQuests().add(questId);
+                    }
+                }
             }
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed loading dailyQuests section for " + player.getName() + ": " + e.getMessage());
         }
 
         // Location
-        if (cfg.contains("stats.location")) {
-            teleportPlayerFromConfig(player, cfg);
+        try {
+            if (cfg.contains("stats.location")) {
+                teleportPlayerFromConfig(player, cfg);
+            }
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed loading location for " + player.getName() + ": " + e.getMessage());
         }
+
+        memory.setLoaded(true);
     }
     private void loadMap(FileConfiguration cfg, String path, java.util.function.Consumer<Map<String, Integer>> consumer) {
         if (!cfg.contains(path)) return;

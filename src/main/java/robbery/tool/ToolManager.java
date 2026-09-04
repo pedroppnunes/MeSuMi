@@ -25,34 +25,24 @@ public class ToolManager {
     public static final Tools TOOL19 = new Tools("Butterfly", 6.2, Material.SADDLE,1_500_000_000L,"§x§0§0§F§F§0§7§lB§x§0§0§F§F§2§0§lu§x§0§0§F§F§3§9§lt§x§0§0§F§F§5§1§lt§x§0§0§F§F§6§A§le§x§0§0§F§F§8§3§lr§x§0§0§F§F§8§3§lf§x§0§0§F§F§8§3§ll§x§0§0§F§F§8§3§ly");
     public static final Tools TOOL20 = new Tools("Karambit", 7.5, Material.CARROT_ON_A_STICK,3_500_000_000L,"§x§F§F§0§0§0§0§lK§x§E§E§8§0§0§0§la§x§D§D§F§F§0§0§lr§x§8§0§F§F§0§0§la§x§2§2§F§F§0§0§lm§x§0§0§F§F§F§5§lb§x§8§0§8§0§E§C§li§x§F§F§0§0§E§3§lt");
 
+    private static final java.util.Map<Material, Tools> TOOLS_BY_MATERIAL = new java.util.EnumMap<>(Material.class);
+
+    static {
+        Tools[] tools = {
+            TOOL1, TOOL2, TOOL3, TOOL4, TOOL5, TOOL6, TOOL7, TOOL8, TOOL9, TOOL10,
+            TOOL11, TOOL12, TOOL13, TOOL14, TOOL15, TOOL16, TOOL17, TOOL18, TOOL19, TOOL20
+        };
+        for (Tools tool : tools) {
+            TOOLS_BY_MATERIAL.put(tool.getMaterial(), tool);
+        }
+    }
+
     public static Tools getToolFromItem(ItemStack item) {
         if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasCustomModelData()) {
             return null;
         }
 
-        return switch (item.getType()) {
-            case Material.MUSIC_DISC_OTHERSIDE -> TOOL1;
-            case Material.MUSIC_DISC_11 -> TOOL2;
-            case Material.MUSIC_DISC_13 -> TOOL3;
-            case Material.MUSIC_DISC_BLOCKS -> TOOL4;
-            case Material.MUSIC_DISC_STAL -> TOOL5;
-            case Material.MUSIC_DISC_CAT -> TOOL6;
-            case Material.MUSIC_DISC_CHIRP -> TOOL7;
-            case Material.MUSIC_DISC_STRAD -> TOOL8;
-            case Material.MUSIC_DISC_FAR -> TOOL9;
-            case Material.MUSIC_DISC_MALL -> TOOL10;
-            case Material.MUSIC_DISC_MELLOHI -> TOOL11;
-            case Material.MUSIC_DISC_WARD -> TOOL12;
-            case Material.MUSIC_DISC_WAIT -> TOOL13;
-            case Material.IRON_HORSE_ARMOR -> TOOL14;
-            case Material.GOLDEN_HORSE_ARMOR -> TOOL15;
-            case Material.DIAMOND_HORSE_ARMOR -> TOOL16;
-            case Material.HEART_OF_THE_SEA -> TOOL17;
-            case Material.FIREWORK_STAR -> TOOL18;
-            case Material.SADDLE -> TOOL19;
-            case Material.CARROT_ON_A_STICK -> TOOL20;
-            default -> null;
-        };
+        return TOOLS_BY_MATERIAL.get(item.getType());
     }
 
     public static Tools getToolsName(String n){
