@@ -82,48 +82,49 @@ public class PlayerSkillTreeGUI implements Listener {
         }
         inv.setItem(46, head);
 
-        // Close Button (Slot 45 on Page 1)
+        // Page 1 Control Buttons
         if (page == 1) {
+            // Close Button (Slot 45)
             ItemStack closeItem = createActionButton(Material.BARRIER, "§cClose", "close", page, targetUuid, targetName);
             inv.setItem(45, closeItem);
-        }
 
-        // Back to General Menu Button (Slot 48)
-        ItemStack backItem = createActionButton(Material.ARROW, "§aBack to General Menu", "back", page, targetUuid, targetName);
-        inv.setItem(48, backItem);
+            // Back to General Menu Button (Slot 48)
+            ItemStack backItem = createActionButton(Material.ARROW, "§aBack to General Menu", "back", page, targetUuid, targetName);
+            inv.setItem(48, backItem);
 
-        // Skill Points Info Button (Slot 49)
-        ItemStack infoItem = new ItemStack(Material.SUNFLOWER);
-        ItemMeta iMeta = infoItem.getItemMeta();
-        if (iMeta != null) {
-            iMeta.displayName(Component.text("Skill Points: ").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text(String.valueOf(targetData.getSkillPoints())).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
-            infoItem.setItemMeta(iMeta);
-        }
-        inv.setItem(49, infoItem);
+            // Skill Points Info Button (Slot 49)
+            ItemStack infoItem = new ItemStack(Material.SUNFLOWER);
+            ItemMeta iMeta = infoItem.getItemMeta();
+            if (iMeta != null) {
+                iMeta.displayName(Component.text("Skill Points: ").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
+                        .append(Component.text(String.valueOf(targetData.getSkillPoints())).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
+                infoItem.setItemMeta(iMeta);
+            }
+            inv.setItem(49, infoItem);
 
-        // Reset Tree Button (Slot 52)
-        int refundPoints = plugin.getSkillTreeConfig() != null ? plugin.getSkillTreeConfig().calculateTotalRefund(targetData) : 0;
-        ItemStack resetItem = new ItemStack(Material.REDSTONE);
-        ItemMeta rMeta = resetItem.getItemMeta();
-        if (rMeta != null) {
-            rMeta.displayName(Component.text("Reset Tree").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
-            rMeta.lore(List.of(
-                    Component.text("SkillTreeReset Points: ").color(NamedTextColor.DARK_RED).decoration(TextDecoration.ITALIC, false)
-                            .append(Component.text(String.valueOf(targetData.getResetSkillTreePoints())).color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)),
-                    Component.text("You need a reset point to reset your Skill Tree.").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
-                    Component.text("This will give you a total of ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                            .append(Component.text(String.valueOf(refundPoints)).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false))
-                            .append(Component.text(" Skill Points.").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)),
-                    Component.text("You reset all your perks and lose 1 SkillTreeReset Point.").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)
-            ));
-            rMeta.getPersistentDataContainer().set(actionKey, PersistentDataType.STRING, "reset");
-            rMeta.getPersistentDataContainer().set(pageKey, PersistentDataType.INTEGER, page);
-            if (targetUuid != null) rMeta.getPersistentDataContainer().set(targetUuidKey, PersistentDataType.STRING, targetUuid.toString());
-            rMeta.getPersistentDataContainer().set(targetNameKey, PersistentDataType.STRING, targetName);
-            resetItem.setItemMeta(rMeta);
+            // Reset Tree Button (Slot 52)
+            int refundPoints = plugin.getSkillTreeConfig() != null ? plugin.getSkillTreeConfig().calculateTotalRefund(targetData) : 0;
+            ItemStack resetItem = new ItemStack(Material.REDSTONE);
+            ItemMeta rMeta = resetItem.getItemMeta();
+            if (rMeta != null) {
+                rMeta.displayName(Component.text("Reset Tree").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+                rMeta.lore(List.of(
+                        Component.text("SkillTreeReset Points: ").color(NamedTextColor.DARK_RED).decoration(TextDecoration.ITALIC, false)
+                                .append(Component.text(String.valueOf(targetData.getResetSkillTreePoints())).color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)),
+                        Component.text("You need a reset point to reset your Skill Tree.").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
+                        Component.text("This will give you a total of ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                                .append(Component.text(String.valueOf(refundPoints)).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false))
+                                .append(Component.text(" Skill Points.").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)),
+                        Component.text("You reset all your perks and lose 1 SkillTreeReset Point.").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)
+                ));
+                rMeta.getPersistentDataContainer().set(actionKey, PersistentDataType.STRING, "reset");
+                rMeta.getPersistentDataContainer().set(pageKey, PersistentDataType.INTEGER, page);
+                if (targetUuid != null) rMeta.getPersistentDataContainer().set(targetUuidKey, PersistentDataType.STRING, targetUuid.toString());
+                rMeta.getPersistentDataContainer().set(targetNameKey, PersistentDataType.STRING, targetName);
+                resetItem.setItemMeta(rMeta);
+            }
+            inv.setItem(52, resetItem);
         }
-        inv.setItem(52, resetItem);
 
         // Page Navigation Buttons
         if (page == 1) {
@@ -213,16 +214,26 @@ public class PlayerSkillTreeGUI implements Listener {
 
     private Map<Integer, String> getPage2Perks() {
         return Map.ofEntries(
-                Map.entry(28, "abilityspinquests2"),
-                Map.entry(29, "stealspeed2"),
-                Map.entry(30, "moneymultiplier2"),
-                Map.entry(31, "xp2"),
-                Map.entry(19, "tripleitemchance1"),
-                Map.entry(21, "instastealchance1"),
-                Map.entry(25, "doubleinventorychance1"),
+                // Bottom rows perks carried over from Page 1 to show tree continuation upwards
+                Map.entry(47, "chancemoneymultiplier1"),
+                Map.entry(48, "chanceskillpoint1"),
+                Map.entry(50, "chancebooster1"),
+                Map.entry(51, "chancestealspeed1"),
+                Map.entry(39, "doubleitemchance1"),
+                Map.entry(40, "avoidbeingcaught"),
+                Map.entry(41, "itemstreakspeed1"),
+
+                // Page 2 specific upper perks
+                Map.entry(31, "abilityspinquests2"),
+                Map.entry(22, "moneymultiplier2"),
+                Map.entry(21, "xp2"),
+                Map.entry(23, "stealspeed2"),
+                Map.entry(13, "instastealchance1"),
+                Map.entry(11, "doubleinventorychance1"),
+                Map.entry(15, "tripleitemchance1"),
+                Map.entry(4, "featherflight"),
                 Map.entry(2, "doublejump"),
-                Map.entry(6, "keyschance"),
-                Map.entry(4, "featherflight")
+                Map.entry(6, "keyschance")
         );
     }
 
