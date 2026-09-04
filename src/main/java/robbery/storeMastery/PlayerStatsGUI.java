@@ -317,19 +317,18 @@ public class PlayerStatsGUI implements Listener {
         }
         inv.setItem(22, catalogButton);
 
-        // 7. View Skill Tree Button (Slot 24 - Row 2 Right, only for self)
-        if (isSelf) {
-            ItemStack skillTreeBook = new ItemStack(Material.BOOK);
-            ItemMeta pMeta = skillTreeBook.getItemMeta();
-            if (pMeta != null) {
-                pMeta.displayName(Component.text("View Skill Tree").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-                pMeta.lore(List.of(
-                        Component.text("Click to open your Skill Tree!").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                ));
-                skillTreeBook.setItemMeta(pMeta);
-            }
-            inv.setItem(24, skillTreeBook);
+        // 7. View Skill Tree Button (Slot 24 - Row 2 Right)
+        ItemStack skillTreeBook = new ItemStack(Material.BOOK);
+        ItemMeta pMeta = skillTreeBook.getItemMeta();
+        if (pMeta != null) {
+            pMeta.displayName(Component.text("View Skill Tree").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+            String loreText = isSelf ? "Click to open your Skill Tree!" : "Click to view " + targetName + "'s Skill Tree!";
+            pMeta.lore(List.of(
+                    Component.text(loreText).color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+            ));
+            skillTreeBook.setItemMeta(pMeta);
         }
+        inv.setItem(24, skillTreeBook);
 
         // 8. Close Button (Slot 31 - Centered Bottom)
         ItemStack closeItem = new ItemStack(Material.BARRIER);
@@ -390,11 +389,14 @@ public class PlayerStatsGUI implements Listener {
 
             String targetName = titleStr.substring(titleStr.indexOf("Stats: ") + 7).trim();
             OfflinePlayer offTarget = Bukkit.getOfflinePlayer(targetName);
-            PlayerData targetPd = (offTarget.isOnline() && offTarget.getPlayer() != null) ? PlayerDataManager.getPlayerData(offTarget.getPlayer()) : null;
 
             if (clicked.getType() == Material.BOOK || clicked.getType() == Material.PAPER) {
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
-                player.performCommand("skilltree");
+                if (targetName.equalsIgnoreCase(player.getName())) {
+                    player.performCommand("skilltree");
+                } else {
+                    player.performCommand("skilltree " + targetName);
+                }
                 return;
             }
 
