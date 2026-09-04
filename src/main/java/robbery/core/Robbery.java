@@ -306,6 +306,13 @@ public class Robbery extends JavaPlugin implements Listener {
         this.skillService = new SkillService(main, skillTreeConfig);
         Objects.requireNonNull(getCommand("skillbuy")).setExecutor(new SkillPerkBuyCommand(skillService,skillTreeConfig));
         Objects.requireNonNull(getCommand("resetskilltree")).setExecutor(new SkillTreeResetCommand(main));
+        robbery.skilltree.SkillTreeCommand skillTreeCmd = new robbery.skilltree.SkillTreeCommand(main);
+        if (getCommand("skilltree") != null) {
+            getCommand("skilltree").setExecutor(skillTreeCmd);
+        }
+        if (getCommand("skilltreeup") != null) {
+            getCommand("skilltreeup").setExecutor(skillTreeCmd);
+        }
         questManager = new QuestManager(main);
         questManager.loadFromConfig("quests.yml");
         questService = new QuestService(questManager,main);

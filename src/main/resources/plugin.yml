@@ -133,6 +133,12 @@ commands:
     description: Reset a player's skilltree and refund spent skillpoints (consumes a reset token)
     usage: /resetskilltree <player>
     permission: robbery.op
+  skilltree:
+    description: Opens the skill tree menu
+    usage: /skilltree [page|player] [player]
+  skilltreeup:
+    description: Opens page 2 of the skill tree menu
+    usage: /skilltreeup [player]
   spawn:
     description: Teleports you to spawn
     usage: /spawn

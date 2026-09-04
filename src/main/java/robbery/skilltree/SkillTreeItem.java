@@ -15,9 +15,11 @@ import robbery.core.Robbery;
 
 public class SkillTreeItem implements Listener {
 
+    private final Robbery plugin;
     private final NamespacedKey key;
 
     public SkillTreeItem(Robbery plugin){
+        this.plugin = plugin;
         this.key = new NamespacedKey(plugin, "skilltree_item");
     }
 
@@ -44,9 +46,10 @@ public class SkillTreeItem implements Listener {
         if (!data.has(key, PersistentDataType.BYTE)) return;
 
         Player player = event.getPlayer();
-        String menuName = "skilltree_menu1";
-
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "dm open " + menuName + " " + player.getName());
+        robbery.player.PlayerData pd = robbery.player.PlayerDataManager.getPlayerData(player);
+        if (pd != null) {
+            plugin.getPlayerSkillTreeGUI().openGUI(player, pd, player.getName(), player.getUniqueId(), 1);
+        }
         event.setCancelled(true);
     }
 }

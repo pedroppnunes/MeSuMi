@@ -29,6 +29,7 @@ public class SkillService {
         int current = pd.getSkillTreeLevel(tierId);
         if (current >= tier.maxLevel()) return false;
         if (pd.getLevel() < tier.requiredLevel()) return false;
+        if (!pd.canBuyPerk(tier)) return false;
         int cost = tier.costForNext(current);
         return pd.getSkillPoints() >= cost;
     }
@@ -46,6 +47,7 @@ public class SkillService {
             if (cur >= tier.maxLevel()) return;
 
             if (pd.getLevel() < tier.requiredLevel()) return;
+            if (!pd.canBuyPerk(tier)) return;
 
             int cost = tier.costForNext(cur);
             if (pd.getSkillPoints() < cost) return;
