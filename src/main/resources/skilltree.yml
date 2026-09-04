@@ -36,9 +36,9 @@ perks:
     required_level: 5
     max_level: 5
     costs: [ 1, 2, 3, 4, 5 ]
-    base_value: 1
-    value_increment: 1
-    description: "Increases the outpost buffs by +1%. (Stacks with island members)"
+    base_value: 6
+    value_increment: 6
+    description: "Increases your Outpost buffs by +6% per tier (up to +30%). Does not stack with hideout members."
     requiredPerks:
       - xp1
 
