@@ -799,10 +799,17 @@ public class Robbery extends JavaPlugin implements Listener {
             return false;
         }
 
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp != null && rsp.getProvider() != null) {
+            econ = rsp.getProvider();
+            getLogger().info("Successfully hooked into Vault Economy provider: " + econ.getName());
+            return true;
+        }
+
         robbery.economy.MesumiVaultEconomy vaultEco = new robbery.economy.MesumiVaultEconomy(this);
-        getServer().getServicesManager().register(Economy.class, vaultEco, this, org.bukkit.plugin.ServicePriority.Highest);
+        getServer().getServicesManager().register(Economy.class, vaultEco, this, org.bukkit.plugin.ServicePriority.Normal);
         econ = vaultEco;
-        getLogger().info("Successfully registered MesumiVaultEconomy with Vault as primary economy provider!");
+        getLogger().info("Registered MesumiVaultEconomy with Vault as fallback provider.");
         return true;
     }
 
