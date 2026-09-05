@@ -147,11 +147,10 @@ public class Sell implements CommandExecutor {
                     java.math.BigDecimal valBD = java.math.BigDecimal.valueOf(hideoutValue);
                     try {
                         hideout.setBonusWorth(hideout.getBonusWorth().add(valBD));
-                    } catch (Throwable t) {
-                        try {
-                            hideout.setBonusLevel(hideout.getBonusLevel().add(valBD));
-                        } catch (Throwable ignored) {}
-                    }
+                    } catch (Throwable ignored) {}
+                    try {
+                        hideout.setBonusLevel(hideout.getBonusLevel().add(valBD));
+                    } catch (Throwable ignored) {}
                 }
             }
         } catch (Throwable ignored) {}

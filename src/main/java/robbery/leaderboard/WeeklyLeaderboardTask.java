@@ -69,7 +69,13 @@ public class WeeklyLeaderboardTask {
      */
     public void generateAndSendLeaderboard() {
         List<Island> topIslands = SuperiorSkyblockAPI.getGrid().getIslands().stream()
-                .sorted(Comparator.comparing(Island::getIslandLevel).reversed())
+                .sorted((i1, i2) -> {
+                    BigDecimal w1 = i1.getWorth() != null && i1.getWorth().compareTo(BigDecimal.ZERO) > 0 ? i1.getWorth() : i1.getBonusWorth();
+                    if (w1 == null) w1 = i1.getIslandLevel();
+                    BigDecimal w2 = i2.getWorth() != null && i2.getWorth().compareTo(BigDecimal.ZERO) > 0 ? i2.getWorth() : i2.getBonusWorth();
+                    if (w2 == null) w2 = i2.getIslandLevel();
+                    return w2.compareTo(w1);
+                })
                 .limit(5)
                 .toList();
 
@@ -77,8 +83,9 @@ public class WeeklyLeaderboardTask {
         int pos = 1;
         for (Island island : topIslands) {
             String name = island.getName() != null ? island.getName() : "Unknown";
-            BigDecimal level = island.getIslandLevel();
-            lines.add(pos + ". " + name + " - Level " + level.toPlainString());
+            BigDecimal worth = island.getWorth() != null && island.getWorth().compareTo(BigDecimal.ZERO) > 0 ? island.getWorth() : island.getBonusWorth();
+            if (worth == null) worth = island.getIslandLevel();
+            lines.add(pos + ". " + name + " - Worth " + robbery.number.NumberFormatter.formatDoubleNumber(worth.doubleValue()));
             pos++;
         }
 

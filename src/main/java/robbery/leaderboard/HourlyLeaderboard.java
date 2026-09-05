@@ -83,12 +83,19 @@ public class HourlyLeaderboard {
     private List<String> buildTop5Lines() {
         try {
             return SuperiorSkyblockAPI.getGrid().getIslands().stream()
-                    .sorted(Comparator.comparing(Island::getIslandLevel).reversed())
+                    .sorted((i1, i2) -> {
+                        BigDecimal w1 = i1.getWorth() != null && i1.getWorth().compareTo(BigDecimal.ZERO) > 0 ? i1.getWorth() : i1.getBonusWorth();
+                        if (w1 == null) w1 = i1.getIslandLevel();
+                        BigDecimal w2 = i2.getWorth() != null && i2.getWorth().compareTo(BigDecimal.ZERO) > 0 ? i2.getWorth() : i2.getBonusWorth();
+                        if (w2 == null) w2 = i2.getIslandLevel();
+                        return w2.compareTo(w1);
+                    })
                     .limit(5)
                     .map(island -> {
                         String name = island.getName() == null ? "Unknown" : island.getName();
-                        BigDecimal level = island.getIslandLevel();
-                        return name + " - Level " + level.toPlainString();
+                        BigDecimal worth = island.getWorth() != null && island.getWorth().compareTo(BigDecimal.ZERO) > 0 ? island.getWorth() : island.getBonusWorth();
+                        if (worth == null) worth = island.getIslandLevel();
+                        return name + " - Worth " + robbery.number.NumberFormatter.formatDoubleNumber(worth.doubleValue());
                     })
                     .collect(Collectors.toList());
         } catch (Exception e) {
