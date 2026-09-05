@@ -97,7 +97,6 @@ public class Robbery extends JavaPlugin implements Listener {
     private final List<Items> items = new ArrayList<>();
     private static Robbery main;
     public static Robbery getMain() { return main; }
-    public static Robbery getInstance() { return main; }
     private boolean isBackingUp = false;
 
     private Rcrate rcrate;
