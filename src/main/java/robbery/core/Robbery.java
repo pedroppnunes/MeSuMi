@@ -96,6 +96,8 @@ public class Robbery extends JavaPlugin implements Listener {
     private static net.milkbowl.vault.permission.Permission perms = null;
     private final List<Items> items = new ArrayList<>();
     private static Robbery main;
+    public static Robbery getMain() { return main; }
+    public static Robbery getInstance() { return main; }
     private boolean isBackingUp = false;
 
     private Rcrate rcrate;
@@ -155,6 +157,7 @@ public class Robbery extends JavaPlugin implements Listener {
     public void onEnable() {
         getLogger().info("Starting");
         main = this;
+        Messages.init(main);
         if (!setupEconomy()) {
             getLogger().severe("Disabled: Vault or an Economy provider (e.g. Essentials / MesumiEconomy) was not found! Please ensure Vault and an Economy plugin are loaded.");
             getServer().getPluginManager().disablePlugin(this);
@@ -199,7 +202,6 @@ public class Robbery extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents(new VoteListener(main), main);
         BlockCraftListener blockCraft = new BlockCraftListener();
-        Messages.init(main);
         robbery.messages.ActionBarManager.init(main);
         addItemstoMap();
         new AutoReloadTask(this).runTaskTimerAsynchronously(this, 0L, 20L);

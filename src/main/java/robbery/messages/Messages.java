@@ -62,6 +62,12 @@ public class Messages {
      * @return The message string.
      */
     public static String get(String path) {
+        if (lang == null && Robbery.getMain() != null) {
+            init(Robbery.getMain());
+        }
+        if (lang == null) {
+            return ChatColor.translateAlternateColorCodes('&', "&cMessage not found: " + path);
+        }
         return ChatColor.translateAlternateColorCodes('&', lang.getString(path, "&cMessage not found: " + path));
     }
 

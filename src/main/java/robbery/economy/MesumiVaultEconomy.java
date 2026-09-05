@@ -108,12 +108,24 @@ public class MesumiVaultEconomy extends AbstractEconomy {
     public double getBalance(OfflinePlayer player) {
         if (player == null || player.getUniqueId() == null) return 0.0;
         loadMoneyConfig();
-        String key = player.getUniqueId().toString();
-        if (moneyConfig.contains(key)) {
-            return moneyConfig.getDouble(key);
-        }
-        if (player.getName() != null && moneyConfig.contains(player.getName())) {
-            return moneyConfig.getDouble(player.getName());
+        String uuid = player.getUniqueId().toString();
+        String name = player.getName();
+
+        String[] possibleKeys = new String[] {
+            uuid,
+            "accounts." + uuid,
+            "data." + uuid,
+            "players." + uuid,
+            name != null ? name : "",
+            name != null ? "accounts." + name : "",
+            name != null ? "data." + name : "",
+            name != null ? "players." + name : ""
+        };
+
+        for (String k : possibleKeys) {
+            if (!k.isEmpty() && moneyConfig.contains(k)) {
+                return moneyConfig.getDouble(k);
+            }
         }
         return 500.0; // Default starting balance
     }
@@ -204,11 +216,32 @@ public class MesumiVaultEconomy extends AbstractEconomy {
     }
 
     private synchronized void setBalance(OfflinePlayer player, double newBal) {
+        if (player == null || player.getUniqueId() == null) return;
         loadMoneyConfig();
-        if (player != null && player.getUniqueId() != null) {
-            moneyConfig.set(player.getUniqueId().toString(), newBal);
-            saveMoneyConfig();
+        String uuid = player.getUniqueId().toString();
+        String name = player.getName();
+
+        String targetKey = uuid;
+        String[] checkKeys = new String[] {
+            uuid,
+            "accounts." + uuid,
+            "data." + uuid,
+            "players." + uuid,
+            name != null ? name : "",
+            name != null ? "accounts." + name : "",
+            name != null ? "data." + name : "",
+            name != null ? "players." + name : ""
+        };
+
+        for (String k : checkKeys) {
+            if (!k.isEmpty() && moneyConfig.contains(k)) {
+                targetKey = k;
+                break;
+            }
         }
+
+        moneyConfig.set(targetKey, newBal);
+        saveMoneyConfig();
     }
 
     @Override
