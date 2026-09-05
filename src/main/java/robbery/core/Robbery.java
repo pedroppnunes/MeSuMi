@@ -316,6 +316,7 @@ public class Robbery extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("loadbackup")).setExecutor(new LoadBackup(main));
         Objects.requireNonNull(getCommand("migrate")).setExecutor(new MigrateBackup(main));
         Objects.requireNonNull(getCommand("migrate-to-sql")).setExecutor(new robbery.database.MigrateToSQLCommand(main));
+        Objects.requireNonNull(getCommand("migratehideoutworth")).setExecutor(new MigrateHideoutWorthCommand(main));
         Objects.requireNonNull(getCommand("stopbooster")).setExecutor(new StopBoosterCommand());
         Objects.requireNonNull(getCommand("adminxp")).setExecutor(new AdminXPCommand(main));
         skillTreeConfig = new SkillTreeConfig(main);

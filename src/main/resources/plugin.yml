@@ -75,9 +75,10 @@ commands:
     description: Migrate player data from YAML to SQL database
     usage: /migrate-to-sql
     permission: robbery.op
-  migrate-economy:
-    description: Migrate player balances from Essentials userdata files to MesumiEconomy via Vault
-    usage: /migrate-economy
+  migratehideoutworth:
+    description: Migrate saved player contributed hideout values directly to SuperiorSkyblock2 island worth and level
+    usage: /migratehideoutworth
+    aliases: [migratehideout, migrateworth]
     permission: robbery.op
   mute:
     usage: /mute <player> <time> [reason]
