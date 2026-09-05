@@ -106,6 +106,7 @@ public class Robbery extends JavaPlugin implements Listener {
     private HidePlayers hidePlayers;
     private VotePartyManager votePartyManager;
     private ChatStyleManager chatStyleManager;
+    private DisqualificationManager disqualificationManager;
     private WeeklyLeaderboardTask weeklyLeaderboardTask;
     private HourlyLeaderboard hourlyLeaderboard;
     private PlayerEventListener playerEventListener;
@@ -195,6 +196,7 @@ public class Robbery extends JavaPlugin implements Listener {
         this.muteManager = new MuteManager(main);
         this.votePartyManager = new VotePartyManager(main);
         this.chatStyleManager = new ChatStyleManager(getDataFolder());
+        this.disqualificationManager = new DisqualificationManager(this);
         this.playerEventListener = new PlayerEventListener(main);
         this.xpManager = new XPManager(main);
         this.storeMasteryManager = new StoreMasteryManager(main);
@@ -317,6 +319,13 @@ public class Robbery extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("migrate")).setExecutor(new MigrateBackup(main));
         Objects.requireNonNull(getCommand("migrate-to-sql")).setExecutor(new robbery.database.MigrateToSQLCommand(main));
         Objects.requireNonNull(getCommand("migratehideoutworth")).setExecutor(new MigrateHideoutWorthCommand(main));
+        HideoutAdminCommand hoAdminCmd = new HideoutAdminCommand(main);
+        if (getCommand("resethideoutworth") != null) getCommand("resethideoutworth").setExecutor(hoAdminCmd);
+        if (getCommand("dqplayer") != null) getCommand("dqplayer").setExecutor(hoAdminCmd);
+        if (getCommand("undqplayer") != null) getCommand("undqplayer").setExecutor(hoAdminCmd);
+        if (getCommand("dqhideout") != null) getCommand("dqhideout").setExecutor(hoAdminCmd);
+        if (getCommand("undqhideout") != null) getCommand("undqhideout").setExecutor(hoAdminCmd);
+        if (getCommand("dqlist") != null) getCommand("dqlist").setExecutor(hoAdminCmd);
         Objects.requireNonNull(getCommand("stopbooster")).setExecutor(new StopBoosterCommand());
         Objects.requireNonNull(getCommand("adminxp")).setExecutor(new AdminXPCommand(main));
         skillTreeConfig = new SkillTreeConfig(main);
@@ -984,6 +993,10 @@ public class Robbery extends JavaPlugin implements Listener {
 
     public ChatStyleManager getChatStyleManager() {
         return chatStyleManager;
+    }
+
+    public DisqualificationManager getDisqualificationManager() {
+        return disqualificationManager;
     }
 
     public WeeklyLeaderboardTask getWeeklyLeaderboardTask() {

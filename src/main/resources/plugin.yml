@@ -194,6 +194,36 @@ commands:
   stats:
     description: View detailed GUI player robbery statistics
     usage: /stats [player]
+  resethideoutworth:
+    description: Reset weekly hideout worth for all hideouts, a specific hideout, or player
+    usage: /resethideoutworth <all|island_name|player_name>
+    aliases: [resethideout, resetworth]
+    permission: robbery.op
+  dqplayer:
+    description: Disqualify a player from contributing hideout value
+    usage: /dqplayer <player_name>
+    aliases: [disqualifyplayer]
+    permission: robbery.op
+  undqplayer:
+    description: Remove disqualification from a player
+    usage: /undqplayer <player_name>
+    aliases: [undisqualifyplayer]
+    permission: robbery.op
+  dqhideout:
+    description: Disqualify a hideout from receiving hideout value
+    usage: /dqhideout <island_name|player_name>
+    aliases: [disqualifyhideout]
+    permission: robbery.op
+  undqhideout:
+    description: Remove disqualification from a hideout
+    usage: /undqhideout <island_name|player_name>
+    aliases: [undisqualifyhideout]
+    permission: robbery.op
+  dqlist:
+    description: List all disqualified players and hideouts
+    usage: /dqlist
+    aliases: [disqualified]
+    permission: robbery.op
 
 permissions:
   robbery.op:

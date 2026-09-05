@@ -137,25 +137,33 @@ public class Sell implements CommandExecutor {
         double hideoutValue = (double) finalMoneyEarned / 1000.0;
 
         boolean hasHideout = false;
+        boolean isDisqualified = false;
         // Deposit Hideout Value to SuperiorSkyblock2 Hideout
         try {
             if (Bukkit.getPluginManager().isPluginEnabled("SuperiorSkyblock2")) {
                 com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer sp = com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI.getPlayer(player);
                 if (sp != null && sp.getIsland() != null) {
-                    hasHideout = true;
                     com.bgsoftware.superiorskyblock.api.island.Island hideout = sp.getIsland();
-                    java.math.BigDecimal valBD = java.math.BigDecimal.valueOf(hideoutValue);
-                    try {
-                        hideout.setBonusWorth(hideout.getBonusWorth().add(valBD));
-                    } catch (Throwable ignored) {}
-                    try {
-                        hideout.setBonusLevel(hideout.getBonusLevel().add(valBD));
-                    } catch (Throwable ignored) {}
+                    if (main.getDisqualificationManager() != null && 
+                       (main.getDisqualificationManager().isPlayerDisqualified(player) || main.getDisqualificationManager().isIslandDisqualified(hideout))) {
+                        isDisqualified = true;
+                    } else {
+                        hasHideout = true;
+                        java.math.BigDecimal valBD = java.math.BigDecimal.valueOf(hideoutValue);
+                        try {
+                            hideout.setBonusWorth(hideout.getBonusWorth().add(valBD));
+                        } catch (Throwable ignored) {}
+                        try {
+                            hideout.setBonusLevel(hideout.getBonusLevel().add(valBD));
+                        } catch (Throwable ignored) {}
+                    }
                 }
             }
         } catch (Throwable ignored) {}
 
-        if (hasHideout) {
+        if (isDisqualified) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c[Robbery] Hideout contribution blocked: Account or Hideout is disqualified from top competition."));
+        } else if (hasHideout) {
             // Track player's personal contribution
             p.addHideoutValueContributed(hideoutValue);
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&a+&e" + NumberFormatter.formatDoubleNumber(hideoutValue) + " &aHideout Value contributed to your Hideout!"));

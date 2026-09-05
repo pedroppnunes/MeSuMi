@@ -47,15 +47,20 @@ public class WeeklyLeaderboardTask {
         startScheduler();
     }
 
+    private int lastResetMinute = -1;
+
     /**
      * Starts an asynchronous repeating scheduler that checks every minute
-     * if it's time to generate the weekly leaderboard.
+     * if it's time to generate the weekly leaderboard or reset hideout values.
      */
     private void startScheduler() {
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             LocalDateTime now = LocalDateTime.now();
             if (now.getDayOfWeek() == DayOfWeek.FRIDAY && now.getHour() == 22 && now.getMinute() == 0) {
                 generateAndSendLeaderboard();
+            } else if (now.getDayOfWeek() == DayOfWeek.FRIDAY && now.getHour() == 22 && now.getMinute() == 1 && now.getMinute() != lastResetMinute) {
+                lastResetMinute = now.getMinute();
+                Bukkit.getScheduler().runTask(plugin, this::resetAllHideoutValues);
             }
         }, 20L, 1200L);
     }
@@ -154,5 +159,29 @@ public class WeeklyLeaderboardTask {
                 });
 
         manager.exec();
+    }
+
+    /**
+     * Resets weekly hideout worth and level for all SuperiorSkyblock hideouts.
+     * Player personal contribution totals remain intact.
+     *
+     * @return Number of hideouts reset.
+     */
+    public int resetAllHideoutValues() {
+        if (!Bukkit.getPluginManager().isPluginEnabled("SuperiorSkyblock2")) {
+            return 0;
+        }
+        int count = 0;
+        for (Island island : SuperiorSkyblockAPI.getGrid().getIslands()) {
+            try {
+                island.setBonusWorth(BigDecimal.ZERO);
+                island.setBonusLevel(BigDecimal.ZERO);
+                count++;
+            } catch (Exception e) {
+                plugin.getLogger().warning("Failed to reset hideout worth for island " + island.getUniqueId() + ": " + e.getMessage());
+            }
+        }
+        plugin.getLogger().info("[Robbery] Reset weekly hideout worth & level for " + count + " hideout(s).");
+        return count;
     }
 }
