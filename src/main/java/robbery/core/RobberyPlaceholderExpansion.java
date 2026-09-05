@@ -158,6 +158,18 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
         XPManager xp = main.getXpManager();
         return switch (id) {
             case "playername", "name", "player_name" -> (p != null ? p.getName() : (pd != null && pd.getPlayer() != null ? pd.getPlayer().getName() : ""));
+            case "balance", "money" -> {
+                OfflinePlayer off = (p != null ? p : (pd != null ? pd.getPlayer() : null));
+                yield (Robbery.getEconomy() != null && off != null) ? String.valueOf(Robbery.getEconomy().getBalance(off)) : "0";
+            }
+            case "balance_formatted", "money_formatted", "balance_short", "money_short" -> {
+                OfflinePlayer off = (p != null ? p : (pd != null ? pd.getPlayer() : null));
+                yield (Robbery.getEconomy() != null && off != null) ? NumberFormatter.formatDoubleNumber(Robbery.getEconomy().getBalance(off)) : "0";
+            }
+            case "balance_commas", "money_commas" -> {
+                OfflinePlayer off = (p != null ? p : (pd != null ? pd.getPlayer() : null));
+                yield (Robbery.getEconomy() != null && off != null) ? String.format("%,.2f", Robbery.getEconomy().getBalance(off)) : "0.00";
+            }
             case "backpack_name" -> pd.getBackpack().getColorname();
             case "backpack_capacity" -> String.valueOf(pd.getBackpack().getcapacity());
             case "backpack_size" -> String.valueOf(pd.getBackpack().getSize());

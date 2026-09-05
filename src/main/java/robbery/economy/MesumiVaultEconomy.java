@@ -65,7 +65,10 @@ public class MesumiVaultEconomy extends AbstractEconomy {
 
     @Override
     public String format(double amount) {
-        return String.format("$%.2f", amount);
+        if (amount < 1000) {
+            return String.format("$%.2f", amount);
+        }
+        return "$" + robbery.number.NumberFormatter.formatDoubleNumber(amount);
     }
 
     @Override
