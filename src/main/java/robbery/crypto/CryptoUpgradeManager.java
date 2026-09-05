@@ -1,6 +1,9 @@
 package robbery.crypto;
 
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import robbery.core.Robbery;
 import robbery.messages.Messages;
@@ -8,96 +11,148 @@ import robbery.number.NumberFormatter;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class CryptoUpgradeManager {
 
-    public static final int MAX_LEVEL = 39;
+    private static int maxLevel = 50;
+    private static final Map<Integer, Long> upgradeCosts = new HashMap<>();
+    private static final TreeMap<Integer, Integer> tierPrestige = new TreeMap<>();
+    private static final Map<Integer, Long> storeRates = new HashMap<>();
+
+    public static void loadConfig() {
+        File file = new File(Robbery.getInstance().getDataFolder(), "crypto_config.yml");
+        if (!file.exists()) {
+            Robbery.getInstance().saveResource("crypto_config.yml", false);
+        }
+        FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+
+        if (cfg.contains("settings.max_level")) {
+            maxLevel = cfg.getInt("settings.max_level", 50);
+        } else {
+            maxLevel = cfg.getInt("max_level", 50);
+        }
+
+        ConfigurationSection storeSec = cfg.getConfigurationSection("store_rates");
+        if (storeSec != null) {
+            storeRates.clear();
+            for (String key : storeSec.getKeys(false)) {
+                try {
+                    int tier = Integer.parseInt(key);
+                    long val = storeSec.getLong(key);
+                    storeRates.put(tier, val);
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+
+        ConfigurationSection presSec = cfg.getConfigurationSection("prestige_requirements");
+        if (presSec != null) {
+            tierPrestige.clear();
+            for (String key : presSec.getKeys(false)) {
+                try {
+                    int lvl = Integer.parseInt(key);
+                    int reqP = presSec.getInt(key);
+                    tierPrestige.put(lvl, reqP);
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+
+        ConfigurationSection secs = cfg.getConfigurationSection("costs");
+        if (secs != null) {
+            upgradeCosts.clear();
+            for (String key : secs.getKeys(false)) {
+                try {
+                    int lvl = Integer.parseInt(key);
+                    long val = secs.getLong(key);
+                    upgradeCosts.put(lvl, val);
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+    }
+
+    public static long getStoreBaseRate(int storeTier) {
+        int clampedTier = Math.min(12, Math.max(1, storeTier));
+        Long val = storeRates.get(clampedTier);
+        if (val != null) {
+            return val;
+        }
+        return switch (clampedTier) {
+            case 1 -> 2L;
+            case 2 -> 4L;
+            case 3 -> 15L;
+            case 4 -> 80L;
+            case 5 -> 8L;
+            case 6 -> 55L;
+            case 7 -> 220L;
+            case 8 -> 820L;
+            case 9 -> 1350L;
+            case 10 -> 2200L;
+            case 11 -> 4650L;
+            case 12 -> 6800L;
+            default -> 2L;
+        };
+    }
+
+    public static void reloadConfig() {
+        loadConfig();
+    }
 
     public static int getMaxLevel() {
-        return MAX_LEVEL;
+        return maxLevel;
     }
 
     public static int getRequiredPrestige(int targetLevel) {
-        if (targetLevel >= 30) return 3;
-        if (targetLevel >= 20) return 2;
-        if (targetLevel >= 10) return 1;
-        return 0;
+        if (tierPrestige.isEmpty()) {
+            if (targetLevel >= 50) return 5;
+            if (targetLevel >= 40) return 4;
+            if (targetLevel >= 30) return 3;
+            if (targetLevel >= 20) return 2;
+            if (targetLevel >= 10) return 1;
+            return 0;
+        }
+
+        Map.Entry<Integer, Integer> entry = tierPrestige.floorEntry(targetLevel);
+        if (entry == null) {
+            return 0;
+        }
+        return entry.getValue();
     }
 
     public static long getUpgradeCost(int currentLevel) {
-        if (currentLevel >= MAX_LEVEL) {
+        if (currentLevel >= getMaxLevel()) {
             return -1L; // Max level reached
         }
 
         int targetLevel = currentLevel + 1;
+        // Try config-based cost first
+        Long configCost = upgradeCosts.get(targetLevel);
+        if (configCost != null) {
+            return configCost;
+        }
 
-        // Big milestone requirements
-        if (targetLevel == 10) return 125_000_000L;       // 125M (was 250M)
-        if (targetLevel == 20) return 500_000_000L;       // 500M (was 750M)
-        if (targetLevel == 30) return 1_000_000_000L;     // 1B (was 1.5B)
+        // Fallback calculation if targetLevel key isn't explicitly defined in costs section
+        if (targetLevel == 10) return 125_000_000L;
+        if (targetLevel == 20) return 500_000_000L;
+        if (targetLevel == 30) return 1_000_000_000L;
+        if (targetLevel == 40) return 2_000_000_000L;
+        if (targetLevel == 50) return 5_000_000_000L;
 
-        // Tier 0 (0 to 9)
         if (targetLevel < 10) {
-            return switch (targetLevel) {
-                case 1 -> 250_000L;
-                case 2 -> 500_000L;
-                case 3 -> 750_000L;
-                case 4 -> 1_000_000L;
-                case 5 -> 1_500_000L;
-                case 6 -> 2_000_000L;
-                case 7 -> 3_000_000L;
-                case 8 -> 4_000_000L;
-                case 9 -> 5_000_000L;
-                default -> 250_000L;
-            };
+            return targetLevel * 250_000L;
         }
-
-        // Tier 1 (11 to 19)
         if (targetLevel < 20) {
-            return switch (targetLevel) {
-                case 11 -> 10_000_000L;
-                case 12 -> 12_000_000L;
-                case 13 -> 15_000_000L;
-                case 14 -> 18_000_000L;
-                case 15 -> 20_000_000L;
-                case 16 -> 25_000_000L;
-                case 17 -> 30_000_000L;
-                case 18 -> 35_000_000L;
-                case 19 -> 45_000_000L;
-                default -> 10_000_000L;
-            };
+            return (targetLevel - 10) * 5_000_000L + 10_000_000L;
         }
-
-        // Tier 2 (21 to 29)
         if (targetLevel < 30) {
-            return switch (targetLevel) {
-                case 21 -> 20_000_000L;
-                case 22 -> 25_000_000L;
-                case 23 -> 30_000_000L;
-                case 24 -> 35_000_000L;
-                case 25 -> 40_000_000L;
-                case 26 -> 50_000_000L;
-                case 27 -> 60_000_000L;
-                case 28 -> 70_000_000L;
-                case 29 -> 80_000_000L;
-                default -> 20_000_000L;
-            };
+            return (targetLevel - 20) * 10_000_000L + 20_000_000L;
         }
-
-        // Tier 3 (31 to 39)
-        return switch (targetLevel) {
-            case 31 -> 40_000_000L;
-            case 32 -> 50_000_000L;
-            case 33 -> 60_000_000L;
-            case 34 -> 70_000_000L;
-            case 35 -> 80_000_000L;
-            case 36 -> 100_000_000L;
-            case 37 -> 110_000_000L;
-            case 38 -> 120_000_000L;
-            case 39 -> 130_000_000L;
-            default -> 40_000_000L;
-        };
+        if (targetLevel < 40) {
+            return (targetLevel - 30) * 15_000_000L + 40_000_000L;
+        }
+        return (targetLevel - 40) * 30_000_000L + 150_000_000L;
     }
 
     public static int getTrackLevel(CryptoMachine machine, String track) {
@@ -111,7 +166,7 @@ public class CryptoUpgradeManager {
 
     public static void setTrackLevel(CryptoMachine machine, String track, int level) {
         if (machine == null) return;
-        int clamped = Math.max(0, Math.min(MAX_LEVEL, level));
+        int clamped = Math.max(0, Math.min(getMaxLevel(), level));
         String t = track.toLowerCase();
         if (t.contains("speed")) machine.setSpeedLevel(clamped);
         else if (t.contains("battery") || t.contains("fuel") || t.contains("time") || t.contains("duration")) machine.setFuelTimeLevel(clamped);
@@ -133,7 +188,7 @@ public class CryptoUpgradeManager {
         if (pd == null) return false;
 
         int currentLevel = getTrackLevel(machine, track);
-        if (currentLevel >= MAX_LEVEL) {
+        if (currentLevel >= getMaxLevel()) {
             Messages.send(player, "crypto.upgrade-max-level");
             return false;
         }

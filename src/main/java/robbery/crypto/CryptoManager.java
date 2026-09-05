@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import robbery.core.Robbery;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
+import robbery.messages.Messages;
 
 import java.util.Map;
 import java.util.UUID;
@@ -50,12 +51,13 @@ public class CryptoManager {
                     
                     int storeTier = pd.getHighestOwnedStoreTier();
                     long baseRate = getBaseRateForStore(storeTier);
-                    
+                    double prestigeMult = 1.0 + (pd.getPrestige() * 0.10);
+
                     double qualityMult = machine.getQualityMultiplier();
                     double speedMult = machine.getSpeedMultiplier();
                     double rewardMult = machine.getRewardMultiplier();
-                    
-                    long moneyGenerated = (long) (activeSeconds * baseRate * qualityMult * speedMult * rewardMult);
+
+                    long moneyGenerated = (long) (activeSeconds * baseRate * prestigeMult * qualityMult * speedMult * rewardMult);
                     
                     machine.addUnclaimedMoney(moneyGenerated);
                     machine.setFuelTicks(machine.getFuelTicks() - activeSeconds);
@@ -144,28 +146,37 @@ public class CryptoManager {
             for (Map.Entry<UUID, CryptoMachine> entry : activeMachines.entrySet()) {
                 CryptoMachine machine = entry.getValue();
 
-                if (machine.getFuelTicks() > 0) {
+                if (machine.getFuelTicks() > 0 && machine.isPlaced()) {
                     Player p = Bukkit.getPlayer(entry.getKey());
                     int storeTier = 1;
+                    int prestige = 0;
                     if (p != null && p.isOnline()) {
                         PlayerData pd = PlayerDataManager.getPlayerData(p);
-                        if (pd != null) storeTier = pd.getHighestOwnedStoreTier();
+                        if (pd != null) {
+                            storeTier = pd.getHighestOwnedStoreTier();
+                            prestige = pd.getPrestige();
+                        }
                     }
 
                     long baseRate = getBaseRateForStore(storeTier);
+                    double prestigeMult = 1.0 + (prestige * 0.10);
                     double qualityMult = machine.getQualityMultiplier();
                     double speedMult = machine.getSpeedMultiplier();
                     double rewardMult = machine.getRewardMultiplier();
                     double onlineBuff = (p != null && p.isOnline()) ? 1.20 : 1.0;
 
-                    long moneyGenerated = (long) Math.max(1, baseRate * qualityMult * speedMult * rewardMult * onlineBuff);
+                    long moneyGenerated = (long) Math.max(1, baseRate * prestigeMult * qualityMult * speedMult * rewardMult * onlineBuff);
 
                     machine.addUnclaimedMoney(moneyGenerated);
                     machine.setFuelTicks(machine.getFuelTicks() - 1);
                     machine.setLastUpdated(now);
 
-                    if (machine.isPlaced()) {
-                        machine.updateHologram();
+                    // Update hologram if still placed
+                    machine.updateHologram();
+
+                    // Notify player if battery just depleted
+                    if (machine.getFuelTicks() <= 0 && p != null && p.isOnline()) {
+                        Messages.send(p, "crypto.battery-stopped");
                     }
                 } else if (machine.isPlaced()) {
                     machine.setLastUpdated(now);
@@ -179,21 +190,6 @@ public class CryptoManager {
     }
     
     public long getBaseRateForStore(int storeTier) {
-        switch (storeTier) {
-            case 1: return 1;           // Store 1 (Supermarket)
-            case 2: return 1;           // Store 2 (The Griffin's)
-            case 3: return 1;           // Store 3 (Gym)
-            case 4: return 1;           // Store 4 (Arcade)      
-            case 5: return 8;           // Store 5 (School)      
-            case 6: return 55;          // Store 6 (Casino)      
-            case 7: return 220;         // Store 7 (Oceanarium)  
-            case 8: return 820;         // Store 8 (Steakhouse)  
-            case 9: return 1350;        // Store 9 (Diamond)     
-            case 10: return 2200;       // Store 10 (Balenziaga) 
-            case 11: return 4650;       // Store 11 (Samzung)    
-            case 12: return 5500;       // Store 12 (The Bank)   
-            case 13: return 7300;       // Store 13 (The Vault)  
-            default: return 1;
-        }
+        return CryptoUpgradeManager.getStoreBaseRate(storeTier);
     }
 }

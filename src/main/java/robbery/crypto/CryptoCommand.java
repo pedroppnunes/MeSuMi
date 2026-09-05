@@ -1,24 +1,23 @@
 package robbery.crypto;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import robbery.messages.Messages;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import robbery.core.Robbery;
 import robbery.items.Items;
+import robbery.messages.Messages;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class CryptoCommand implements CommandExecutor {
 
@@ -26,6 +25,20 @@ public class CryptoCommand implements CommandExecutor {
 
     public CryptoCommand(Robbery plugin) {
         this.plugin = plugin;
+    }
+
+    private void sendAdminUsage(CommandSender sender) {
+        sender.sendMessage(Messages.colorize("&cAdmin Commands:"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin resetnpc <player>"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin givemachine <player> [force]"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin check <player>"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin upgradespeed <player>"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin upgradefueltime <player>"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin upgradebatterytime <player>"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin upgradereward <player>"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin addstoredfuel <player> <quality>"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin addstoredbattery <player> <quality>"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin sacrifice <player>"));
     }
 
     @Override
@@ -80,23 +93,23 @@ public class CryptoCommand implements CommandExecutor {
             return true;
         }
 
+        if (args[0].equalsIgnoreCase("reload")) {
+            if (!sender.hasPermission("robbery.op") && !sender.isOp()) {
+                Messages.send(sender, "global.no-permission");
+                return true;
+            }
+            CryptoUpgradeManager.reloadConfig();
+            Messages.send(sender, "crypto.config-reloaded");
+            return true;
+        }
+
         if (args[0].equalsIgnoreCase("admin")) {
             if (!sender.hasPermission("robbery.op") && !sender.isOp()) {
                 Messages.send(sender, "global.no-permission");
                 return true;
             }
             if (args.length < 3) {
-                sender.sendMessage(Messages.colorize("&cAdmin Commands:"));
-                sender.sendMessage(Messages.colorize("&e/crypto admin resetnpc <player>"));
-                sender.sendMessage(Messages.colorize("&e/crypto admin givemachine <player> [force]"));
-                sender.sendMessage(Messages.colorize("&e/crypto admin check <player>"));
-                sender.sendMessage(Messages.colorize("&e/crypto admin upgradespeed <player>"));
-                sender.sendMessage(Messages.colorize("&e/crypto admin upgradefueltime <player>"));
-                sender.sendMessage(Messages.colorize("&e/crypto admin upgradebatterytime <player>"));
-                sender.sendMessage(Messages.colorize("&e/crypto admin upgradereward <player>"));
-                sender.sendMessage(Messages.colorize("&e/crypto admin addstoredfuel <player> <quality>"));
-                sender.sendMessage(Messages.colorize("&e/crypto admin addstoredbattery <player> <quality>"));
-                sender.sendMessage(Messages.colorize("&e/crypto admin sacrifice <player>"));
+                sendAdminUsage(sender);
                 return true;
             }
 
@@ -115,9 +128,7 @@ public class CryptoCommand implements CommandExecutor {
                     Robbery.getInstance().getPlayerEventListener().savePlayerData(target, pd);
                     target.sendMessage(Messages.colorize("&aYour Crypto NPC dialogue has been reset!"));
                     sender.sendMessage(Messages.colorize("&aReset NPC dialogue for " + target.getName()));
-                    
-                    // Trigger visibility update
-                    new robbery.crypto.CryptoNPCListener(plugin).updateNPCVisibility(target);
+                    new CryptoNPCListener(plugin).updateNPCVisibility(target);
                 }
                 return true;
             }
@@ -144,26 +155,33 @@ public class CryptoCommand implements CommandExecutor {
                 Messages.send(sender, "global.player-not-found");
                 return true;
             } else if (action.equalsIgnoreCase("upgradespeed")) {
-                int newLvl = Math.min(CryptoUpgradeManager.MAX_LEVEL, machine.getSpeedLevel() + 1);
+                int newLvl = Math.min(CryptoUpgradeManager.getMaxLevel(), machine.getSpeedLevel() + 1);
                 machine.setSpeedLevel(newLvl);
                 plugin.getCryptoManager().saveMachine(machine);
                 Messages.sendFormatted(sender, "crypto.admin-upgrade-speed", Map.of("player", target.getName(), "level", String.valueOf(machine.getSpeedLevel())));
             } else if (action.equalsIgnoreCase("upgradefueltime") || action.equalsIgnoreCase("upgradebatterytime")) {
-                int newLvl = Math.min(CryptoUpgradeManager.MAX_LEVEL, machine.getFuelTimeLevel() + 1);
+                int newLvl = Math.min(CryptoUpgradeManager.getMaxLevel(), machine.getFuelTimeLevel() + 1);
                 machine.setFuelTimeLevel(newLvl);
                 plugin.getCryptoManager().saveMachine(machine);
                 Messages.sendFormatted(sender, "crypto.admin-upgrade-fueltime", Map.of("player", target.getName(), "level", String.valueOf(machine.getFuelTimeLevel()), "duration", CryptoMachine.getFuelDurationFormattedForLevel(machine.getFuelTimeLevel())));
             } else if (action.equalsIgnoreCase("upgradereward")) {
-                int newLvl = Math.min(CryptoUpgradeManager.MAX_LEVEL, machine.getRewardLevel() + 1);
+                int newLvl = Math.min(CryptoUpgradeManager.getMaxLevel(), machine.getRewardLevel() + 1);
                 machine.setRewardLevel(newLvl);
                 plugin.getCryptoManager().saveMachine(machine);
                 Messages.sendFormatted(sender, "crypto.admin-upgrade-reward", Map.of("player", target.getName(), "level", String.valueOf(machine.getRewardLevel())));
             } else if (action.equalsIgnoreCase("addstoredfuel") || action.equalsIgnoreCase("addstoredbattery")) {
-                if (args.length < 4) return true;
-                double quality = Double.parseDouble(args[3]);
-                machine.addStoredFuel(new StoredFuel(quality));
-                plugin.getCryptoManager().saveMachine(machine);
-                Messages.sendFormatted(sender, "crypto.admin-add-storedfuel", Map.of("player", target.getName(), "quality", String.format("%.1f", quality)));
+                if (args.length < 4) {
+                    sendAdminUsage(sender);
+                    return true;
+                }
+                try {
+                    double quality = Double.parseDouble(args[3]);
+                    machine.addStoredFuel(new StoredFuel(quality));
+                    plugin.getCryptoManager().saveMachine(machine);
+                    Messages.sendFormatted(sender, "crypto.admin-add-storedfuel", Map.of("player", target.getName(), "quality", String.format("%.1f", quality)));
+                } catch (NumberFormatException e) {
+                    sendAdminUsage(sender);
+                }
             } else if (action.equalsIgnoreCase("sacrifice")) {
                 PlayerData pd = PlayerDataManager.getPlayerData(target);
                 if (pd == null) return true;
@@ -177,10 +195,12 @@ public class CryptoCommand implements CommandExecutor {
                 if (machine.getFuelTicks() > 0) {
                     sender.sendMessage(Messages.colorize(" &7- &fCurrent Fuel Quality: &e" + String.format("%.1f%%", machine.getFuelQuality())));
                 }
-                sender.sendMessage(Messages.colorize(" &7- &fSpeed Level: &a" + machine.getSpeedLevel() + "&8/&a" + CryptoUpgradeManager.MAX_LEVEL));
-                sender.sendMessage(Messages.colorize(" &7- &fBattery Time Level: &a" + machine.getFuelTimeLevel() + "&8/&a" + CryptoUpgradeManager.MAX_LEVEL));
-                sender.sendMessage(Messages.colorize(" &7- &fReward Level: &a" + machine.getRewardLevel() + "&8/&a" + CryptoUpgradeManager.MAX_LEVEL));
+                sender.sendMessage(Messages.colorize(" &7- &fSpeed Level: &a" + machine.getSpeedLevel() + "&8/&a" + CryptoUpgradeManager.getMaxLevel()));
+                sender.sendMessage(Messages.colorize(" &7- &fBattery Time Level: &a" + machine.getFuelTimeLevel() + "&8/&a" + CryptoUpgradeManager.getMaxLevel()));
+                sender.sendMessage(Messages.colorize(" &7- &fReward Level: &a" + machine.getRewardLevel() + "&8/&a" + CryptoUpgradeManager.getMaxLevel()));
                 sender.sendMessage(Messages.colorize(" &7- &fStored Batteries: &e" + machine.getStoredFuels().size() + "&8/&a36"));
+            } else {
+                sendAdminUsage(sender);
             }
             return true;
         }
@@ -215,32 +235,34 @@ public class CryptoCommand implements CommandExecutor {
             if (args[0].equalsIgnoreCase("battery") || args[0].equalsIgnoreCase("batterystorage") || args[0].equalsIgnoreCase("fuel") || args[0].equalsIgnoreCase("fuelstorage") || args[0].equalsIgnoreCase("storage")) {
                 if (args.length >= 3) {
                     String subAction = args[1];
-                    int index = Integer.parseInt(args[2]) - 1; // 1-based index from DeluxeMenus
+                    try {
+                        int index = Integer.parseInt(args[2]) - 1; // 1-based index from DeluxeMenus
 
-                    if (machine != null && index >= 0 && index < machine.getStoredFuels().size()) {
-                        StoredFuel fuelObj = machine.getStoredFuels().get(index);
-                        if (subAction.equalsIgnoreCase("load")) {
-                            if (machine.getFuelTicks() > 0) {
-                                p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
-                                Messages.send(p, "crypto.battery-already-active");
-                                return true;
+                        if (machine != null && index >= 0 && index < machine.getStoredFuels().size()) {
+                            StoredFuel fuelObj = machine.getStoredFuels().get(index);
+                            if (subAction.equalsIgnoreCase("load")) {
+                                if (machine.getFuelTicks() > 0) {
+                                    p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+                                    Messages.send(p, "crypto.battery-already-active");
+                                    return true;
+                                }
+                                long baseDurationTicks = machine.getFuelDurationTicks();
+                                long scaledDurationTicks = (long) (baseDurationTicks * (fuelObj.getQuality() / 100.0));
+                                machine.setFuelTicks(scaledDurationTicks);
+                                machine.setFuelQuality(fuelObj.getQuality());
+                                machine.getStoredFuels().remove(index);
+                                plugin.getCryptoManager().saveMachine(machine);
+
+                                p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.5f);
+                                Messages.sendFormatted(p, "crypto.battery-loaded", Map.of("quality", String.format("%.1f", fuelObj.getQuality()), "duration", CryptoMachine.getFuelDurationFormattedForTicks(scaledDurationTicks)));
+                            } else if (subAction.equalsIgnoreCase("trash") || subAction.equalsIgnoreCase("delete")) {
+                                machine.getStoredFuels().remove(index);
+                                plugin.getCryptoManager().saveMachine(machine);
+                                p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
+                                Messages.send(p, "crypto.battery-trashed");
                             }
-                            long baseDurationTicks = machine.getFuelDurationTicks();
-                            long scaledDurationTicks = (long) (baseDurationTicks * (fuelObj.getQuality() / 100.0));
-                            machine.setFuelTicks(scaledDurationTicks);
-                            machine.setFuelQuality(fuelObj.getQuality());
-                            machine.getStoredFuels().remove(index);
-                            plugin.getCryptoManager().saveMachine(machine);
-
-                            p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.5f);
-                            Messages.sendFormatted(p, "crypto.battery-loaded", Map.of("quality", String.format("%.1f", fuelObj.getQuality()), "duration", CryptoMachine.getFuelDurationFormattedForTicks(scaledDurationTicks)));
-                        } else if (subAction.equalsIgnoreCase("trash") || subAction.equalsIgnoreCase("delete")) {
-                            machine.getStoredFuels().remove(index);
-                            plugin.getCryptoManager().saveMachine(machine);
-                            p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
-                            Messages.send(p, "crypto.battery-trashed");
                         }
-                    }
+                    } catch (NumberFormatException ignored) {}
                 } else {
                     plugin.getCryptoBatteryStorageGUI().open(p);
                 }
@@ -254,12 +276,18 @@ public class CryptoCommand implements CommandExecutor {
                     String subAction = args[1];
                     if (subAction.equalsIgnoreCase("add") && args.length >= 3) {
                         String itemId = args[2];
-                        int amt = args.length >= 4 ? Integer.parseInt(args[3]) : 1;
+                        int amt = 1;
+                        if (args.length >= 4) {
+                            try { amt = Integer.parseInt(args[3]); } catch (NumberFormatException ignored) {}
+                        }
                         int avail = sm.getAvailableAmountInBackpack(p, itemId);
                         sm.addSelectedAmount(p.getUniqueId(), itemId, amt, avail);
                     } else if (subAction.equalsIgnoreCase("remove") && args.length >= 3) {
                         String itemId = args[2];
-                        int amt = args.length >= 4 ? Integer.parseInt(args[3]) : 1;
+                        int amt = 1;
+                        if (args.length >= 4) {
+                            try { amt = Integer.parseInt(args[3]); } catch (NumberFormatException ignored) {}
+                        }
                         int avail = sm.getAvailableAmountInBackpack(p, itemId);
                         sm.addSelectedAmount(p.getUniqueId(), itemId, -amt, avail);
                     } else if (subAction.equalsIgnoreCase("clear")) {
@@ -318,8 +346,7 @@ public class CryptoCommand implements CommandExecutor {
                     Messages.send(p, "crypto.no-claim");
                 }
                 return true;
-            }
-            else if (args[0].equalsIgnoreCase("pickup")) {
+            } else if (args[0].equalsIgnoreCase("pickup")) {
                 String worldName = p.getWorld().getName();
                 if (!worldName.equalsIgnoreCase("outpost") && !worldName.equalsIgnoreCase("SuperiorWorld")) {
                     Messages.send(p, "global.not-here");
@@ -342,6 +369,8 @@ public class CryptoCommand implements CommandExecutor {
                         }
                     }
                     machine.setLocation(null);
+                    machine.setFuelTicks(0);
+                    machine.setUnclaimedMoney(0);
                     machine.updateHologram();
                     ItemStack machineItem = CryptoItemHelper.createMachineItem(plugin);
                     p.getInventory().addItem(machineItem);

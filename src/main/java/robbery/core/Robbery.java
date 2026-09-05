@@ -253,6 +253,7 @@ public class Robbery extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("spawn")).setExecutor(s);
 
         this.cryptoManager = new robbery.crypto.CryptoManager(this);
+        robbery.crypto.CryptoUpgradeManager.loadConfig();
         this.cryptoDealerGUI = new robbery.crypto.CryptoDealerGUI(this);
         this.fuelRouletteGUI = new robbery.crypto.FuelRouletteGUI(this);
         this.cryptoSacrificeGUI = new robbery.crypto.CryptoSacrificeGUI(this);

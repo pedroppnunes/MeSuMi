@@ -1,0 +1,117 @@
+# =======================================================
+#               CRYPTO MACHINE CONFIGURATION
+# =======================================================
+# File location: plugins/MeSuMi-Robbery/crypto_config.yml
+# Use '/crypto reload' to apply changes in-game.
+
+# General Settings
+settings:
+  max_level: 50
+  max_battery_hours: 24
+  # Maximum percentage of store unlock cost per hour generated at max level (10.0%)
+  max_store_hourly_percentage: 10.0
+  # Prestige multiplier per prestige level (+10% to store rates matching +10% store cost)
+  prestige_cost_multiplier_per_level: 0.10
+
+# Store Base Rates (Base money generated per second per store tier)
+# Derived from Next Store Unlock Cost (P0 base) so that a Max Machine generates ~10%/hr:
+# - Store 1 (Supermarket): Next store (The Griffin's) $500 -> Base 2 $/s (Bad = $7.20/hr, Max = $69/hr)
+# - Store 2 (The Griffin's): Next store (Gym) $6,000 -> Base 4 $/s (Bad = $14.40/hr, Max = $138/hr)
+# - Store 3 (Gym): Next store (Arcade) $75,000 -> Base 15 $/s (Bad = $54/hr, Max = $518/hr)
+# - Store 4 (Arcade): Next store (School) $500,000 -> Base 80 $/s (Bad = $288/hr, Max = $2,764/hr)
+# - Store 5 (School): Next store (Casino) $3M -> Base 8 $/s
+# - Store 6 (Casino): Next store (Oceanarium) $20M -> Base 55 $/s
+# - Store 7 (Oceanarium): Next store (Steakhouse) $80M -> Base 220 $/s
+# - Store 8 (Steakhouse): Next store (Diamond) $300M -> Base 820 $/s
+# - Store 9 (Diamond): Next store (Balenziaga) $500M -> Base 1,350 $/s
+# - Store 10 (Balenziaga): Next store (Samzung) $800M -> Base 2,200 $/s
+# - Store 11 (Samzung): Next store (The Bank) $1.7B -> Base 4,650 $/s
+# - Store 12 (The Bank): Next store (The Vault) $2.5B -> Base 6,800 $/s
+# - Store 13 (The Vault): Endgame Vault -> Base 10,000 $/s
+store_rates:
+  1: 2       # Supermarket
+  2: 4       # The Griffin's
+  3: 15      # Gym
+  4: 80      # Arcade
+  5: 8       # School
+  6: 55      # Casino
+  7: 220     # Oceanarium
+  8: 820     # Steakhouse
+  9: 1350    # Diamond
+  10: 2200   # Balenziaga
+  11: 4650   # Samzung
+  12: 6800   # The Bank (Next store $2.5B)
+  13: 10000  # The Vault
+
+# Prestige Requirements per Tier Milestone
+# Tiers are at levels 10, 20, 30, 40, 50.
+# - Levels 1-9 (below Tier 10): Prestige 0 required
+# - Levels 10-19: Requires prestige set for level 10 (Default: 1)
+# - Levels 20-29: Requires prestige set for level 20 (Default: 2)
+# - Levels 30-39: Requires prestige set for level 30 (Default: 3)
+# - Levels 40-49: Requires prestige set for level 40 (Default: 4)
+# - Level 50: Requires prestige set for level 50 (Default: 5)
+prestige_requirements:
+  10: 1
+  20: 2
+  30: 3
+  40: 4
+  50: 5
+
+# Money cost per upgrade level (levels 1 through 50)
+costs:
+  1: 250000
+  2: 500000
+  3: 750000
+  4: 1000000
+  5: 1500000
+  6: 2000000
+  7: 3000000
+  8: 4000000
+  9: 5000000
+  # Tier 1 (Level 10)
+  10: 125000000
+  11: 10000000
+  12: 12000000
+  13: 15000000
+  14: 18000000
+  15: 20000000
+  16: 25000000
+  17: 30000000
+  18: 35000000
+  19: 45000000
+  # Tier 2 (Level 20)
+  20: 500000000
+  21: 20000000
+  22: 25000000
+  23: 30000000
+  24: 35000000
+  25: 40000000
+  26: 50000000
+  27: 60000000
+  28: 70000000
+  29: 80000000
+  # Tier 3 (Level 30)
+  30: 1000000000
+  31: 40000000
+  32: 50000000
+  33: 60000000
+  34: 70000000
+  35: 80000000
+  36: 100000000
+  37: 110000000
+  38: 120000000
+  39: 130000000
+  # Tier 4 (Level 40)
+  40: 2000000000
+  41: 150000000
+  42: 170000000
+  43: 190000000
+  44: 210000000
+  45: 230000000
+  46: 250000000
+  47: 280000000
+  48: 310000000
+  49: 350000000
+  # Tier 5 (Level 50)
+  50: 5000000000

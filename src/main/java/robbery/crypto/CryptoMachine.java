@@ -22,7 +22,10 @@ public class CryptoMachine {
     // 3 Upgrade Tracks
     private int speedLevel;
     private int fuelTimeLevel;
+    // Deprecated: reward level upgrade track (no longer used for reward scaling)
     private int rewardLevel;
+    // New field: reward tier based on highest owned store (ignores prestige)
+    private int rewardTier;
 
     // Virtual Fuel Storage
     private final List<StoredFuel> storedFuels = new ArrayList<>();
@@ -152,7 +155,7 @@ public class CryptoMachine {
 
     public static long getFuelDurationTicksForLevel(int level) {
         if (level <= 0) return 600L; // 10 min
-        if (level >= 39) return 86400L; // 24 Hours max level
+        if (level >= 50) return 86400L; // 24 Hours max level
 
         // Tier 0 (1 to 9): 20m up to 2.5h
         if (level < 10) {
@@ -170,24 +173,23 @@ public class CryptoMachine {
             };
         }
 
-        // Tier 1 (10 to 19): 3h up to 10h
+        // Tier 1 (10 to 19): 3h up to 8h
         if (level < 20) {
-            if (level <= 14) {
-                return 10800L + (long) (level - 10) * 1800L; // 3h to 5h
-            }
-            return 21600L + (long) (level - 15) * 3600L; // 6h to 10h
+            return 10800L + (long) (level - 10) * 1800L; // 3h to 7.5h
         }
 
-        // Tier 2 (20 to 29): 11h up to 20h
+        // Tier 2 (20 to 29): 9h up to 15h
         if (level < 30) {
-            return 39600L + (long) (level - 20) * 3600L; // 11h to 20h
+            return 32400L + (long) (level - 20) * 2400L; // 9h to 15h
         }
 
-        // Tier 3 (30 to 39): 20.5h up to 24h (Max level 39 = 24h)
-        if (level < 35) {
-            return 73800L + (long) (level - 30) * 1800L; // 20.5h to 22.5h
+        // Tier 3 (30 to 39): 16h up to 20h
+        if (level < 40) {
+            return 57600L + (long) (level - 30) * 1440L; // 16h to 20h
         }
-        return Math.min(86400L, 82800L + (long) (level - 35) * 900L); // 23h to 24h
+
+        // Tier 4 (40 to 49): 20.5h up to 23.5h
+        return Math.min(86400L, 73800L + (long) (level - 40) * 1080L);
     }
 
     public static String getFuelDurationFormattedForTicks(long seconds) {
@@ -224,8 +226,17 @@ public class CryptoMachine {
     }
 
     public double getRewardMultiplier() {
-        // Each reward level adds 2% money multiplier (Level 0 = 1.0x, Level 20 = 1.4x, Level 39 = 1.78x)
-        return 1.0 + (rewardLevel * 0.02);
+        // Multiplier Curve:
+        // Early game (L0-9): 1.0x to 1.09x (+1%/lvl) - Gentle curve prevents early abuse
+        // Mid game (L10-29): 1.10x to 1.48x (+2%/lvl)
+        // Late game (L30-50): 1.50x to 2.50x (+5%/lvl) - Late game reward boost
+        if (rewardLevel < 10) {
+            return 1.0 + (rewardLevel * 0.01);
+        } else if (rewardLevel < 30) {
+            return 1.10 + ((rewardLevel - 10) * 0.019);
+        } else {
+            return Math.min(2.50, 1.50 + ((rewardLevel - 30) * 0.05));
+        }
     }
     
     public void updateHologram() {
@@ -338,8 +349,13 @@ public class CryptoMachine {
     }
 
     public double getSpeedMultiplier() {
-        // Each speed level adds 2% speed multiplier (Level 0 = 1.0x, Level 20 = 1.4x, Level 39 = 1.78x)
-        return 1.0 + (speedLevel * 0.02);
+        if (speedLevel < 10) {
+            return 1.0 + (speedLevel * 0.01);
+        } else if (speedLevel < 30) {
+            return 1.10 + ((speedLevel - 10) * 0.014);
+        } else {
+            return Math.min(2.0, 1.38 + ((speedLevel - 30) * 0.031));
+        }
     }
 
     public double getQualityMultiplier() {
