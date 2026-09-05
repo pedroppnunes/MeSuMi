@@ -125,10 +125,18 @@ public class StoreNPCListener implements Listener {
 
     private String getStoreFromNPCNameOrLocation(String name, Entity entity, Player player) {
         if (name == null) name = "";
-        String clean = name.toLowerCase().replaceAll("[^a-z0-9]", "");
+        String lowerName = name.toLowerCase();
+        String clean = lowerName.replaceAll("[^a-z0-9]", "");
+
+        // Must explicitly contain "sell" or "catalog" to be a catalog/sell NPC.
+        // This prevents Guard NPCs (e.g. "Supermarket Guard", "Bank Guard") from triggering the catalog.
+        boolean containsSellOrCatalog = lowerName.contains("sell") || lowerName.contains("catalog");
+        if (!containsSellOrCatalog) {
+            return null;
+        }
 
         // 1. Explicit store sell NPC name mapping
-        if (clean.contains("shopsell")) return "store1";
+        if (clean.contains("shopsell") || clean.contains("supermarketsell")) return "store1";
         if (clean.contains("thegriffinssell") || clean.contains("griffinssell")) return "store2";
         if (clean.contains("gymsell")) return "store3";
         if (clean.contains("arcadesell")) return "store4";
@@ -136,20 +144,18 @@ public class StoreNPCListener implements Listener {
         if (clean.contains("casinosell")) return "store6";
         if (clean.contains("occeanariumsell") || clean.contains("oceanariumsell")) return "store7";
         if (clean.contains("steakhousesell")) return "store8";
-        if (clean.contains("diamondstoresell")) return "store9";
+        if (clean.contains("diamondstoresell") || clean.contains("diamondsell")) return "store9";
         if (clean.contains("balenziagasell") || clean.contains("balenciagasell")) return "store10";
         if (clean.contains("samzungsell") || clean.contains("samsungsell")) return "store11";
         if (clean.contains("banksell")) return "store12";
 
-        String lowerName = name.toLowerCase();
-
-        // 2. Direct store ID in NPC name e.g. "store1", "store 2"
+        // 2. Direct store ID in NPC name e.g. "store1 sell", "store 2 catalog"
         Matcher m = Pattern.compile("store\\s*(\\d+)").matcher(lowerName);
         if (m.find()) {
             return "store" + m.group(1);
         }
 
-        // 3. Check store names (e.g. "Supermarket", "Arcade", "The Bank", etc.)
+        // 3. Match store title IF the NPC name explicitly contains "sell" or "catalog"
         for (int i = 1; i <= 12; i++) {
             String sId = "store" + i;
             String storeTitle = KeyManager.getStoreN(sId);
@@ -158,25 +164,11 @@ public class StoreNPCListener implements Listener {
             }
         }
 
-        // 4. Keywords in NPC name e.g. "clerk", "catalog", "completionist", "merchant", "vendor"
-        boolean isStoreNPC = lowerName.contains("clerk") ||
-                lowerName.contains("catalog") || lowerName.contains("completionist") ||
-                lowerName.contains("merchant") || lowerName.contains("vendor") ||
-                lowerName.contains("shopkeeper") || lowerName.contains("sell");
+        // 4. Fallback: If it has "sell" or "catalog", detect store from player/entity location
+        String storeAtLoc = plugin.getStorePlaytimeTask().detectStore(player);
+        if (storeAtLoc != null) return storeAtLoc;
 
-        if (isStoreNPC) {
-            String storeAtLoc = plugin.getStorePlaytimeTask().detectStore(player);
-            if (storeAtLoc != null) return storeAtLoc;
-            return "store1"; // Fallback to store 1
-        }
-
-        // 5. If entity is an NPC located inside a store region
-        if (entity.hasMetadata("NPC")) {
-            String storeAtEntityLoc = plugin.getStorePlaytimeTask().detectStore(player);
-            if (storeAtEntityLoc != null) return storeAtEntityLoc;
-        }
-
-        return null;
+        return "store1";
     }
 
     private String getNormalizedNPCName(Entity entity) {
