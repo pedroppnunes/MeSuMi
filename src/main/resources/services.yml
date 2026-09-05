@@ -1,3 +1,0 @@
-services:
-  economy:
-    class: com.mesumi.economy.MesumiEconomy

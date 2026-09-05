@@ -19,6 +19,8 @@ import robbery.number.NumberFormatter;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 
+import robbery.notifications.NotificationType;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -116,7 +118,7 @@ public class Sell implements CommandExecutor {
                 econ.depositPlayer(player, newAmount);
 
                 title = "&aYou sold your items for &2" + NumberFormatter.formatDoubleNumber(newAmount) + "$";
-                subtitle = "&6You got Lucky! &e+" + String.format("%.1f", chance) + "% Bonus!";
+                subtitle = Messages.get("command.sell.lucky-subtitle");
         }
 
         if (!lucky) {
@@ -162,16 +164,21 @@ public class Sell implements CommandExecutor {
         } catch (Throwable ignored) {}
 
         if (isDisqualified) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c[Robbery] Hideout contribution blocked: Account or Hideout is disqualified from top competition."));
+            if (p.isNotificationEnabled(NotificationType.HIDEOUT_DQ)) {
+                Messages.send(player, "command.sell.hideout-disqualified");
+            }
         } else if (hasHideout) {
             // Track player's personal contribution
             p.addHideoutValueContributed(hideoutValue);
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&a+&e" + NumberFormatter.formatDoubleNumber(hideoutValue) + " &aHideout Value contributed to your Hideout!"));
+            if (p.isNotificationEnabled(NotificationType.HIDEOUT_VALUE)) {
+                Messages.sendFormatted(player, "command.sell.hideout-contributed", Map.of("value", NumberFormatter.formatDoubleNumber(hideoutValue)));
+            }
         }
 
         if (lucky) {
-            Map<String, String> luckyPlaceholders = Map.of("bonus", String.format("%.1f", chance));
-            Messages.sendFormatted(player, "command.sell.lucky", luckyPlaceholders);
+            if (p.isNotificationEnabled(NotificationType.ABILITY_PROCS)) {
+                Messages.send(player, "command.sell.lucky");
+            }
         }
 
         if (totalXp > 0) {
@@ -186,8 +193,11 @@ public class Sell implements CommandExecutor {
                 player.sendActionBar(
                         Component.text("+" + NumberFormatter.formatDoubleNumber(totalXp) + " Robbery XP (" + NumberFormatter.formatDoubleNumber(xpIntoLevel) + "/" + NumberFormatter.formatDoubleNumber(xpNeeded) + " XP)")
                                 .color(NamedTextColor.DARK_AQUA));
-                Map<String, String> xpearned = Map.of("xp", String.valueOf(NumberFormatter.formatDoubleNumber(totalXp)));
-                Messages.sendFormatted(player, "command.sell.xp-earned", xpearned);
+
+                if (p.isNotificationEnabled(NotificationType.ROBBERY_XP)) {
+                    Map<String, String> xpearned = Map.of("xp", String.valueOf(NumberFormatter.formatDoubleNumber(totalXp)));
+                    Messages.sendFormatted(player, "command.sell.xp-earned", xpearned);
+                }
             } catch (Exception ex) {
                 main.getLogger().warning("Failed to award XP on /sell for " + player.getName() + " : " + ex.getMessage());
             }

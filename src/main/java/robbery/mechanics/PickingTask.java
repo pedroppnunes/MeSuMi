@@ -24,6 +24,8 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import robbery.notifications.NotificationType;
+
 import static robbery.attribute.Attribute.*;
 
 public class PickingTask extends BukkitRunnable {
@@ -95,18 +97,27 @@ public class PickingTask extends BukkitRunnable {
                             "item", itemName,
                             "value", NumberFormatter.formatDoubleNumber(baseValue * 2) + "$"
                     ));
+                    if (p.isNotificationEnabled(NotificationType.ABILITY_PROCS)) {
+                        Messages.sendFormatted(player, "events.picking.triple_item_chat", Map.of("item", itemName));
+                    }
                 } else if (doubleProb > 0 && random.nextDouble() < doubleProb) {
                     p.addItemToBackpack(item, storeId);
                     Messages.sendActionBarFormatted(player, "events.picking.double_item", Map.of(
                             "item", itemName,
                             "value", NumberFormatter.formatDoubleNumber(baseValue) + "$"
                     ));
+                    if (p.isNotificationEnabled(NotificationType.ABILITY_PROCS)) {
+                        Messages.sendFormatted(player, "events.picking.double_item_chat", Map.of("item", itemName));
+                    }
                 } else if (masteryDoubleProb > 0 && random.nextDouble() < masteryDoubleProb) {
                     p.addItemToBackpack(item, storeId);
                     Messages.sendActionBarFormatted(player, "events.picking.double_item", Map.of(
                             "item", itemName,
                             "value", NumberFormatter.formatDoubleNumber(baseValue) + "$"
                     ));
+                    if (p.isNotificationEnabled(NotificationType.ABILITY_PROCS)) {
+                        Messages.sendFormatted(player, "events.picking.double_item_chat", Map.of("item", itemName));
+                    }
                 }
             }
 
@@ -116,7 +127,9 @@ public class PickingTask extends BukkitRunnable {
 
             Booster booster = BoosterManager.getRandomBoosterWithChance(itemStoreNum, p);
             if (booster != null) {
-                Messages.sendFormatted(player, "events.picking.booster_reward", Map.of("booster", booster.getName()));
+                if (p.isNotificationEnabled(NotificationType.ABILITY_PROCS)) {
+                    Messages.sendFormatted(player, "events.picking.booster_reward", Map.of("booster", booster.getName()));
+                }
                 p.addBoosters(booster);
             }
 
@@ -135,6 +148,9 @@ public class PickingTask extends BukkitRunnable {
                         Messages.get("events.picking.skillpoint_reward_subtitle"),
                         10, 60, 10
                 );
+                if (p.isNotificationEnabled(NotificationType.ABILITY_PROCS)) {
+                    Messages.send(player, "events.picking.skillpoint_reward_chat");
+                }
                 p.addSkillPoints(1);
             }
 
@@ -143,6 +159,9 @@ public class PickingTask extends BukkitRunnable {
                 if (random.nextDouble() < 0.05) {
                     p.setTemporaryPerk(PERK_ABILITY_MONEYMULT1, 10.0);
                     Messages.sendActionBar(player, "events.picking.boost_ability_proc");
+                    if (p.isNotificationEnabled(NotificationType.ABILITY_PROCS)) {
+                        Messages.send(player, "events.picking.boost_ability_proc_chat");
+                    }
                 }
             }
 
@@ -151,6 +170,9 @@ public class PickingTask extends BukkitRunnable {
                 if (random.nextDouble() < 0.05) {
                     p.setTemporaryPerk(PERK_ABILITY_STEALSPEED1, 10.0);
                     Messages.sendActionBar(player, "events.picking.stealspeed_proc");
+                    if (p.isNotificationEnabled(NotificationType.ABILITY_PROCS)) {
+                        Messages.send(player, "events.picking.stealspeed_proc_chat");
+                    }
                 }
             }
             double streakIncrement = p.getPerkValue(PERK_ITEM_STREAK1);
@@ -168,6 +190,9 @@ public class PickingTask extends BukkitRunnable {
                         Messages.get("events.picking.keychance_subtitle"),
                         10, 60, 10
                 );
+                if (p.isNotificationEnabled(NotificationType.ABILITY_PROCS)) {
+                    Messages.send(player, "events.picking.keychance_chat");
+                }
                 Bukkit.dispatchCommand(player, "crates key give " + player.getName() + " " + keyType);
             }
 
@@ -206,6 +231,9 @@ public class PickingTask extends BukkitRunnable {
                         (masteryInstaProb > 0 && random.nextDouble() < masteryInstaProb)) {
                     item.setHp(0);
                     sendProgressBar(player, item.getHp(), item.getInitialhp());
+                    if (p.isNotificationEnabled(NotificationType.ABILITY_PROCS)) {
+                        Messages.send(player, "events.picking.insta_steal_chat");
+                    }
                     return;
                 }
             }

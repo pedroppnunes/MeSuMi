@@ -169,8 +169,8 @@ public class StoreCatalogGUI implements Listener {
                     meta.displayName(Component.text(itemObj.getName()).color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 
                     long baseValue = itemObj.getValue();
-                    int storeNum = extractStoreNum(storeId);
-                    long robberyXp = (long) (itemObj.getInitialhp() * (1.0 + storeNum * 0.10));
+                    int itemStoreNum = extractStoreNum(itemObj.getId());
+                    long robberyXp = (long) (itemObj.getInitialhp() * (1.0 + itemStoreNum * 0.10));
 
                     List<Component> lore = new ArrayList<>();
                     lore.add(Component.text("Status: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
@@ -497,7 +497,7 @@ public class StoreCatalogGUI implements Listener {
             if (itemId == null || itemObj == null) continue;
 
             int itemStoreNum = extractStoreNum(itemId);
-            if (itemStoreNum == targetStoreNum) {
+            if (itemStoreNum == targetStoreNum || (targetStoreNum == 12 && itemStoreNum == 13) || (targetStoreNum == 13 && itemStoreNum == 12)) {
                 result.add(itemObj);
             }
         }

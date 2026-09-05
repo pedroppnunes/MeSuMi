@@ -138,6 +138,9 @@ public class Robbery extends JavaPlugin implements Listener {
     private robbery.storeMastery.StorePlaytimeTask storePlaytimeTask;
     private robbery.storeMastery.PlayerStatsGUI playerStatsGUI;
     private robbery.storeMastery.PlayerSkillTreeGUI playerSkillTreeGUI;
+    private robbery.notifications.NotificationsGUI notificationsGUI;
+
+    public robbery.notifications.NotificationsGUI getNotificationsGUI() { return notificationsGUI; }
 
     public robbery.storeMastery.StoreCatalogGUI getStoreCatalogGUI() { return storeCatalogGUI; }
     public robbery.storeMastery.StorePlaytimeTask getStorePlaytimeTask() { return storePlaytimeTask; }
@@ -267,6 +270,7 @@ public class Robbery extends JavaPlugin implements Listener {
         this.storePlaytimeTask = new robbery.storeMastery.StorePlaytimeTask(this);
         this.playerStatsGUI = new robbery.storeMastery.PlayerStatsGUI(this);
         this.playerSkillTreeGUI = new robbery.storeMastery.PlayerSkillTreeGUI(this);
+        this.notificationsGUI = new robbery.notifications.NotificationsGUI(this);
         this.storePlaytimeTask.runTaskTimer(this, 20L, 20L);
 
         getServer().getPluginManager().registerEvents(fuelRouletteGUI, this);
@@ -276,9 +280,16 @@ public class Robbery extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(storeCatalogGUI, this);
         getServer().getPluginManager().registerEvents(playerStatsGUI, this);
         getServer().getPluginManager().registerEvents(playerSkillTreeGUI, this);
+        getServer().getPluginManager().registerEvents(notificationsGUI, this);
         getServer().getPluginManager().registerEvents(new robbery.storeMastery.StoreNPCListener(this), this);
         getServer().getPluginManager().registerEvents(new robbery.crypto.CryptoListener(this), this);
         getServer().getPluginManager().registerEvents(new robbery.crypto.CryptoNPCListener(this), this);
+
+        robbery.notifications.NotificationsCommand notificationsCmd = new robbery.notifications.NotificationsCommand(this, notificationsGUI);
+        if (getCommand("notifications") != null) {
+            getCommand("notifications").setExecutor(notificationsCmd);
+            getCommand("notifications").setTabCompleter(notificationsCmd);
+        }
 
         robbery.storeMastery.StoreCatalogCommand catalogCmd = new robbery.storeMastery.StoreCatalogCommand(this);
         if (getCommand("catalog") != null) {

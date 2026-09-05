@@ -6,6 +6,7 @@ import robbery.core.Robbery;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 import robbery.messages.Messages;
+import robbery.notifications.NotificationType;
 
 import java.util.Map;
 import java.util.UUID;
@@ -176,7 +177,10 @@ public class CryptoManager {
 
                     // Notify player if battery just depleted
                     if (machine.getFuelTicks() <= 0 && p != null && p.isOnline()) {
-                        Messages.send(p, "crypto.battery-stopped");
+                        PlayerData pd = PlayerDataManager.getPlayerData(p);
+                        if (pd == null || pd.isNotificationEnabled(NotificationType.CRYPTO_MACHINE)) {
+                            Messages.send(p, "crypto.battery-stopped");
+                        }
                     }
                 } else if (machine.isPlaced()) {
                     machine.setLastUpdated(now);

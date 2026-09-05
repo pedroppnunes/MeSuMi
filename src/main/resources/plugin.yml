@@ -175,6 +175,10 @@ commands:
   crypto:
     description: Open the crypto menu
     usage: /crypto
+  notifications:
+    description: Open the notification settings menu
+    usage: /notifications
+    aliases: [notifs, settings, togglenotifications, notification]
   backpack:
     description: View your backpack contents
     usage: /backpack

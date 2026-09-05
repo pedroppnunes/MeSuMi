@@ -79,12 +79,14 @@ public class StoreCatalogCommand implements CommandExecutor, TabCompleter {
         String targetStore = null;
 
         if (arg.startsWith("store")) {
-            targetStore = arg;
+            targetStore = arg.equalsIgnoreCase("store13") ? "store12" : arg;
+        } else if (arg.equals("vault")) {
+            targetStore = "store12";
         } else {
             try {
                 int storeNum = Integer.parseInt(arg);
-                if (storeNum >= 1 && storeNum <= 12) {
-                    targetStore = "store" + storeNum;
+                if (storeNum >= 1 && storeNum <= 13) {
+                    targetStore = "store" + (storeNum == 13 ? 12 : storeNum);
                 }
             } catch (NumberFormatException ignored) {}
         }

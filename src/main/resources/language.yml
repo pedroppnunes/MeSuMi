@@ -143,8 +143,11 @@ command:
     updated-items: "&5&lRobbery &8> &aReloaded successfully %count% items."
   sell:
     sold: "&5&lRobbery &8> &aYou sold your items for &2%amount%$"
-    lucky: "&5&lRobbery &8> &6You got Lucky! &e+%bonus% Bonus!"
+    lucky: "&5&lRobbery &8> &6You got Lucky! &aYou sold your inventory twice!"
+    lucky-subtitle: "&6You got Lucky! &eYou sold your inventory twice!"
     xp-earned: "&5&lRobbery &8> &bYou earned &3+%xp% Robbery XP"
+    hideout-contributed: "&5&lRobbery &8> &a+&e%value% &aHideout Value contributed to your Hideout!"
+    hideout-disqualified: "&5&lRobbery &8> &cHideout contribution blocked: Account or Hideout is disqualified from top competition."
   skillpointbuy:
     usage: "&5&lRobbery &8> &cUsage: /skillpointbuy <operation> <player>"
     unknown-upgrade: "&5&lRobbery &8> &cUnknown upgrade type."
@@ -226,6 +229,13 @@ events:
     keychance_subtitle: "&dYou've Received a Key!"
     boost_ability_proc: "&aMoney Multiplier activated +0.5x"
     stealspeed_proc: "&aSteal Speed activated +50%"
+    boost_ability_proc_chat: "&5&lRobbery &8> &a+0.5x Money Multiplier activated for 10 seconds!"
+    stealspeed_proc_chat: "&5&lRobbery &8> &a+50% Steal Speed activated for 10 seconds!"
+    double_item_chat: "&5&lRobbery &8> &aDouble Item Catch! (+1 extra %item%)"
+    triple_item_chat: "&5&lRobbery &8> &aTriple Item Catch! (+2 extra %item%)"
+    insta_steal_chat: "&5&lRobbery &8> &aInsta-Steal Proc!"
+    skillpoint_reward_chat: "&5&lRobbery &8> &6You got 1 Skillpoint!"
+    keychance_chat: "&5&lRobbery &8> &dYou received a Special Key!"
   combat:
     logout_broadcast: "&6&lOutpost &8> &c%player% logged out during combat!"
     command_blocked: "&6&lOutpost &8> &cYou cannot use commands while in PvP!"
@@ -360,7 +370,7 @@ crypto:
   battery-already-active: "&b&lCrypto Battery &8> &cYour Crypto Machine already has an active battery running!"
   battery-loaded: "&b&lCrypto Battery &8> &aLoaded &b%quality%% &aquality battery! Duration: &b%duration%"
   battery-trashed: "&b&lCrypto Battery &8> &cBattery canister deleted."
-  battery-stopped: "&b&lCrypto Battery &8> &cYour active battery has depleted!"
+  battery-stopped: "&5&lRobbery &8> &bCrypto Battery &8> &cYour active battery has depleted!"
   sacrifice-empty: "&b&lCrypto Battery &8> &cNo items selected for sacrifice!"
   admin-give-machine: "&e&lCrypto Admin &8> &aGave Crypto Machine to %player%."
   admin-upgrade-speed: "&e&lCrypto Admin &8> &aUpgraded %player%'s Speed level to %level%."
@@ -396,3 +406,29 @@ storeMastery:
     line2: "&e&lShop Manager &8> &fUse your tool to &esteal items&f around the store, then bring them back to me to &asell&f them!"
     line3: "&e&lShop Manager &8> &fClick me anytime to open the menu and check your stolen items and &dStore Masteries&f!"
     line4: "&e&lShop Manager &8> &fMasteries give you &dboosts&f for that store. You can also upgrade your &bTool&f, &bBackpack&f, and unlock the &bnext store&f at the Mall!"
+
+notifications-gui:
+  title: "&8Notification Settings"
+  close: "&c&lClose Menu"
+  status-enabled: "&a&lENABLED"
+  status-disabled: "&c&lDISABLED"
+  status-on: "&a&l[✔] ON"
+  status-off: "&c&l[✘] OFF"
+  click-to-toggle: "&eClick to toggle!"
+  click-to-switch: "&7Click to switch to %next%"
+  items:
+    ability_procs:
+      name: "&a&lAbility Procs Notifications"
+      desc: "&7Toggle chat messages when skill tree abilities & masteries activate."
+    hideout_value:
+      name: "&a&lHideout Value Notifications"
+      desc: "&7Toggle chat messages when contributing value to your hideout on /sell."
+    hideout_dq:
+      name: "&a&lHideout Disqualification Notifications"
+      desc: "&7Toggle warning messages when hideout contribution is blocked due to disqualification."
+    robbery_xp:
+      name: "&a&lRobbery XP Notifications"
+      desc: "&7Toggle chat messages when earning Robbery XP on /sell."
+    crypto_machine:
+      name: "&a&lCrypto Machine Notifications"
+      desc: "&7Toggle alerts for Crypto Machine events (battery depleted, battery loaded, etc.)."

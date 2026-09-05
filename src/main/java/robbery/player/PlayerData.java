@@ -35,7 +35,11 @@ import static robbery.keys.KeyManager.STORE1;
 import static robbery.ranks.RankManager.NONE;
 import static robbery.tool.ToolManager.TOOL1;
 
+import robbery.notifications.NotificationType;
+
 public class PlayerData {
+
+    private final Map<NotificationType, Boolean> notificationSettings = new EnumMap<>(NotificationType.class);
 
     private boolean loaded = false;
     private Backpacks backpack;
@@ -149,6 +153,43 @@ public class PlayerData {
     public void addHideoutValueContributed(double amount) {
         if (amount > 0) {
             this.hideoutValueContributed += amount;
+        }
+    }
+
+    public boolean isNotificationEnabled(NotificationType type) {
+        if (type == null) return true;
+        return notificationSettings.getOrDefault(type, true);
+    }
+
+    public void setNotificationEnabled(NotificationType type, boolean enabled) {
+        if (type != null) {
+            notificationSettings.put(type, enabled);
+        }
+    }
+
+    public boolean toggleNotification(NotificationType type) {
+        boolean newState = !isNotificationEnabled(type);
+        setNotificationEnabled(type, newState);
+        return newState;
+    }
+
+    public Map<String, Boolean> getNotificationSettingsMap() {
+        Map<String, Boolean> map = new HashMap<>();
+        for (NotificationType type : NotificationType.values()) {
+            map.put(type.name(), isNotificationEnabled(type));
+        }
+        return map;
+    }
+
+    public void setNotificationSettingsMap(Map<String, Boolean> map) {
+        if (map == null) return;
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+            try {
+                NotificationType type = NotificationType.valueOf(entry.getKey());
+                if (entry.getValue() != null) {
+                    notificationSettings.put(type, entry.getValue());
+                }
+            } catch (IllegalArgumentException ignored) {}
         }
     }
 

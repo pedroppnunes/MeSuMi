@@ -207,6 +207,7 @@ public class PlayerEventListener implements Listener {
         cfg.set("crypto.talkedToBatteryNPC", memory.hasTalkedToCryptoBatteryNPC());
         cfg.set("stats.talkedToShopSellNPC", memory.hasTalkedToShopSellNPC());
         cfg.set("stats.profilePrivacy", memory.getProfilePrivacy());
+        cfg.set("stats.notifications", memory.getNotificationSettingsMap());
 
         // Quest progress
         Map<String, Map<String, Object>> progressMap = new HashMap<>();
@@ -405,6 +406,17 @@ public class PlayerEventListener implements Listener {
             memory.setTalkedToCryptoBatteryNPC(cfg.getBoolean("crypto.talkedToBatteryNPC", false));
             memory.setTalkedToShopSellNPC(cfg.getBoolean("stats.talkedToShopSellNPC", false));
             memory.setProfilePrivacy(cfg.getString("stats.profilePrivacy", "HIDEOUT"));
+
+            if (cfg.contains("stats.notifications")) {
+                ConfigurationSection notifSec = cfg.getConfigurationSection("stats.notifications");
+                if (notifSec != null) {
+                    Map<String, Boolean> notifMap = new HashMap<>();
+                    for (String key : notifSec.getKeys(false)) {
+                        notifMap.put(key, notifSec.getBoolean(key, true));
+                    }
+                    memory.setNotificationSettingsMap(notifMap);
+                }
+            }
 
             if (cfg.contains("dailyQuests.progress")) {
                 ConfigurationSection progressSec = cfg.getConfigurationSection("dailyQuests.progress");

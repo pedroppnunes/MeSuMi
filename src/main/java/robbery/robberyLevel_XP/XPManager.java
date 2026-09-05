@@ -188,7 +188,7 @@ public class XPManager {
             return 4;
         if (level <= 120)
             return 5;
-        return 10;
+        return 6;
     }
 
     public String colorizeLevel(int level) {
