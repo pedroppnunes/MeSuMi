@@ -1128,14 +1128,6 @@ public int getStoreItems(String storeId) {
                 }
             }
         }
-        // Prestige scaling: P1 = Balenziaga (10), P2 = Samzung (11), P3+ = The Bank (12)
-        if (prestige >= 3) {
-            max = Math.max(max, 12);
-        } else if (prestige == 2) {
-            max = Math.max(max, 11);
-        } else if (prestige == 1) {
-            max = Math.max(max, 10);
-        }
         return Math.max(1, max);
     }
 
