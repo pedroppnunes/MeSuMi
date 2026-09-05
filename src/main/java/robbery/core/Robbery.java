@@ -158,7 +158,7 @@ public class Robbery extends JavaPlugin implements Listener {
         main = this;
         Messages.init(main);
         if (!setupEconomy()) {
-            getLogger().severe("Disabled: Vault or an Economy provider (e.g. Essentials / MesumiEconomy) was not found! Please ensure Vault and an Economy plugin are loaded.");
+            getLogger().severe("Disabled: Vault or an Economy provider (e.g. Essentials) was not found! Please ensure Vault and an Economy plugin are loaded.");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -316,9 +316,6 @@ public class Robbery extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("loadbackup")).setExecutor(new LoadBackup(main));
         Objects.requireNonNull(getCommand("migrate")).setExecutor(new MigrateBackup(main));
         Objects.requireNonNull(getCommand("migrate-to-sql")).setExecutor(new robbery.database.MigrateToSQLCommand(main));
-        if (getCommand("migrate-economy") != null) {
-            getCommand("migrate-economy").setExecutor(new robbery.economy.MigrateEconomyCommand(main));
-        }
         Objects.requireNonNull(getCommand("stopbooster")).setExecutor(new StopBoosterCommand());
         Objects.requireNonNull(getCommand("adminxp")).setExecutor(new AdminXPCommand(main));
         skillTreeConfig = new SkillTreeConfig(main);
@@ -795,22 +792,14 @@ public class Robbery extends JavaPlugin implements Listener {
 
     private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
-            getLogger().warning("Vault plugin not found!");
             return false;
         }
-
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp != null && rsp.getProvider() != null) {
-            econ = rsp.getProvider();
-            getLogger().info("Successfully hooked into Vault Economy provider: " + econ.getName());
-            return true;
+        if (rsp == null) {
+            return false;
         }
-
-        robbery.economy.MesumiVaultEconomy vaultEco = new robbery.economy.MesumiVaultEconomy(this);
-        getServer().getServicesManager().register(Economy.class, vaultEco, this, org.bukkit.plugin.ServicePriority.Normal);
-        econ = vaultEco;
-        getLogger().info("Registered MesumiVaultEconomy with Vault as fallback provider.");
-        return true;
+        econ = rsp.getProvider();
+        return econ != null;
     }
 
     private boolean setupPermissions() {
