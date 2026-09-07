@@ -1,6 +1,7 @@
 package robbery.prestige;
 
 import net.milkbowl.vault.economy.Economy;
+import org.MSM.mesumiEconomy.economy.MoneyManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -120,13 +121,18 @@ public class Prestige implements CommandExecutor {
             return true;
         }
 
+        MoneyManager moneyManager = Robbery.getMoneyManager();
         Economy econ = Robbery.getEconomy();
-        double balance = econ.getBalance(player);
+        double balance = (moneyManager != null) ? moneyManager.getMoney(player.getUniqueId()) : (econ != null ? econ.getBalance(player) : 0.0);
         int prestige = p.getPrestige();
 
         if (balance >= getPrestigeValue(p) && isInLastStore(prestige, p)) {
             // Remove all money
-            econ.withdrawPlayer(player, econ.getBalance(player));
+            if (moneyManager != null) {
+                moneyManager.resetMoney(player.getUniqueId());
+            } else if (econ != null) {
+                econ.withdrawPlayer(player, econ.getBalance(player));
+            }
             // Increment prestige
             p.setPrestige(prestige + 1);
             // Reset backpack and keys

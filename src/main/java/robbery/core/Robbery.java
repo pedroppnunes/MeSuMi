@@ -2,6 +2,8 @@ package robbery.core;
 
 import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.Economy;
+import org.MSM.mesumiEconomy.MesumiEconomy;
+import org.MSM.mesumiEconomy.economy.MoneyManager;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -23,6 +25,7 @@ import robbery.hotbar.HotbarListener;
 import robbery.items.AddItem;
 import robbery.items.RemoveItem;
 import robbery.economy.Baltop;
+import robbery.economy.MigrateEconomyCommand;
 import robbery.economy.Sell;
 import robbery.mechanics.Busted;
 import robbery.backpacks.BuyBackpack;
@@ -47,7 +50,6 @@ import robbery.teleport.StoreTeleport;
 import robbery.mutes.MuteCommand;
 import robbery.mutes.MuteInfoCommand;
 import robbery.mutes.UnmuteCommand;
-import robbery.outpost.Outpost;
 import robbery.prestige.Prestige;
 import robbery.ranks.RankUp;
 import robbery.ranks.RankUpdate;
@@ -74,7 +76,6 @@ import robbery.outpost.OutpostManager;
 import robbery.outpost.OutpostRegion;
 import robbery.player.PlayerEventListener;
 import robbery.prestige.PrestigeCountManager;
-import robbery.ranks.RankPaperListener;
 import robbery.robberyLevel_XP.AdminXPCommand;
 import robbery.robberyLevel_XP.XPManager;
 import robbery.votes.VotePartyManager;
@@ -92,6 +93,8 @@ public class Robbery extends JavaPlugin implements Listener {
 
     private static final Map<String, Items> itemsMap = new HashMap<>();
 
+    private static MesumiEconomy mesumiEconomy = null;
+    private static MoneyManager moneyManager = null;
     private static Economy econ = null;
     private static net.milkbowl.vault.permission.Permission perms = null;
     private final List<Items> items = new ArrayList<>();
@@ -161,11 +164,8 @@ public class Robbery extends JavaPlugin implements Listener {
         getLogger().info("Starting");
         main = this;
         Messages.init(main);
-        if (!setupEconomy()) {
-            getLogger().severe("Disabled: Vault or an Economy provider (e.g. Essentials) was not found! Please ensure Vault and an Economy plugin are loaded.");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+        hookEconomy();
+        setupEconomy();
         setupPermissions();
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             Bukkit.getPluginManager().registerEvents(this, this);
@@ -221,7 +221,6 @@ public class Robbery extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(hidePlayers, main);
         getServer().getPluginManager().registerEvents(blockCraft, main);
         getServer().getPluginManager().registerEvents(rcrate, main);
-        getServer().getPluginManager().registerEvents(new RankPaperListener(), main);
         getServer().getPluginManager().registerEvents(new ClaimGuiListener(), main);
         getServer().getPluginManager().registerEvents(new SkillTreeItem(main), main);
         getServer().getPluginManager().registerEvents(new HotbarListener(main), main);
@@ -239,6 +238,8 @@ public class Robbery extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("hp")).setExecutor(hidePlayers);
         Objects.requireNonNull(getCommand("mall")).setExecutor(new Mall(main));
         Objects.requireNonNull(getCommand("rankupdate")).setExecutor(new RankUpdate(main));
+        if (getCommand("awardrank") != null) getCommand("awardrank").setExecutor(new robbery.ranks.AwardRankCommand(main));
+        if (getCommand("giftrank") != null) getCommand("giftrank").setExecutor(new robbery.ranks.GiftRankCommand(main));
         Objects.requireNonNull(getCommand("nv")).setExecutor(new NightVision(main));
         Objects.requireNonNull(getCommand("pv")).setExecutor(new PvCommand());
         Objects.requireNonNull(getCommand("warn")).setExecutor(new WarnCommand(main));
@@ -330,6 +331,7 @@ public class Robbery extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("migrate")).setExecutor(new MigrateBackup(main));
         Objects.requireNonNull(getCommand("migrate-to-sql")).setExecutor(new robbery.database.MigrateToSQLCommand(main));
         Objects.requireNonNull(getCommand("migratehideoutworth")).setExecutor(new MigrateHideoutWorthCommand(main));
+        if (getCommand("migrate-economy") != null) getCommand("migrate-economy").setExecutor(new MigrateEconomyCommand(main));
         HideoutAdminCommand hoAdminCmd = new HideoutAdminCommand(main);
         if (getCommand("resethideoutworth") != null) getCommand("resethideoutworth").setExecutor(hoAdminCmd);
         if (getCommand("dqplayer") != null) getCommand("dqplayer").setExecutor(hoAdminCmd);
@@ -811,6 +813,19 @@ public class Robbery extends JavaPlugin implements Listener {
         Bukkit.getScheduler().runTaskLater(this, this::spawnLoadedItems, 40L);
     }
 
+    private void hookEconomy() {
+        Plugin found = getServer().getPluginManager().getPlugin("MesumiEconomy");
+        if (found instanceof MesumiEconomy mEcon && found.isEnabled()) {
+            mesumiEconomy = mEcon;
+            moneyManager = mEcon.getMoneyManager();
+            getLogger().info("Successfully hooked into MesumiEconomy!");
+        } else {
+            mesumiEconomy = null;
+            moneyManager = null;
+            getLogger().warning("MesumiEconomy plugin was not found or is not enabled!");
+        }
+    }
+
     private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
             return false;
@@ -820,19 +835,18 @@ public class Robbery extends JavaPlugin implements Listener {
             return false;
         }
         econ = rsp.getProvider();
-        return econ != null;
+        return true;
     }
 
-    private boolean setupPermissions() {
+    private void setupPermissions() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
-            return false;
+            return;
         }
         RegisteredServiceProvider<net.milkbowl.vault.permission.Permission> rsp = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
         if (rsp == null) {
-            return false;
+            return;
         }
         perms = rsp.getProvider();
-        return perms != null;
     }
 
     private void startItemClearTask() {
@@ -972,6 +986,14 @@ public class Robbery extends JavaPlugin implements Listener {
 //Getters
     public boolean getIsBackup() {
         return isBackingUp;
+    }
+
+    public static MesumiEconomy getMesumiEconomy() {
+        return mesumiEconomy;
+    }
+
+    public static MoneyManager getMoneyManager() {
+        return moneyManager;
     }
 
     public static Economy getEconomy() {

@@ -155,7 +155,7 @@ public class PickingTask extends BukkitRunnable {
             }
 
             double abilityChance = p.getPerkValue(PERK_ABILITY_MONEYMULT1);
-            if (abilityChance > 0 && !p.hasTemporaryPerk(PERK_ABILITY_MONEYMULT1)) {
+            if (abilityChance > 0) {
                 if (random.nextDouble() < 0.05) {
                     p.setTemporaryPerk(PERK_ABILITY_MONEYMULT1, 10.0);
                     Messages.sendActionBar(player, "events.picking.boost_ability_proc");
@@ -166,7 +166,7 @@ public class PickingTask extends BukkitRunnable {
             }
 
             double stealSpeedChance = p.getPerkValue(PERK_ABILITY_STEALSPEED1);
-            if (stealSpeedChance > 0 && !p.hasTemporaryPerk(PERK_ABILITY_STEALSPEED1)) {
+            if (stealSpeedChance > 0) {
                 if (random.nextDouble() < 0.05) {
                     p.setTemporaryPerk(PERK_ABILITY_STEALSPEED1, 10.0);
                     Messages.sendActionBar(player, "events.picking.stealspeed_proc");

@@ -58,6 +58,7 @@ public class PlayerData {
     private int itemsStolen;
     private final Map<String, Integer> storeItems = new java.util.HashMap<>();
     private final Map<String, Integer> storeMilestones = new java.util.HashMap<>();
+    private final Map<String, Integer> virtualRanks = new HashMap<>();
     private final Map<String, Integer> skillTreeLevels = new HashMap<>();
     private final Map<String, Double> perkValues = new HashMap<>();
     private final Map<String, Long> temporaryPerks = new HashMap<>();
@@ -401,6 +402,51 @@ public class PlayerData {
         this.rank = RankManager.getRank(rank);
         refreshBackpackSlots();
     }
+
+    public Map<String, Integer> getVirtualRanksMap() {
+        return virtualRanks;
+    }
+
+    public void setVirtualRanksMap(Map<String, Integer> map) {
+        virtualRanks.clear();
+        if (map != null) virtualRanks.putAll(map);
+    }
+
+    public int getVirtualRankCount(String rankKey) {
+        if (rankKey == null) return 0;
+        return virtualRanks.getOrDefault(rankKey.toLowerCase(), 0);
+    }
+
+    public void addVirtualRank(String rankKey) {
+        addVirtualRank(rankKey, 1);
+    }
+
+    public void addVirtualRank(String rankKey, int amount) {
+        if (rankKey == null || amount <= 0) return;
+        String key = rankKey.toLowerCase();
+        virtualRanks.put(key, virtualRanks.getOrDefault(key, 0) + amount);
+    }
+
+    public boolean removeVirtualRank(String rankKey) {
+        return removeVirtualRank(rankKey, 1);
+    }
+
+    public boolean removeVirtualRank(String rankKey, int amount) {
+        if (rankKey == null || amount <= 0) return false;
+        String key = rankKey.toLowerCase();
+        int current = virtualRanks.getOrDefault(key, 0);
+        if (current < amount) return false;
+        if (current == amount) {
+            virtualRanks.remove(key);
+        } else {
+            virtualRanks.put(key, current - amount);
+        }
+        return true;
+    }
+
+    public boolean hasVirtualRank(String rankKey) {
+        return getVirtualRankCount(rankKey) > 0;
+    }
     public void toggleDoubleJump(){
         doubleJump = !doubleJump;
     }
@@ -695,6 +741,28 @@ public class PlayerData {
     }
     public int getSkillPoints() {
         return skillpoints;
+    }
+
+    private int cryptoCredits = 0;
+
+    public int getCryptoCredits() {
+        return cryptoCredits;
+    }
+
+    public void setCryptoCredits(int cryptoCredits) {
+        this.cryptoCredits = Math.max(0, cryptoCredits);
+    }
+
+    public void addCryptoCredits(int amount) {
+        this.cryptoCredits += amount;
+    }
+
+    public boolean removeCryptoCredits(int amount) {
+        if (this.cryptoCredits >= amount) {
+            this.cryptoCredits -= amount;
+            return true;
+        }
+        return false;
     }
 
 //Store Milestones

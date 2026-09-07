@@ -1,6 +1,7 @@
 package robbery.keys;
 
 import net.milkbowl.vault.economy.Economy;
+import org.MSM.mesumiEconomy.economy.MoneyManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -101,11 +102,17 @@ public class BuyKey implements CommandExecutor {
             return true;
         }
 
+        MoneyManager moneyManager = Robbery.getMoneyManager();
         Economy econ = Robbery.getEconomy();
         double price = key.getPrice(data);
+        double balance = (moneyManager != null) ? moneyManager.getMoney(player.getUniqueId()) : (econ != null ? econ.getBalance(player) : 0.0);
 
-        if (econ.getBalance(player) >= price) {
-            econ.withdrawPlayer(player, price);
+        if (balance >= price) {
+            if (moneyManager != null) {
+                moneyManager.removeMoney(player.getUniqueId(), price);
+            } else if (econ != null) {
+                econ.withdrawPlayer(player, price);
+            }
             data.addKey(keyName);
             data.setKey(key);
 

@@ -1,6 +1,7 @@
 package robbery.backpacks;
 
 import net.milkbowl.vault.economy.Economy;
+import org.MSM.mesumiEconomy.economy.MoneyManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -77,6 +78,7 @@ public class BuyBackpack implements CommandExecutor {
         String canonicalId = BackpackManager.getBackpackNameR(rawName);
         if (canonicalId == null) canonicalId = rawName.toLowerCase().replace(" ", "");
 
+        MoneyManager moneyManager = Robbery.getMoneyManager();
         Economy econ = Robbery.getEconomy();
 
         // Determine required prestige for specific backpacks
@@ -109,8 +111,13 @@ public class BuyBackpack implements CommandExecutor {
         }
 
         double price = (double) backpack.getPrice();
-        if (econ != null && econ.getBalance(player) >= price) {
-            econ.withdrawPlayer(player, price);
+        double balance = (moneyManager != null) ? moneyManager.getMoney(player.getUniqueId()) : (econ != null ? econ.getBalance(player) : 0.0);
+        if (balance >= price) {
+            if (moneyManager != null) {
+                moneyManager.removeMoney(player.getUniqueId(), price);
+            } else if (econ != null) {
+                econ.withdrawPlayer(player, price);
+            }
 
             // Transfer items to newly purchased backpack
             if (data.getBackpack() != null) {

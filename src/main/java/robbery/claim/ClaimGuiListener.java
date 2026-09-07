@@ -11,7 +11,7 @@ import robbery.core.RewardHolder;
 import robbery.core.Robbery;
 import robbery.keys.Rcrate;
 import robbery.messages.Messages;
-import robbery.ranks.RankPaper;
+import robbery.ranks.RankManager;
 import robbery.crypto.CryptoItemHelper;
 
 import java.util.Iterator;
@@ -120,41 +120,21 @@ public class ClaimGuiListener implements Listener {
     }
 
     /**
-     * Adds one rank voucher of the specified rank to the player's inventory.
-     *
-     * @param p the player
-     * @param rankKey the rank key to give
-     * @return true if the item was successfully added, false if inventory was full
-     */
-    private boolean giveOneRank(Player p, String rankKey) {
-        ItemStack one = RankPaper.create(rankKey);
-        one.setAmount(1);
-        var leftover = p.getInventory().addItem(one);
-        return leftover.isEmpty();
-    }
-
-    /**
-     * Helper method to claim all rank rewards, respecting inventory space.
+     * Helper method to claim all rank rewards.
      */
     private void claimAllRankRewards(Player p, Map<String,Integer> rankRewards) {
-        if (rankRewards == null) return;
+        if (rankRewards == null || rankRewards.isEmpty()) return;
 
         Iterator<Map.Entry<String,Integer>> rit = rankRewards.entrySet().iterator();
         while (rit.hasNext()) {
             var entry = rit.next();
             String key = entry.getKey();
             int count = entry.getValue();
-            int space = calculatePaperSpace(p);
 
-            int toGive = Math.min(space, count);
-            for (int i = 0; i < toGive; i++) {
-                if (!giveOneRank(p, key)) break;
+            for (int i = 0; i < count; i++) {
+                RankManager.awardRank(p, key);
             }
-
-            if (toGive >= count) rit.remove();
-            else entry.setValue(count - toGive);
-
-            if (toGive < count) break;
+            rit.remove();
         }
     }
 
@@ -247,20 +227,17 @@ public class ClaimGuiListener implements Listener {
             return;
         }
 
-        // 2. Check if rank voucher
-        String rankKey = RankPaper.getRankKey(clicked);
+        // 2. Check if rank voucher / reward
+        String rankKey = RankManager.getClaimedRankKey(clicked);
         if (rankKey != null && rankRewards != null && rankRewards.containsKey(rankKey)) {
-            if (!giveOneRank(p, rankKey)) {
-                Messages.send(p, "command.claim.inv-full");
-                p.closeInventory();
-                return;
-            }
+            RankManager.awardRank(p, rankKey);
             int left = rankRewards.get(rankKey) - 1;
             if (left <= 0) rankRewards.remove(rankKey);
             else rankRewards.put(rankKey, left);
 
             Rcrate.saveRewards(p.getUniqueId());
-            Messages.sendFormatted(p, "command.claim.claimed-one", Map.of("amount","1","material","Rank Voucher"));
+            Messages.sendFormatted(p, "command.claim.claimed-one", Map.of("amount","1","material","Rank Reward"));
+            return;
         } else if (clicked.getType() != Material.PAPER && itemRewards != null) {
             Material mat = clicked.getType();
             int pending = itemRewards.getOrDefault(mat, 0);

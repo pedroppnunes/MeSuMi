@@ -43,9 +43,9 @@ public class CryptoBatteryStorageGUI implements Listener {
 
         int[] bgSlots = {
             0,1,2,3,4,5,6,7,8,
-            9,10,11,12,13,14,15,16,17,
-            18,19,25,26,
-            27,28,29,30,31,32,33,34,35,
+            9,17,
+            18,26,
+            27,35,
             36,37,38,39,41,42,43,44,
             45,46,47,48,50,51,52,53
         };
@@ -83,9 +83,15 @@ public class CryptoBatteryStorageGUI implements Listener {
         }
         gui.setItem(40, statusItem);
 
-        // Batteries (Slots 20, 21, 22, 23, 24)
+        // Batteries (21 slots across rows 2, 3, 4)
+        int[] batterySlots = {
+            10,11,12,13,14,15,16,
+            19,20,21,22,23,24,25,
+            28,29,30,31,32,33,34
+        };
         List<StoredFuel> storedFuels = machine.getStoredFuels();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < batterySlots.length; i++) {
+            int slot = batterySlots[i];
             if (i < storedFuels.size()) {
                 StoredFuel fuel = storedFuels.get(i);
                 double qual = fuel.getQuality();
@@ -114,9 +120,9 @@ public class CryptoBatteryStorageGUI implements Listener {
                     batMeta.lore(loreItem);
                     batteryItem.setItemMeta(batMeta);
                 }
-                gui.setItem(20 + i, batteryItem);
+                gui.setItem(slot, batteryItem);
             } else {
-                gui.setItem(20 + i, null);
+                gui.setItem(slot, null);
             }
         }
 
@@ -159,9 +165,21 @@ public class CryptoBatteryStorageGUI implements Listener {
             player.closeInventory();
             return;
         }
+
+        int[] batterySlots = {
+            10,11,12,13,14,15,16,
+            19,20,21,22,23,24,25,
+            28,29,30,31,32,33,34
+        };
+        int index = -1;
+        for (int i = 0; i < batterySlots.length; i++) {
+            if (batterySlots[i] == slot) {
+                index = i;
+                break;
+            }
+        }
         
-        if (slot >= 20 && slot <= 24) {
-            int index = slot - 20;
+        if (index != -1) {
             CryptoMachine machine = plugin.getCryptoManager().getMachine(player.getUniqueId());
             if (machine != null && index < machine.getStoredFuels().size()) {
                 StoredFuel fuelObj = machine.getStoredFuels().get(index);

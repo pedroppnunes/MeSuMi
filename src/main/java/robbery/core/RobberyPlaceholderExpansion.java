@@ -2,6 +2,7 @@ package robbery.core;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.milkbowl.vault.economy.Economy;
+import org.MSM.mesumiEconomy.economy.MoneyManager;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -160,15 +161,15 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
             case "playername", "name", "player_name" -> (p != null ? p.getName() : (pd != null && pd.getPlayer() != null ? pd.getPlayer().getName() : ""));
             case "balance", "money" -> {
                 OfflinePlayer off = (p != null ? p : (pd != null ? pd.getPlayer() : null));
-                yield (Robbery.getEconomy() != null && off != null) ? String.valueOf(Robbery.getEconomy().getBalance(off)) : "0";
+                yield String.valueOf(getPlayerBalance(off));
             }
             case "balance_formatted", "money_formatted", "balance_short", "money_short" -> {
                 OfflinePlayer off = (p != null ? p : (pd != null ? pd.getPlayer() : null));
-                yield (Robbery.getEconomy() != null && off != null) ? NumberFormatter.formatDoubleNumber(Robbery.getEconomy().getBalance(off)) : "0";
+                yield NumberFormatter.formatDoubleNumber(getPlayerBalance(off));
             }
             case "balance_commas", "money_commas" -> {
                 OfflinePlayer off = (p != null ? p : (pd != null ? pd.getPlayer() : null));
-                yield (Robbery.getEconomy() != null && off != null) ? String.format("%,.2f", Robbery.getEconomy().getBalance(off)) : "0.00";
+                yield String.format("%,.2f", getPlayerBalance(off));
             }
             case "backpack_name" -> pd.getBackpack().getColorname();
             case "backpack_capacity" -> String.valueOf(pd.getBackpack().getcapacity());
@@ -267,6 +268,24 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                 robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
                 yield String.valueOf(machine != null && machine.isPlaced());
             }
+            case "crypto_credits" -> String.valueOf(pd.getCryptoCredits());
+            case "crypto_level" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                yield (machine != null) ? String.valueOf(machine.getMachineLevel()) : "1";
+            }
+            case "crypto_capacity" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                yield (machine != null) ? String.valueOf(machine.getCapacity()) : "1";
+            }
+            case "crypto_interval" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "10m";
+                int sec = machine.getStealIntervalSeconds();
+                int min = sec / 60;
+                int remSec = sec % 60;
+                yield (remSec > 0) ? min + "m " + remSec + "s" : min + "m";
+            }
+            case "crypto_avg_item_value" -> NumberFormatter.formatDoubleNumber(robbery.crypto.CryptoMachine.getAverageTop5ItemValue(pd));
             case "crypto_status" -> {
                 robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
                 if (machine == null || !machine.isPlaced()) yield "&cNot Placed";
@@ -283,31 +302,65 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                 if (machine == null) yield "0";
                 yield String.valueOf(machine.getUnclaimedMoney());
             }
+            case "crypto_money_pm" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "0";
+                double avgTop5Val = robbery.crypto.CryptoMachine.getAverageTop5ItemValue(pd);
+                int capacity = machine.getCapacity();
+                double rewardMult = machine.getRewardMultiplier();
+                double qualityMult = machine.getQualityMultiplier();
+                double onlineBuff = (p.isOnline() && machine.getFuelTicks() > 0) ? 1.20 : 1.0;
+                int storeOrder = (pd.getKey() != null) ? pd.getKey().getOrder() : 1;
+                double storeEfficiency = robbery.crypto.CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
+
+                double stealsPerMin = 60.0 / (double) machine.getStealIntervalSeconds();
+                double totalPm = stealsPerMin * capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency;
+                yield NumberFormatter.formatDoubleNumber(totalPm);
+            }
+            case "crypto_money_pm_raw" -> {
+                robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
+                if (machine == null) yield "0";
+                double avgTop5Val = robbery.crypto.CryptoMachine.getAverageTop5ItemValue(pd);
+                int capacity = machine.getCapacity();
+                double rewardMult = machine.getRewardMultiplier();
+                double qualityMult = machine.getQualityMultiplier();
+                double onlineBuff = (p.isOnline() && machine.getFuelTicks() > 0) ? 1.20 : 1.0;
+                int storeOrder = (pd.getKey() != null) ? pd.getKey().getOrder() : 1;
+                double storeEfficiency = robbery.crypto.CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
+
+                double stealsPerMin = 60.0 / (double) machine.getStealIntervalSeconds();
+                double totalPm = stealsPerMin * capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency;
+                yield String.format("%.2f", totalPm);
+            }
             case "crypto_money_ps" -> {
                 robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
                 if (machine == null) yield "0";
-                long baseRate = main.getCryptoManager().getBaseRateForStore(pd.getHighestOwnedStoreTier());
-                double qualityMult = machine.getQualityMultiplier();
-                double speedMult = machine.getSpeedMultiplier();
+                double avgTop5Val = robbery.crypto.CryptoMachine.getAverageTop5ItemValue(pd);
+                int capacity = machine.getCapacity();
                 double rewardMult = machine.getRewardMultiplier();
-                double onlineBuff = 1.0;
-                if (p.isOnline() && machine.getFuelTicks() > 0) onlineBuff = 1.20; // 20% online buff
-                
-                long totalPs = (long) (baseRate * qualityMult * speedMult * rewardMult * onlineBuff);
-                yield NumberFormatter.formatDoubleNumber((double) totalPs);
+                double qualityMult = machine.getQualityMultiplier();
+                double onlineBuff = (p.isOnline() && machine.getFuelTicks() > 0) ? 1.20 : 1.0;
+                int storeOrder = (pd.getKey() != null) ? pd.getKey().getOrder() : 1;
+                double storeEfficiency = robbery.crypto.CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
+
+                double stealsPerMin = 60.0 / (double) machine.getStealIntervalSeconds();
+                double totalPs = (stealsPerMin * capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency) / 60.0;
+                yield NumberFormatter.formatDoubleNumber(totalPs);
             }
             case "crypto_money_ps_raw" -> {
                 robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
                 if (machine == null) yield "0";
-                long baseRate = main.getCryptoManager().getBaseRateForStore(pd.getHighestOwnedStoreTier());
-                double qualityMult = machine.getQualityMultiplier();
-                double speedMult = machine.getSpeedMultiplier();
+                double avgTop5Val = robbery.crypto.CryptoMachine.getAverageTop5ItemValue(pd);
+                int capacity = machine.getCapacity();
                 double rewardMult = machine.getRewardMultiplier();
-                double onlineBuff = 1.0;
-                if (p.isOnline() && machine.getFuelTicks() > 0) onlineBuff = 1.20;
-                
-                long totalPs = (long) (baseRate * qualityMult * speedMult * rewardMult * onlineBuff);
-                yield String.valueOf(totalPs);
+                double qualityMult = machine.getQualityMultiplier();
+                double onlineBuff = (p.isOnline() && machine.getFuelTicks() > 0) ? 1.20 : 1.0;
+                int storeOrder = (pd.getKey() != null) ? pd.getKey().getOrder() : 1;
+                double storeEfficiency = robbery.crypto.CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
+
+                double stealsPerMin = 60.0 / (double) machine.getStealIntervalSeconds();
+                double totalPs = (stealsPerMin * capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency) / 60.0;
+                yield String.format("%.2f", totalPs);
             }
             case "crypto_quality" -> {
                 robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
@@ -673,12 +726,23 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
         return color + (styles.isBold(player.getUniqueId()) ? ChatColor.BOLD.toString() : "");
     }
 
+    private double getPlayerBalance(OfflinePlayer off) {
+        if (off == null) return 0.0;
+        MoneyManager moneyManager = Robbery.getMoneyManager();
+        if (moneyManager != null) {
+            return moneyManager.getMoney(off.getUniqueId());
+        }
+        if (Robbery.getEconomy() != null) {
+            return Robbery.getEconomy().getBalance(off);
+        }
+        return 0.0;
+    }
+
     private String nextStorePercentage(PlayerData pd, Player p) {
         int nextStore = pd.getKey().getOrder() + 1;
         var key = KeyManager.getKeyByOrder(nextStore);
         if (key == null) return "MAX";
-        Economy econ = Robbery.getEconomy();
-        double balance = econ.getBalance(p);
+        double balance = getPlayerBalance(p);
         double price = key.getPrice(pd);
         double percentage = Math.min((balance / price) * 100.0, 100.0);
         return String.format("%.2f%%", percentage);

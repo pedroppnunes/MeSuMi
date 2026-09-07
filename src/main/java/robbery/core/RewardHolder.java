@@ -5,7 +5,21 @@ import org.bukkit.inventory.InventoryHolder;
 
 import java.util.UUID;
 
-public record RewardHolder(UUID owner) implements InventoryHolder {
+public class RewardHolder implements InventoryHolder {
+
+    private final UUID owner;
+
+    public RewardHolder(UUID owner) {
+        this.owner = owner;
+    }
+
+    public UUID owner() {
+        return owner;
+    }
+
+    public UUID getOwner() {
+        return owner;
+    }
 
     @Override
     public Inventory getInventory() {

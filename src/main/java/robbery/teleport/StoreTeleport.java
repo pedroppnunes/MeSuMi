@@ -65,7 +65,7 @@ public class StoreTeleport implements CommandExecutor {
      * @return true if the command executed or a message was sent to the player
      */
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String lbl, String @NotNull [] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String lbl, String[] args) {
 
         if (!(sender instanceof Player p)) {
             Messages.send(sender, "global.player-only");

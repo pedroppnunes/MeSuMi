@@ -3,6 +3,7 @@ package robbery.economy;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.milkbowl.vault.economy.Economy;
+import org.MSM.mesumiEconomy.economy.MoneyManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -105,6 +106,7 @@ public class Sell implements CommandExecutor {
         long amountToAdd = p.getBackpack().sell();
         if (amountToAdd == 0)
             return true;
+        MoneyManager moneyManager = Robbery.getMoneyManager();
         Economy econ = Robbery.getEconomy();
         String title = "&aYou sold your items for &2" + NumberFormatter.formatDoubleNumber(amountToAdd) + "$";
         String subtitle = "";
@@ -115,14 +117,22 @@ public class Sell implements CommandExecutor {
                 lucky = true;
 
                 long newAmount = amountToAdd * 2;
-                econ.depositPlayer(player, newAmount);
+                if (moneyManager != null) {
+                    moneyManager.addMoney(player.getUniqueId(), newAmount);
+                } else if (econ != null) {
+                    econ.depositPlayer(player, newAmount);
+                }
 
                 title = "&aYou sold your items for &2" + NumberFormatter.formatDoubleNumber(newAmount) + "$";
                 subtitle = Messages.get("command.sell.lucky-subtitle");
         }
 
         if (!lucky) {
-            econ.depositPlayer(player, amountToAdd);
+            if (moneyManager != null) {
+                moneyManager.addMoney(player.getUniqueId(), amountToAdd);
+            } else if (econ != null) {
+                econ.depositPlayer(player, amountToAdd);
+            }
         }
 
         player.sendTitle(ChatColor.translateAlternateColorCodes('&', title),

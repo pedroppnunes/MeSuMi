@@ -26,6 +26,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:26.2.build.+")
+    compileOnly files('src/main/resources/MesumiEconomy-1.0.jar')
     compileOnly 'net.dmulloy2:ProtocolLib:5.4.0'
     compileOnly "com.github.MilkBowl:VaultAPI:1.7.1"
     compileOnly 'me.clip:placeholderapi:2.11.6'

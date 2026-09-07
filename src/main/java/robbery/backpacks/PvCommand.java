@@ -53,7 +53,7 @@ public class PvCommand implements CommandExecutor {
      * @return true if command executed successfully
      */
     @Override
-    public boolean onCommand(@NotNull CommandSender s, @NotNull Command c, @NotNull String l, String @NotNull [] args) {
+    public boolean onCommand(@NotNull CommandSender s, @NotNull Command c, @NotNull String l, String[] args) {
         if (!(s instanceof Player p)) return false;
 
         PlayerData pd = PlayerDataManager.getPlayerData(p);
@@ -138,7 +138,7 @@ public class PvCommand implements CommandExecutor {
      */
     public Inventory loadInventory(UUID uuid, int slot) {
         File file = new File(main.getDataFolder(), "player/" + uuid + "/pv/slot_" + slot + ".yml");
-        Inventory inventory = Bukkit.createInventory(null, 54, "§6Private Chest #" + slot);
+        Inventory inventory = Bukkit.createInventory(null, 54, "Â§6Private Chest #" + slot);
 
         if (!file.exists()) return inventory;
 

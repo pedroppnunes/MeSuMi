@@ -1,6 +1,7 @@
 package robbery.tool;
 
 import net.milkbowl.vault.economy.Economy;
+import org.MSM.mesumiEconomy.economy.MoneyManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -70,6 +71,7 @@ public class BuyTool implements CommandExecutor {
 
         PlayerData data = PlayerDataManager.getPlayerData(player);
         Tools tool = ToolManager.getToolsName(toolName);
+        MoneyManager moneyManager = Robbery.getMoneyManager();
         Economy econ = Robbery.getEconomy();
 
         if (tool == null) {
@@ -87,8 +89,14 @@ public class BuyTool implements CommandExecutor {
             return true;
         }
 
-        if ((toolName.equalsIgnoreCase("tool19") || toolName.equalsIgnoreCase("tool20")) && prestige < 2) {
+        if (toolName.equalsIgnoreCase("tool19") && prestige < 2) {
             placeholders.put("prestige", "2");
+            Messages.sendFormatted(player, "command.buytool.require-prestige", placeholders);
+            return true;
+        }
+
+        if (toolName.equalsIgnoreCase("tool20") && prestige < 3) {
+            placeholders.put("prestige", "3");
             Messages.sendFormatted(player, "command.buytool.require-prestige", placeholders);
             return true;
         }
@@ -103,8 +111,13 @@ public class BuyTool implements CommandExecutor {
 
         // Purchase the tool if the player has enough money
         double price = tool.getPrice();
-        if (econ.getBalance(player) >= price) {
-            econ.withdrawPlayer(player, price);
+        double balance = (moneyManager != null) ? moneyManager.getMoney(player.getUniqueId()) : (econ != null ? econ.getBalance(player) : 0.0);
+        if (balance >= price) {
+            if (moneyManager != null) {
+                moneyManager.removeMoney(player.getUniqueId(), price);
+            } else if (econ != null) {
+                econ.withdrawPlayer(player, price);
+            }
             data.setTool(tool);
             data.addToolsName(toolName);
             data.giveToolToInv();

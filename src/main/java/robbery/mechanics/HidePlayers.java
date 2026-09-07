@@ -79,7 +79,7 @@ public class HidePlayers implements CommandExecutor, Listener {
      */
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
-                             @NotNull String label, String @NotNull [] args) {
+                             @NotNull String label, String[] args) {
         if (!(sender instanceof Player senderPlayer)) return true;
 
         UUID uuid = senderPlayer.getUniqueId();

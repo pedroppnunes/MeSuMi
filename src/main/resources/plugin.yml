@@ -75,6 +75,10 @@ commands:
     description: Migrate player data from YAML to SQL database
     usage: /migrate-to-sql
     permission: robbery.op
+  migrate-economy:
+    description: Migrate player balances to MesumiEconomy
+    usage: /migrate-economy
+    permission: robbery.op
   migratehideoutworth:
     description: Migrate saved player contributed hideout values directly to SuperiorSkyblock2 island worth and level
     usage: /migratehideoutworth
@@ -102,6 +106,13 @@ commands:
     permission: robbery.op
   ranks:
     usage: /ranks
+  awardrank:
+    description: Award a rank directly to an online or offline player
+    usage: /awardrank <player> <rank>
+    permission: robbery.op
+  giftrank:
+    description: View or gift virtual ranks to another player
+    usage: /giftrank [player] [rank]
   rankupdate:
     usage: /rankupdate <rank> [player]
     permission: robbery.op

@@ -23,7 +23,7 @@ public class ToolManager {
     public static final Tools TOOL17 = new Tools("Plasma Claws", 5.1, Material.HEART_OF_THE_SEA,650_000_000L,"§x§A§9§0§0§F§F§lP§x§B§7§0§0§F§2§ll§x§C§6§0§0§E§5§la§x§D§4§0§0§D§8§ls§x§E§2§0§0§C§A§lm§x§F§1§0§0§B§D§la §x§F§F§0§0§B§0§lC§x§F§F§0§0§B§0§ll§x§F§F§0§0§B§0§la§x§F§F§0§0§B§0§lw§x§F§F§0§0§B§0§ls");
     public static final Tools TOOL18 = new Tools("Lightsaber", 5.6, Material.FIREWORK_STAR,900_000_000L,"§x§0§0§F§F§0§7§lL§x§0§0§F§F§4§5§li§x§0§0§F§F§8§3§lg§x§0§0§F§F§C§1§lh§x§0§0§F§F§F§F§lt§x§3§3§C§C§C§C§ls§x§6§6§9§9§9§9§la§x§9§9§6§6§6§6§lb§x§C§C§3§3§3§3§le§x§F§F§0§0§0§0§lr");
     public static final Tools TOOL19 = new Tools("Butterfly", 6.2, Material.SADDLE,1_500_000_000L,"§x§0§0§F§F§0§7§lB§x§0§0§F§F§2§0§lu§x§0§0§F§F§3§9§lt§x§0§0§F§F§5§1§lt§x§0§0§F§F§6§A§le§x§0§0§F§F§8§3§lr§x§0§0§F§F§8§3§lf§x§0§0§F§F§8§3§ll§x§0§0§F§F§8§3§ly");
-    public static final Tools TOOL20 = new Tools("Karambit", 7.5, Material.CARROT_ON_A_STICK,3_500_000_000L,"§x§F§F§0§0§0§0§lK§x§E§E§8§0§0§0§la§x§D§D§F§F§0§0§lr§x§8§0§F§F§0§0§la§x§2§2§F§F§0§0§lm§x§0§0§F§F§F§5§lb§x§8§0§8§0§E§C§li§x§F§F§0§0§E§3§lt");
+    public static final Tools TOOL20 = new Tools("Karambit", 7.5, Material.CARROT_ON_A_STICK,5_000_000_000L,"§x§F§F§0§0§0§0§lK§x§E§E§8§0§0§0§la§x§D§D§F§F§0§0§lr§x§8§0§F§F§0§0§la§x§2§2§F§F§0§0§lm§x§0§0§F§F§F§5§lb§x§8§0§8§0§E§C§li§x§F§F§0§0§E§3§lt");
 
     private static final java.util.Map<Material, Tools> TOOLS_BY_MATERIAL = new java.util.EnumMap<>(Material.class);
 

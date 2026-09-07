@@ -21,7 +21,7 @@ import robbery.core.RewardHolder;
 import robbery.messages.Messages;
 import robbery.player.PlayerDataManager;
 import net.kyori.adventure.text.Component;
-import robbery.ranks.RankPaper;
+import robbery.ranks.RankManager;
 import robbery.ranks.RankUpdate;
 
 import java.io.File;
@@ -223,7 +223,7 @@ public class Rcrate implements CommandExecutor,Listener {
         for (Map.Entry<String, Integer> entry : rankRewards.entrySet()) {
             if (index >= guiSize - 9) break;
 
-            ItemStack display = RankPaper.create(entry.getKey());
+            ItemStack display = RankManager.createDisplayItem(entry.getKey(), entry.getValue());
 
             gui.setItem(index++, display);
         }

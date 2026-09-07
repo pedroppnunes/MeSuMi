@@ -32,7 +32,7 @@ public class SpawnCommand implements CommandExecutor {
      * @return true if the command was executed or a message was sent to the sender
      */
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String @NotNull [] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
         if (!(sender instanceof Player player)) {
             Messages.send(sender, "global.player-only");
             return true;

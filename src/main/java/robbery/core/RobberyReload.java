@@ -45,7 +45,7 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (args.length == 0) {
             sendHelp(sender);
             return true;
@@ -149,11 +149,11 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
                 return;
             }
             double xpPerItem = Math.pow(hp, 0.85) * 1.4;
-            sender.sendMessage("§8§m---------------------------------");
-            sender.sendMessage("§aCalculation for: §f" + itemId);
-            sender.sendMessage("§2HP: §f" + hp);
-            sender.sendMessage("§2Base XP per Item: §f" + String.format("%.2f", xpPerItem));
-            sender.sendMessage("§8§m---------------------------------");
+            sender.sendMessage("Â§8Â§m---------------------------------");
+            sender.sendMessage("Â§aCalculation for: Â§f" + itemId);
+            sender.sendMessage("Â§2HP: Â§f" + hp);
+            sender.sendMessage("Â§2Base XP per Item: Â§f" + String.format("%.2f", xpPerItem));
+            sender.sendMessage("Â§8Â§m---------------------------------");
             return;
         }
 
@@ -407,13 +407,13 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
     }
 
     private void sendHelp(CommandSender sender) {
-        sender.sendMessage("§8=== §5§lRobbery Admin Commands §8===");
-        sender.sendMessage("§d/robbery reload §7- Reload plugin data & items");
-        sender.sendMessage("§d/robbery admin xp <give|set|remove|setlevel|reset> <player> [amount] §7- Manage player XP");
-        sender.sendMessage("§d/robbery admin sp <give|set|remove|reset> <player> [amount] §7- Manage Skill Points");
-        sender.sendMessage("§d/robbery admin itemsstolen <give|set|remove|reset> <store> <player> [amount] §7- Manage Items Stolen");
-        sender.sendMessage("§d/robbery admin reload §7- Reload plugin data & items");
-        sender.sendMessage("§8=================================");
+        sender.sendMessage("Â§8=== Â§5Â§lRobbery Admin Commands Â§8===");
+        sender.sendMessage("Â§d/robbery reload Â§7- Reload plugin data & items");
+        sender.sendMessage("Â§d/robbery admin xp <give|set|remove|setlevel|reset> <player> [amount] Â§7- Manage player XP");
+        sender.sendMessage("Â§d/robbery admin sp <give|set|remove|reset> <player> [amount] Â§7- Manage Skill Points");
+        sender.sendMessage("Â§d/robbery admin itemsstolen <give|set|remove|reset> <store> <player> [amount] Â§7- Manage Items Stolen");
+        sender.sendMessage("Â§d/robbery admin reload Â§7- Reload plugin data & items");
+        sender.sendMessage("Â§8=================================");
     }
 
     @Override

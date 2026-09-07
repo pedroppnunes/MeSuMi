@@ -40,7 +40,7 @@ public class WeeklyLeaderboardCommand implements CommandExecutor {
      * @return true if the command was handled, false otherwise.
      */
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!(sender instanceof Player p)) {
             Messages.send(sender, "global.player-only");
             return true;

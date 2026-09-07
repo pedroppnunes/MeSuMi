@@ -31,7 +31,7 @@ public class Claim implements CommandExecutor {
      */
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
-                             @NotNull String label, String @NotNull [] args) {
+                             @NotNull String label, String[] args) {
         if (!(sender instanceof Player p)) {
             Messages.send(sender, "global.player-only");
             return true;

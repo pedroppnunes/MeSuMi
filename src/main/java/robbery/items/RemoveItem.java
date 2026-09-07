@@ -53,7 +53,7 @@ public class RemoveItem implements CommandExecutor {
      * @return true if the command executed (even if no item was found)
      */
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!(sender instanceof Player player)) {
             Messages.send(sender, "global.player-only");
             return true;
@@ -102,7 +102,7 @@ public class RemoveItem implements CommandExecutor {
                 }
             }
             if (cleanedGhost) {
-                player.sendMessage("§a[!] Cleaned up broken ghost items nearby!");
+                player.sendMessage("Â§a[!] Cleaned up broken ghost items nearby!");
             } else {
                 Messages.send(player, "command.removeitem.no-items-nearby");
             }

@@ -1,5 +1,6 @@
 package robbery.crypto;
 
+import org.MSM.mesumiEconomy.economy.MoneyManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -32,10 +33,8 @@ public class CryptoCommand implements CommandExecutor {
         sender.sendMessage(Messages.colorize("&e/crypto admin resetnpc <player>"));
         sender.sendMessage(Messages.colorize("&e/crypto admin givemachine <player> [force]"));
         sender.sendMessage(Messages.colorize("&e/crypto admin check <player>"));
-        sender.sendMessage(Messages.colorize("&e/crypto admin upgradespeed <player>"));
-        sender.sendMessage(Messages.colorize("&e/crypto admin upgradefueltime <player>"));
-        sender.sendMessage(Messages.colorize("&e/crypto admin upgradebatterytime <player>"));
-        sender.sendMessage(Messages.colorize("&e/crypto admin upgradereward <player>"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin addcredits <player> <amount>"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin upgrade <player>"));
         sender.sendMessage(Messages.colorize("&e/crypto admin addstoredfuel <player> <quality>"));
         sender.sendMessage(Messages.colorize("&e/crypto admin addstoredbattery <player> <quality>"));
         sender.sendMessage(Messages.colorize("&e/crypto admin sacrifice <player>"));
@@ -90,6 +89,59 @@ public class CryptoCommand implements CommandExecutor {
                 sender.sendMessage(Messages.colorize("&aReset NPC dialogue for " + target.getName()));
                 new CryptoNPCListener(plugin).updateNPCVisibility(target);
             }
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("credits") || args[0].equalsIgnoreCase("balance")) {
+            if (sender instanceof Player p) {
+                PlayerData pd = PlayerDataManager.getPlayerData(p);
+                int credits = (pd != null) ? pd.getCryptoCredits() : 0;
+                p.sendMessage(Messages.colorize("&8[&dCrypto&8] &7Your Crypto Credits: &e" + credits + " Credits"));
+            }
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("buycredits") || args[0].equalsIgnoreCase("buycredit")) {
+            if (!sender.hasPermission("robbery.op") && !sender.isOp()) {
+                Messages.send(sender, "global.no-permission");
+                return true;
+            }
+
+            if (!(sender instanceof Player p)) {
+                Messages.send(sender, "global.player-only");
+                return true;
+            }
+
+            if (!p.getWorld().getName().equalsIgnoreCase("SuperiorWorld")) {
+                p.sendMessage(Messages.colorize("&cYou can only exchange XP for Crypto Credits while in SuperiorWorld!"));
+                return true;
+            }
+
+            int amount = 1;
+            if (args.length >= 2) {
+                try {
+                    amount = Math.max(1, Integer.parseInt(args[1]));
+                } catch (NumberFormatException ignored) {}
+            }
+
+            int xpPerCredit = CryptoUpgradeManager.getXpPerCredit();
+            int totalXpNeeded = amount * xpPerCredit;
+
+            int currentTotalExp = getTotalExperience(p);
+            if (currentTotalExp < totalXpNeeded) {
+                p.sendMessage(Messages.colorize("&cYou need &e" + String.format("%,d", totalXpNeeded) + " XP &cto buy &e" + amount + " Crypto Credit(s)&c! (You have: &e" + String.format("%,d", currentTotalExp) + " XP&c)"));
+                return true;
+            }
+
+            setTotalExperience(p, currentTotalExp - totalXpNeeded);
+            PlayerData pd = PlayerDataManager.getPlayerData(p);
+            if (pd != null) {
+                pd.addCryptoCredits(amount);
+                plugin.getPlayerEventListener().savePlayerData(p, pd);
+            }
+
+            p.sendMessage(Messages.colorize("&aSuccessfully purchased &e" + amount + " Crypto Credit(s) &afor &e" + String.format("%,d", totalXpNeeded) + " XP&a!"));
+            p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.4f);
             return true;
         }
 
@@ -150,25 +202,32 @@ public class CryptoCommand implements CommandExecutor {
                 return true;
             }
 
-            CryptoMachine machine = plugin.getCryptoManager().getMachine(target.getUniqueId());
-            if (machine == null) {
-                Messages.send(sender, "global.player-not-found");
+            if (action.equalsIgnoreCase("addcredits") || action.equalsIgnoreCase("addcredit")) {
+                if (args.length < 4) {
+                    sendAdminUsage(sender);
+                    return true;
+                }
+                try {
+                    int amt = Math.max(1, Integer.parseInt(args[3]));
+                    PlayerData targetPd = PlayerDataManager.getPlayerData(target);
+                    if (targetPd != null) {
+                        targetPd.addCryptoCredits(amt);
+                        Robbery.getInstance().getPlayerEventListener().savePlayerData(target, targetPd);
+                        sender.sendMessage(Messages.colorize("&aAdded &e" + amt + " Crypto Credit(s) &ato &b" + target.getName() + "&a!"));
+                        if (target.isOnline()) {
+                            target.sendMessage(Messages.colorize("&aYou received &e" + amt + " Crypto Credit(s)&a!"));
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    sendAdminUsage(sender);
+                }
                 return true;
-            } else if (action.equalsIgnoreCase("upgradespeed")) {
-                int newLvl = Math.min(CryptoUpgradeManager.getMaxLevel(), machine.getSpeedLevel() + 1);
-                machine.setSpeedLevel(newLvl);
-                plugin.getCryptoManager().saveMachine(machine);
-                Messages.sendFormatted(sender, "crypto.admin-upgrade-speed", Map.of("player", target.getName(), "level", String.valueOf(machine.getSpeedLevel())));
-            } else if (action.equalsIgnoreCase("upgradefueltime") || action.equalsIgnoreCase("upgradebatterytime")) {
-                int newLvl = Math.min(CryptoUpgradeManager.getMaxLevel(), machine.getFuelTimeLevel() + 1);
-                machine.setFuelTimeLevel(newLvl);
-                plugin.getCryptoManager().saveMachine(machine);
-                Messages.sendFormatted(sender, "crypto.admin-upgrade-fueltime", Map.of("player", target.getName(), "level", String.valueOf(machine.getFuelTimeLevel()), "duration", CryptoMachine.getFuelDurationFormattedForLevel(machine.getFuelTimeLevel())));
-            } else if (action.equalsIgnoreCase("upgradereward")) {
-                int newLvl = Math.min(CryptoUpgradeManager.getMaxLevel(), machine.getRewardLevel() + 1);
-                machine.setRewardLevel(newLvl);
-                plugin.getCryptoManager().saveMachine(machine);
-                Messages.sendFormatted(sender, "crypto.admin-upgrade-reward", Map.of("player", target.getName(), "level", String.valueOf(machine.getRewardLevel())));
+            }
+
+            if (action.equalsIgnoreCase("upgrade")) {
+                CryptoUpgradeManager.upgradeMachine(target, machine);
+                sender.sendMessage(Messages.colorize("&aAttempted upgrade for " + target.getName()));
+                return true;
             } else if (action.equalsIgnoreCase("addstoredfuel") || action.equalsIgnoreCase("addstoredbattery")) {
                 if (args.length < 4) {
                     sendAdminUsage(sender);
@@ -336,12 +395,17 @@ public class CryptoCommand implements CommandExecutor {
 
                 if (machine == null) return true;
 
-                long money = machine.getUnclaimedMoney();
-                if (money > 0) {
-                    Robbery.getEconomy().depositPlayer(p, money);
-                    machine.setUnclaimedMoney(0);
+                double money = machine.getUnclaimedMoneyDouble();
+                if (money > 0.0) {
+                    MoneyManager moneyManager = Robbery.getMoneyManager();
+                    if (moneyManager != null) {
+                        moneyManager.addMoney(p.getUniqueId(), money);
+                    } else if (Robbery.getEconomy() != null) {
+                        Robbery.getEconomy().depositPlayer(p, money);
+                    }
+                    machine.setUnclaimedMoney(0.0);
                     machine.updateHologram();
-                    Messages.sendFormatted(p, "crypto.claim", "money", robbery.number.NumberFormatter.formatDoubleNumber((double) money));
+                    Messages.sendFormatted(p, "crypto.claim", "money", robbery.number.NumberFormatter.formatDoubleNumber(money));
                 } else {
                     Messages.send(p, "crypto.no-claim");
                 }
@@ -369,8 +433,6 @@ public class CryptoCommand implements CommandExecutor {
                         }
                     }
                     machine.setLocation(null);
-                    machine.setFuelTicks(0);
-                    machine.setUnclaimedMoney(0);
                     machine.updateHologram();
                     ItemStack machineItem = CryptoItemHelper.createMachineItem(plugin);
                     p.getInventory().addItem(machineItem);
@@ -380,5 +442,40 @@ public class CryptoCommand implements CommandExecutor {
             }
         }
         return true;
+    }
+
+    public static int getTotalExperience(Player player) {
+        int exp = 0;
+        int level = player.getLevel();
+        for (int i = 0; i < level; i++) {
+            exp += getExpToLevel(i);
+        }
+        exp += Math.round(getExpToLevel(level) * player.getExp());
+        return exp;
+    }
+
+    public static int getExpToLevel(int level) {
+        if (level <= 15) return 2 * level + 7;
+        if (level <= 30) return 5 * level - 38;
+        return 9 * level - 158;
+    }
+
+    public static void setTotalExperience(Player player, int exp) {
+        player.setExp(0);
+        player.setLevel(0);
+        player.setTotalExperience(0);
+        int currentExp = exp;
+
+        while (currentExp > 0) {
+            int expToNextLevel = getExpToLevel(player.getLevel());
+            if (currentExp >= expToNextLevel) {
+                currentExp -= expToNextLevel;
+                player.setLevel(player.getLevel() + 1);
+            } else {
+                float expFraction = (float) currentExp / (float) expToNextLevel;
+                player.setExp(expFraction);
+                currentExp = 0;
+            }
+        }
     }
 }

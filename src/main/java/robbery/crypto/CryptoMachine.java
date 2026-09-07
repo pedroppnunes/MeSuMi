@@ -15,7 +15,7 @@ public class CryptoMachine {
     private Integer y;
     private Integer z;
 
-    private long unclaimedMoney;
+    private double unclaimedMoney;
     private long fuelTicks;
     private double fuelQuality;
     
@@ -36,7 +36,7 @@ public class CryptoMachine {
     private long lastUpdated;
 
     public CryptoMachine(UUID ownerId, String worldName, Integer x, Integer y, Integer z,
-                         long unclaimedMoney, long fuelTicks, double fuelQuality,
+                         double unclaimedMoney, long fuelTicks, double fuelQuality,
                          int speedLevel, int fuelTimeLevel, int rewardLevel, long lastUpdated) {
         this.ownerId = ownerId;
         this.worldName = worldName;
@@ -50,6 +50,12 @@ public class CryptoMachine {
         this.fuelTimeLevel = fuelTimeLevel;
         this.rewardLevel = rewardLevel;
         this.lastUpdated = lastUpdated;
+    }
+
+    public CryptoMachine(UUID ownerId, String worldName, Integer x, Integer y, Integer z,
+                         long unclaimedMoney, long fuelTicks, double fuelQuality,
+                         int speedLevel, int fuelTimeLevel, int rewardLevel, long lastUpdated) {
+        this(ownerId, worldName, x, y, z, (double) unclaimedMoney, fuelTicks, fuelQuality, speedLevel, fuelTimeLevel, rewardLevel, lastUpdated);
     }
 
     public long getLastUpdated() { return lastUpdated; }
@@ -92,14 +98,26 @@ public class CryptoMachine {
     }
 
     public long getUnclaimedMoney() {
+        return (long) unclaimedMoney;
+    }
+
+    public double getUnclaimedMoneyDouble() {
         return unclaimedMoney;
     }
 
     public void setUnclaimedMoney(long unclaimedMoney) {
+        this.unclaimedMoney = (double) unclaimedMoney;
+    }
+
+    public void setUnclaimedMoney(double unclaimedMoney) {
         this.unclaimedMoney = unclaimedMoney;
     }
     
     public void addUnclaimedMoney(long amount) {
+        this.unclaimedMoney += amount;
+    }
+
+    public void addUnclaimedMoney(double amount) {
         this.unclaimedMoney += amount;
     }
 
@@ -348,24 +366,86 @@ public class CryptoMachine {
         }
     }
 
+    public int getMachineLevel() {
+        if (speedLevel <= 0) return 1;
+        return Math.min(10, speedLevel);
+    }
+
+    public int getCapacity() {
+        return Math.min(10, Math.max(1, getMachineLevel()));
+    }
+
+    public int getStealIntervalSeconds() {
+        int lvl = getMachineLevel();
+        return Math.max(60, 600 - ((lvl - 1) * 60));
+    }
+
+    public double getRewardMultiplier() {
+        int lvl = getMachineLevel();
+        if (lvl <= 1) return 1.0;
+        if (lvl >= 10) return 3.0;
+        return 1.0 + ((lvl - 1) * (2.0 / 9.0));
+    }
+
     public double getSpeedMultiplier() {
-        if (speedLevel < 10) {
-            return 1.0 + (speedLevel * 0.01);
-        } else if (speedLevel < 30) {
-            return 1.10 + ((speedLevel - 10) * 0.014);
-        } else {
-            return Math.min(2.0, 1.38 + ((speedLevel - 30) * 0.031));
-        }
+        return 1.0;
     }
 
     public double getQualityMultiplier() {
-        // Quality ranges: 1% (0.5x), 50% (1.0x), 100% (1.6x)
+        // Base/default battery starts at 1.0x so early game isn't heavily penalized
         if (fuelQuality <= 1.0) {
-            return 0.50;
+            return 1.00;
         } else if (fuelQuality <= 50.0) {
-            return 0.50 + (0.50 * ((fuelQuality - 1.0) / 49.0));
+            return 1.00 + (0.25 * ((fuelQuality - 1.0) / 49.0));
         } else {
-            return 1.00 + (0.60 * ((fuelQuality - 50.0) / 50.0));
+            return 1.25 + (0.35 * ((fuelQuality - 50.0) / 50.0));
         }
+    }
+
+    public static double getAverageTop5ItemValue(robbery.player.PlayerData pd) {
+        if (pd == null || pd.getKey() == null) return 15.80;
+        String storeId = pd.getKey().getName();
+        int targetStoreNum = extractStoreNumStatic(storeId);
+
+        java.util.List<robbery.items.Items> storeItems = new java.util.ArrayList<>();
+        if (robbery.core.Robbery.getItemsMap() != null) {
+            for (java.util.Map.Entry<String, robbery.items.Items> entry : robbery.core.Robbery.getItemsMap().entrySet()) {
+                String itemId = entry.getKey();
+                robbery.items.Items itemObj = entry.getValue();
+                if (itemId == null || itemObj == null) continue;
+                int itemStoreNum = extractStoreNumStatic(itemId);
+                if (itemStoreNum == targetStoreNum || (targetStoreNum == 12 && itemStoreNum == 13) || (targetStoreNum == 13 && itemStoreNum == 12)) {
+                    storeItems.add(itemObj);
+                }
+            }
+        }
+
+        if (storeItems.isEmpty()) return 15.80;
+
+        storeItems.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
+        int count = Math.min(5, storeItems.size());
+        double sum = 0.0;
+        for (int i = 0; i < count; i++) {
+            sum += storeItems.get(i).getValue();
+        }
+        return sum / count;
+    }
+
+    private static int extractStoreNumStatic(String id) {
+        if (id == null) return 1;
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\d+").matcher(id);
+        if (m.find()) {
+            try {
+                return Integer.parseInt(m.group());
+            } catch (NumberFormatException ignored) {}
+        }
+        return 1;
+    }
+
+    public static double getStoreEfficiencyMultiplier(int storeOrder) {
+        if (storeOrder <= 3) return 1.00;
+        if (storeOrder <= 6) return 0.50;
+        if (storeOrder <= 9) return 0.15;
+        return 0.025;
     }
 }

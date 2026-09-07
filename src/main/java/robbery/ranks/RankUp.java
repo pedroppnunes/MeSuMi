@@ -1,6 +1,7 @@
 package robbery.ranks;
 
 import net.milkbowl.vault.economy.Economy;
+import org.MSM.mesumiEconomy.economy.MoneyManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -55,7 +56,7 @@ public class RankUp implements CommandExecutor {
      * @return true if the command was executed successfully
      */
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!(sender instanceof Player p)) {
             Messages.send(sender, "global.only-players");
             return true;
@@ -79,17 +80,24 @@ public class RankUp implements CommandExecutor {
             return true;
         }
 
+        MoneyManager moneyManager = Robbery.getMoneyManager();
         Economy econ   = Robbery.getEconomy();
         double price = next.getPrice(data);
         String priceString = NumberFormatter.formatDoubleNumber((long) price);
+        double balance = (moneyManager != null) ? moneyManager.getMoney(p.getUniqueId()) : (econ != null ? econ.getBalance(p) : 0.0);
+
         // Check if player has enough money
-        if (econ.getBalance(p) < price) {
+        if (balance < price) {
             Messages.sendFormatted(p, "command.rankup.not-enough-money", Map.of("price", priceString, "store", next.getName()));
             return true;
         }
 
         // Deduct price and update player's key
-        econ.withdrawPlayer(p, price);
+        if (moneyManager != null) {
+            moneyManager.removeMoney(p.getUniqueId(), price);
+        } else if (econ != null) {
+            econ.withdrawPlayer(p, price);
+        }
         data.addKey(next.getId());
         data.setKey(next);
 

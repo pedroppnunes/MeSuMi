@@ -125,15 +125,27 @@ public class FuelRouletteGUI implements Listener {
             }
         }, 0L, 1L).getTaskId();
         
-        activeSpins.put(player.getUniqueId(), new SpinInfo(taskId, items.get((totalSpins + 3) % items.size())));
+        activeSpins.put(player.getUniqueId(), new SpinInfo(taskId, items.get((totalSpins + 4) % items.size())));
     }
     
     private void finishSpin(Player player, ItemStack winner, boolean autoClose) {
         if (winner == null || !winner.hasItemMeta()) return;
         
         Integer qualObj = winner.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "fuel_quality"), PersistentDataType.INTEGER);
-        if (qualObj == null) return;
-        int quality = qualObj;
+        int quality = 50;
+        if (qualObj != null) {
+            quality = qualObj;
+        } else if (winner.getItemMeta().hasLore() && winner.getItemMeta().lore() != null) {
+            for (Component line : winner.getItemMeta().lore()) {
+                String plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(line);
+                if (plain.contains("Quality:")) {
+                    try {
+                        String numStr = plain.replaceAll("[^0-9]", "");
+                        quality = Integer.parseInt(numStr);
+                    } catch (NumberFormatException ignored) {}
+                }
+            }
+        }
         
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
         

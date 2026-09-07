@@ -107,7 +107,7 @@ public class CryptoMachineDao {
         Integer y = rs.getObject("y") != null ? rs.getInt("y") : null;
         Integer z = rs.getObject("z") != null ? rs.getInt("z") : null;
         
-        long money = rs.getLong("unclaimed_money");
+        double money = rs.getDouble("unclaimed_money");
         long fuel = rs.getLong("fuel_ticks");
         double quality = rs.getDouble("fuel_quality");
         
@@ -208,7 +208,7 @@ public class CryptoMachineDao {
                 stmt.setObject(3, machine.getX());
                 stmt.setObject(4, machine.getY());
                 stmt.setObject(5, machine.getZ());
-                stmt.setLong(6, machine.getUnclaimedMoney());
+                stmt.setDouble(6, machine.getUnclaimedMoneyDouble());
                 stmt.setLong(7, machine.getFuelTicks());
                 stmt.setDouble(8, machine.getFuelQuality());
                 stmt.setInt(9, machine.getSpeedLevel());
@@ -221,7 +221,7 @@ public class CryptoMachineDao {
                 stmt.setObject(15, machine.getX());
                 stmt.setObject(16, machine.getY());
                 stmt.setObject(17, machine.getZ());
-                stmt.setLong(18, machine.getUnclaimedMoney());
+                stmt.setDouble(18, machine.getUnclaimedMoneyDouble());
                 stmt.setLong(19, machine.getFuelTicks());
                 stmt.setDouble(20, machine.getFuelQuality());
                 stmt.setInt(21, machine.getSpeedLevel());

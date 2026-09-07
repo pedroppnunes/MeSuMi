@@ -45,7 +45,7 @@ public class Lobby implements CommandExecutor {
      */
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
-                             @NotNull String label, String @NotNull [] args) {
+                             @NotNull String label, String[] args) {
         if (!(sender instanceof Player player)) {
             return true; // Only players can execute this command
         }

@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.milkbowl.vault.economy.Economy;
+import org.MSM.mesumiEconomy.economy.MoneyManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -108,16 +109,21 @@ public class PlayerStatsGUI implements Listener {
             }
         }
 
+        MoneyManager moneyManager = Robbery.getMoneyManager();
         Economy econ = Robbery.getEconomy();
         double balance = 0.0;
         if (targetUuid != null) {
-            OfflinePlayer off = Bukkit.getOfflinePlayer(targetUuid);
-            if (econ != null) balance = econ.getBalance(off);
+            if (moneyManager != null) {
+                balance = moneyManager.getMoney(targetUuid);
+            } else if (econ != null) {
+                OfflinePlayer off = Bukkit.getOfflinePlayer(targetUuid);
+                balance = econ.getBalance(off);
+            }
         }
 
-        // Dark Gray title format: "Stats: PlayerName"
+        // 45 slots (5 rows) title format: "Stats: PlayerName"
         String titleStr = "Stats: " + targetName;
-        Inventory inv = Bukkit.createInventory(null, 36, Component.text(titleStr).color(NamedTextColor.DARK_GRAY));
+        Inventory inv = Bukkit.createInventory(null, 45, Component.text(titleStr).color(NamedTextColor.DARK_GRAY));
 
         // Background Glass
         ItemStack glass = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
@@ -126,7 +132,7 @@ public class PlayerStatsGUI implements Listener {
             glassMeta.displayName(Component.text(" "));
             glass.setItemMeta(glassMeta);
         }
-        for (int i = 0; i < 36; i++) {
+        for (int i = 0; i < 45; i++) {
             inv.setItem(i, glass);
         }
 
@@ -165,6 +171,8 @@ public class PlayerStatsGUI implements Listener {
                     .append(Component.text("$" + NumberFormatter.formatDoubleNumber(balance)).color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Skill Points: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text(String.valueOf(pd.getSkillPoints())).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
+            lore.add(Component.text("Crypto Credits: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(String.valueOf(pd.getCryptoCredits())).color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Total Items Stolen: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text(String.valueOf(pd.getItemsStolen())).color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Total Times Busted: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
@@ -265,7 +273,83 @@ public class PlayerStatsGUI implements Listener {
         }
         inv.setItem(15, equipItem);
 
-        // 5. Profile Privacy Dye Button (Slot 20 - Row 2 Left)
+        // 5. Ranks & Gifted Ranks Card (Slot 20 - Row 2 Left)
+        ItemStack ranksGiftItem = new ItemStack(Material.NETHER_STAR);
+        ItemMeta rgMeta = ranksGiftItem.getItemMeta();
+        if (rgMeta != null) {
+            rgMeta.displayName(Component.text("Ranks & Gifted Ranks").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+            List<Component> lore = new ArrayList<>();
+            lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+            
+            String mainRank = getFormattedRank(targetUuid, pd);
+            lore.add(Component.text("Primary Rank: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(mainRank).color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+
+            java.util.Map<String, Integer> virtRanks = pd.getVirtualRanksMap();
+            int totalVirt = 0;
+            if (virtRanks != null) {
+                for (int count : virtRanks.values()) totalVirt += count;
+            }
+            lore.add(Component.text("Gifted Ranks Owned: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(totalVirt + " Ranks").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)));
+
+            if (virtRanks != null && !virtRanks.isEmpty()) {
+                virtRanks.forEach((rKey, count) -> {
+                    if (count > 0) {
+                        robbery.ranks.Rank rObj = robbery.ranks.RankManager.getRank(rKey);
+                        String rName = rObj != null && !rObj.name().isEmpty() ? rObj.name() : rKey;
+                        lore.add(Component.text(" • " + rName + ": ").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)
+                                .append(Component.text(count + "x").color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
+                    }
+                });
+            }
+            lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+            rgMeta.lore(lore);
+            ranksGiftItem.setItemMeta(rgMeta);
+        }
+        inv.setItem(20, ranksGiftItem);
+
+        // 6. Crypto Machine & Credits Card (Slot 22 - Row 2 Center)
+        ItemStack cryptoStatItem = new ItemStack(Material.REPEATER);
+        ItemMeta csMeta = cryptoStatItem.getItemMeta();
+        if (csMeta != null) {
+            csMeta.displayName(Component.text("Crypto Machine & Credits").color(NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+            List<Component> lore = new ArrayList<>();
+            lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+
+            robbery.crypto.CryptoMachine machine = (targetUuid != null) ? plugin.getCryptoManager().getMachine(targetUuid) : null;
+            String status = (machine != null && machine.isPlaced()) ? (machine.getFuelTicks() > 0 ? "Online" : "Offline (No Battery)") : "Not Placed";
+            NamedTextColor statusColor = status.startsWith("Online") ? NamedTextColor.GREEN : NamedTextColor.RED;
+
+            lore.add(Component.text("Machine Status: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(status).color(statusColor).decoration(TextDecoration.ITALIC, false)));
+
+            int level = (machine != null) ? machine.getMachineLevel() : 1;
+            lore.add(Component.text("Machine Level: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text("Level " + level + "/10").color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)));
+
+            int capacity = (machine != null) ? machine.getCapacity() : 1;
+            lore.add(Component.text("Stolen Items / Batch: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(capacity + " Items").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)));
+
+            int intervalMin = (machine != null) ? machine.getStealIntervalSeconds() / 60 : 10;
+            lore.add(Component.text("Steal Interval: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text("Every " + intervalMin + " min").color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
+
+            double unclaimed = (machine != null) ? machine.getUnclaimedMoneyDouble() : 0.0;
+            lore.add(Component.text("Unclaimed Money: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text("$" + NumberFormatter.formatDoubleNumber(unclaimed)).color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)));
+
+            lore.add(Component.text("Crypto Credits: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text(pd.getCryptoCredits() + " Credits").color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false)));
+
+            lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+            csMeta.lore(lore);
+            cryptoStatItem.setItemMeta(csMeta);
+        }
+        inv.setItem(22, cryptoStatItem);
+
+        // 7. Profile Privacy Dye Button (Slot 24 - Row 2 Right)
         String currentPrivacy = pd.getProfilePrivacy();
         ItemStack dyeItem;
         String dyeName;
@@ -303,9 +387,9 @@ public class PlayerStatsGUI implements Listener {
             }
             dyeItem.setItemMeta(dyeMeta);
         }
-        inv.setItem(20, dyeItem);
+        inv.setItem(24, dyeItem);
 
-        // 6. Store Item Catalog Button (Slot 22 - Row 2 Center)
+        // 8. Store Item Catalog Button (Slot 29 - Row 3 Left-Center)
         ItemStack catalogButton = new ItemStack(Material.ENCHANTED_BOOK);
         ItemMeta cMeta = catalogButton.getItemMeta();
         if (cMeta != null) {
@@ -315,9 +399,9 @@ public class PlayerStatsGUI implements Listener {
             ));
             catalogButton.setItemMeta(cMeta);
         }
-        inv.setItem(22, catalogButton);
+        inv.setItem(29, catalogButton);
 
-        // 7. View Skill Tree Button (Slot 24 - Row 2 Right)
+        // 9. View Skill Tree Button (Slot 33 - Row 3 Right-Center)
         ItemStack skillTreeBook = new ItemStack(Material.BOOK);
         ItemMeta pMeta = skillTreeBook.getItemMeta();
         if (pMeta != null) {
@@ -328,16 +412,16 @@ public class PlayerStatsGUI implements Listener {
             ));
             skillTreeBook.setItemMeta(pMeta);
         }
-        inv.setItem(24, skillTreeBook);
+        inv.setItem(33, skillTreeBook);
 
-        // 8. Close Button (Slot 31 - Centered Bottom)
+        // 10. Close Button (Slot 40 - Row 4 Centered Bottom)
         ItemStack closeItem = new ItemStack(Material.BARRIER);
         ItemMeta closeMeta = closeItem.getItemMeta();
         if (closeMeta != null) {
             closeMeta.displayName(Component.text("Close").color(NamedTextColor.RED).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
             closeItem.setItemMeta(closeMeta);
         }
-        inv.setItem(31, closeItem);
+        inv.setItem(40, closeItem);
 
         viewer.openInventory(inv);
     }
@@ -406,7 +490,7 @@ public class PlayerStatsGUI implements Listener {
                 return;
             }
 
-            if (event.getRawSlot() == 20 || clicked.getType() == Material.LIME_DYE || clicked.getType() == Material.YELLOW_DYE || clicked.getType() == Material.RED_DYE) {
+            if (event.getRawSlot() == 24 || clicked.getType() == Material.LIME_DYE || clicked.getType() == Material.YELLOW_DYE || clicked.getType() == Material.RED_DYE) {
                 // Toggle privacy if viewing self
                 if (player.getName().equalsIgnoreCase(targetName) || (offTarget != null && player.getUniqueId().equals(offTarget.getUniqueId()))) {
                     PlayerData selfPd = PlayerDataManager.getPlayerData(player);

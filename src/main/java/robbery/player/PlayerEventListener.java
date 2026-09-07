@@ -88,8 +88,8 @@ public class PlayerEventListener implements Listener {
         }
 
         Rcrate.loadRewards(player.getUniqueId());
-        plugin.getCryptoManager().loadPlayer(player);
         PlayerDataManager.setPlayerData(player, memory);
+        plugin.getCryptoManager().loadPlayer(player);
         PrestigeLeaderboard.updateLeaderboard(player);
 
         plugin.getChatStyleManager().ensurePlayerExists(player, hasAnyRank(player));
@@ -149,6 +149,7 @@ public class PlayerEventListener implements Listener {
         cfg.set("stats.level", memory.getLevel());
         cfg.set("stats.rank", memory.getRank());
         cfg.set("stats.prestige", memory.getPrestige());
+        cfg.set("stats.virtualRanks", memory.getVirtualRanksMap());
 
         // Store robbery stats & detailed statistics
         cfg.set("stats.itemsStolen", memory.getItemsStolen());
@@ -190,8 +191,9 @@ public class PlayerEventListener implements Listener {
         cfg.set("stats.hasbooster", memory.getBoostersString());
         cfg.set("stats.boosterpaused", memory.isBoostersPaused());
 
-        // Skillpoints & Tree
+        // Skillpoints & Tree & Crypto
         cfg.set("stats.skillpoints", memory.getSkillPoints());
+        cfg.set("stats.cryptocredits", memory.getCryptoCredits());
         cfg.set("skilltree.levels", memory.getAllSkillTreeLevels());
         cfg.set("skilltree.perks", memory.getAllPerkValues());
         cfg.set("skilltree.reset", memory.getResetSkillTreePoints());
@@ -300,7 +302,7 @@ public class PlayerEventListener implements Listener {
     }
     public void loadPlayerDataFromDB(Player player, PlayerData memory, YamlConfiguration cfg) {
         if (cfg == null) {
-            memory.setRank(getRank(player));
+            memory.setRank(getRankFromPermissions(player));
             memory.setLoaded(true);
             return;
         }
@@ -308,6 +310,8 @@ public class PlayerEventListener implements Listener {
         // Basic stats (Critical)
         try {
             memory.setRank(cfg.getString("stats.rank"));
+            syncRankFromPermissions(player, memory);
+            loadMap(cfg, "stats.virtualRanks", memory::setVirtualRanksMap);
             long loadedXp = Math.max(0L, cfg.getLong("stats.xp", 0L));
             memory.setXp(loadedXp);
             memory.setLevel(plugin.getXpManager().getLevelFromXp(loadedXp));
@@ -326,11 +330,12 @@ public class PlayerEventListener implements Listener {
             plugin.getLogger().warning("Failed loading tools/keys section for " + player.getName() + ": " + e.getMessage());
         }
 
-        // Skillpoints
+        // Skillpoints & Crypto
         try {
             memory.setSP(cfg.getString("stats.skillpoints"));
+            memory.setCryptoCredits(cfg.getInt("stats.cryptocredits", 0));
         } catch (Exception e) {
-            plugin.getLogger().warning("Failed loading skillpoints section for " + player.getName() + ": " + e.getMessage());
+            plugin.getLogger().warning("Failed loading skillpoints/crypto section for " + player.getName() + ": " + e.getMessage());
         }
 
         // Stats & store
@@ -583,20 +588,32 @@ public class PlayerEventListener implements Listener {
         return "&f";
     }
 
-    private String getRank(Player player) {
-        if (player.hasPermission("robbery.rank7"))
+    public static void syncRankFromPermissions(Player player, PlayerData memory) {
+        if (player == null || memory == null) return;
+        String permRank = getRankFromPermissions(player);
+        String currentDbRank = memory.getRank();
+        if (permRank != null && !permRank.equalsIgnoreCase("rank0")) {
+            if (robbery.ranks.RankManager.isBetterOrEqual(permRank, currentDbRank) && !permRank.equalsIgnoreCase(currentDbRank)) {
+                memory.setRank(permRank);
+            }
+        }
+    }
+
+    public static String getRankFromPermissions(Player player) {
+        if (player == null) return "rank0";
+        if (player.hasPermission("robbery.rank7") || player.hasPermission("robbery.mafiaboss") || player.hasPermission("robbery.mafia_boss"))
             return "rank7";
-        if (player.hasPermission("robbery.rank6"))
+        if (player.hasPermission("robbery.rank6") || player.hasPermission("robbery.kingpin"))
             return "rank6";
-        if (player.hasPermission("robbery.rank5"))
+        if (player.hasPermission("robbery.rank5") || player.hasPermission("robbery.heister"))
             return "rank5";
-        if (player.hasPermission("robbery.rank4"))
+        if (player.hasPermission("robbery.rank4") || player.hasPermission("robbery.outlaw"))
             return "rank4";
-        if (player.hasPermission("robbery.rank3"))
+        if (player.hasPermission("robbery.rank3") || player.hasPermission("robbery.bandit"))
             return "rank3";
-        if (player.hasPermission("robbery.rank2"))
+        if (player.hasPermission("robbery.rank2") || player.hasPermission("robbery.robber"))
             return "rank2";
-        if (player.hasPermission("robbery.rank1"))
+        if (player.hasPermission("robbery.rank1") || player.hasPermission("robbery.burglar"))
             return "rank1";
 
         return "rank0";

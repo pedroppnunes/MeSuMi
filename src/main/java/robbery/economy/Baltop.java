@@ -1,6 +1,7 @@
 package robbery.economy;
 
 import net.milkbowl.vault.economy.Economy;
+import org.MSM.mesumiEconomy.economy.MoneyManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -12,45 +13,22 @@ import robbery.core.Robbery;
 import robbery.messages.Messages;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Handles the /baltop command, which displays a paginated leaderboard
  * of players sorted by their balance in descending order.
- * <p>
- * Only online or offline players with a valid name are considered.
- * Balances are retrieved via Vault's {@link Economy} interface.
- * Pagination is handled with a default page size of 10 entries.
- * </p>
  */
 public class Baltop implements CommandExecutor {
 
     private final Economy economy;
 
-    /**
-     * Constructs a new Baltop command executor using the plugin's Vault economy.
-     */
     public Baltop() {
         this.economy = Robbery.getEconomy();
     }
 
-    /**
-     * Executes the /baltop command.
-     * <p>
-     * Usage: /baltop [page]
-     * Only players can execute this command; console execution is blocked.
-     * Displays the requested page of the top balances leaderboard.
-     * </p>
-     *
-     * @param sender  the command sender (must be a player)
-     * @param command the command object
-     * @param label   the command alias used
-     * @param args    optional arguments, where args[0] can be the page number
-     * @return true if the command executed successfully
-     */
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
-                             @NotNull String label, String @NotNull [] args) {
+                             @NotNull String label, String[] args) {
         if (!(sender instanceof Player player)) {
             Messages.send(sender, "global.player-only");
             return true;
@@ -66,6 +44,39 @@ public class Baltop implements CommandExecutor {
                 return true;
             }
         }
+
+        MoneyManager moneyManager = Robbery.getMoneyManager();
+        if (moneyManager != null) {
+            List<MoneyManager.Entry> topEntries = moneyManager.getTop();
+            int PAGE_SIZE = 10;
+            int totalPages = Math.max(1, (int) Math.ceil(topEntries.size() / (double) PAGE_SIZE));
+            if (page > totalPages) {
+                Messages.sendFormatted(player, "command.baltop.page-not-found", "page", String.valueOf(page));
+                return true;
+            }
+
+            int startIndex = (page - 1) * PAGE_SIZE;
+            int endIndex = Math.min(startIndex + PAGE_SIZE, topEntries.size());
+
+            Map<String, String> headerPlaceholders = Map.of(
+                    "page", String.valueOf(page),
+                    "total", String.valueOf(totalPages)
+            );
+            Messages.sendFormatted(player, "command.baltop.header", headerPlaceholders);
+
+            for (int i = startIndex; i < endIndex; i++) {
+                MoneyManager.Entry entry = topEntries.get(i);
+                Map<String, String> placeholders = new HashMap<>();
+                placeholders.put("rank", String.valueOf(i + 1));
+                placeholders.put("player", entry.name() != null ? entry.name() : "Unknown");
+                placeholders.put("balance", format(entry.money()));
+
+                Messages.sendFormatted(player, "command.baltop.entry", placeholders);
+            }
+            return true;
+        }
+
+        if (economy == null) return true;
 
         List<OfflinePlayer> sorted = Arrays.stream(Bukkit.getOfflinePlayers())
                 .filter(p -> p.getName() != null)
@@ -113,9 +124,9 @@ public class Baltop implements CommandExecutor {
      * <p>
      * Examples:
      * <ul>
-     *     <li>1500 → 1.5k</li>
-     *     <li>2_500_000 → 2.50m</li>
-     *     <li>3_000_000_000 → 3.00b</li>
+     *     <li>1500 â†’ 1.5k</li>
+     *     <li>2_500_000 â†’ 2.50m</li>
+     *     <li>3_000_000_000 â†’ 3.00b</li>
      * </ul>
      * </p>
      *

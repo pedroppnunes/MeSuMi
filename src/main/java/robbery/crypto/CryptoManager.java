@@ -42,26 +42,27 @@ public class CryptoManager {
             
             PlayerData pd = PlayerDataManager.getPlayerData(player);
             
-            // Offline progress calculation
+            // Offline progress calculation (item stealing batches)
             if (pd != null && machine.getFuelTicks() > 0 && machine.getLastUpdated() > 0) {
                 long now = System.currentTimeMillis();
                 long secondsPassed = (now - machine.getLastUpdated()) / 1000L;
+                int intervalSeconds = machine.getStealIntervalSeconds();
+                long batchesPassed = secondsPassed / (long) intervalSeconds;
                 
-                if (secondsPassed > 0) {
-                    long activeSeconds = Math.min(secondsPassed, machine.getFuelTicks());
+                if (batchesPassed > 0) {
+                    long activeBatches = Math.min(batchesPassed, machine.getFuelTicks() / (long) intervalSeconds);
                     
-                    int storeTier = pd.getHighestOwnedStoreTier();
-                    long baseRate = getBaseRateForStore(storeTier);
-                    double prestigeMult = 1.0 + (pd.getPrestige() * 0.10);
-
-                    double qualityMult = machine.getQualityMultiplier();
-                    double speedMult = machine.getSpeedMultiplier();
+                    int capacity = machine.getCapacity();
+                    double avgTop5Val = CryptoMachine.getAverageTop5ItemValue(pd);
                     double rewardMult = machine.getRewardMultiplier();
+                    double qualityMult = machine.getQualityMultiplier();
+                    int storeOrder = (pd.getKey() != null) ? pd.getKey().getOrder() : 1;
+                    double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
 
-                    long moneyGenerated = (long) (activeSeconds * baseRate * prestigeMult * qualityMult * speedMult * rewardMult);
+                    double moneyGenerated = activeBatches * capacity * avgTop5Val * rewardMult * qualityMult * storeEfficiency;
                     
                     machine.addUnclaimedMoney(moneyGenerated);
-                    machine.setFuelTicks(machine.getFuelTicks() - activeSeconds);
+                    machine.setFuelTicks(machine.getFuelTicks() - (activeBatches * intervalSeconds));
                 }
             }
             
@@ -74,7 +75,7 @@ public class CryptoManager {
                 if (existing.getSpeedLevel() > machine.getSpeedLevel()) machine.setSpeedLevel(existing.getSpeedLevel());
                 if (existing.getFuelTimeLevel() > machine.getFuelTimeLevel()) machine.setFuelTimeLevel(existing.getFuelTimeLevel());
                 if (existing.getRewardLevel() > machine.getRewardLevel()) machine.setRewardLevel(existing.getRewardLevel());
-                if (existing.getUnclaimedMoney() > machine.getUnclaimedMoney()) machine.setUnclaimedMoney(existing.getUnclaimedMoney());
+                if (existing.getUnclaimedMoneyDouble() > machine.getUnclaimedMoneyDouble()) machine.setUnclaimedMoney(existing.getUnclaimedMoneyDouble());
                 if (existing.getStoredFuels().size() > machine.getStoredFuels().size()) {
                     machine.getStoredFuels().clear();
                     machine.getStoredFuels().addAll(existing.getStoredFuels());
@@ -147,43 +148,42 @@ public class CryptoManager {
             for (Map.Entry<UUID, CryptoMachine> entry : activeMachines.entrySet()) {
                 CryptoMachine machine = entry.getValue();
 
-                if (machine.getFuelTicks() > 0 && machine.isPlaced()) {
-                    Player p = Bukkit.getPlayer(entry.getKey());
-                    int storeTier = 1;
-                    int prestige = 0;
-                    if (p != null && p.isOnline()) {
-                        PlayerData pd = PlayerDataManager.getPlayerData(p);
-                        if (pd != null) {
-                            storeTier = pd.getHighestOwnedStoreTier();
-                            prestige = pd.getPrestige();
+                int intervalSeconds = machine.getStealIntervalSeconds();
+                boolean isStealTick = (tickCount[0] % intervalSeconds == 0);
+
+                if (isStealTick) {
+                    if (machine.getFuelTicks() >= intervalSeconds && machine.isPlaced()) {
+                        Player p = Bukkit.getPlayer(entry.getKey());
+                        PlayerData pd = (p != null && p.isOnline()) ? PlayerDataManager.getPlayerData(p) : null;
+
+                        int capacity = machine.getCapacity();
+                        double avgTop5Val = CryptoMachine.getAverageTop5ItemValue(pd);
+                        double rewardMult = machine.getRewardMultiplier();
+                        double qualityMult = machine.getQualityMultiplier();
+                        double onlineBuff = (p != null && p.isOnline()) ? 1.20 : 1.0;
+                        int storeOrder = (pd != null && pd.getKey() != null) ? pd.getKey().getOrder() : 1;
+                        double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
+
+                        double moneyGenerated = capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency;
+
+                        machine.addUnclaimedMoney(moneyGenerated);
+                        machine.setFuelTicks(machine.getFuelTicks() - intervalSeconds);
+                        machine.setLastUpdated(now);
+
+                        // Notify player if battery just depleted
+                        if (machine.getFuelTicks() < intervalSeconds && p != null && p.isOnline()) {
+                            if (pd == null || pd.isNotificationEnabled(NotificationType.CRYPTO_MACHINE)) {
+                                Messages.send(p, "crypto.battery-stopped");
+                            }
                         }
+                    } else if (machine.isPlaced()) {
+                        machine.setLastUpdated(now);
                     }
+                }
 
-                    long baseRate = getBaseRateForStore(storeTier);
-                    double prestigeMult = 1.0 + (prestige * 0.10);
-                    double qualityMult = machine.getQualityMultiplier();
-                    double speedMult = machine.getSpeedMultiplier();
-                    double rewardMult = machine.getRewardMultiplier();
-                    double onlineBuff = (p != null && p.isOnline()) ? 1.20 : 1.0;
-
-                    long moneyGenerated = (long) Math.max(1, baseRate * prestigeMult * qualityMult * speedMult * rewardMult * onlineBuff);
-
-                    machine.addUnclaimedMoney(moneyGenerated);
-                    machine.setFuelTicks(machine.getFuelTicks() - 1);
-                    machine.setLastUpdated(now);
-
-                    // Update hologram if still placed
+                // ALWAYS update hologram if placed, so it doesn't disappear when battery is dead
+                if (machine.isPlaced()) {
                     machine.updateHologram();
-
-                    // Notify player if battery just depleted
-                    if (machine.getFuelTicks() <= 0 && p != null && p.isOnline()) {
-                        PlayerData pd = PlayerDataManager.getPlayerData(p);
-                        if (pd == null || pd.isNotificationEnabled(NotificationType.CRYPTO_MACHINE)) {
-                            Messages.send(p, "crypto.battery-stopped");
-                        }
-                    }
-                } else if (machine.isPlaced()) {
-                    machine.setLastUpdated(now);
                 }
 
                 if (autoSaveTime) {
@@ -193,6 +193,41 @@ public class CryptoManager {
         }, 20L, 20L); // Run every second
     }
     
+    public double getBaseRatePerMinuteForPlayer(PlayerData pd) {
+        if (pd == null) return 120.0;
+        int currentOrder = (pd.getKey() != null) ? pd.getKey().getOrder() : 1;
+        robbery.keys.Keys nextKey = robbery.keys.KeyManager.getKeyByOrder(currentOrder + 1);
+        double storeCost;
+        if (nextKey != null) {
+            storeCost = nextKey.getPrice(pd);
+        } else if (pd.getKey() != null) {
+            storeCost = pd.getKey().getPrice(pd);
+        } else {
+            robbery.keys.Keys defaultKey = robbery.keys.KeyManager.getKeyByOrder(1);
+            storeCost = (defaultKey != null) ? defaultKey.getPrice(pd) : 1000.0;
+        }
+
+        // Cap max hourly rate at full upgrades + all buffs (9.6x total multiplier):
+        // Early stores (Store 1-5): 50% / hour max
+        // Mid stores (Store 6-9): 25% / hour max
+        // Late stores (Store 10+): 10% / hour max
+        double targetHourlyPercent;
+        if (currentOrder <= 5) {
+            targetHourlyPercent = 0.50;
+        } else if (currentOrder <= 9) {
+            targetHourlyPercent = 0.25;
+        } else {
+            targetHourlyPercent = 0.10;
+        }
+
+        // 60 minutes * 9.6 (max total multiplier) = 576.0
+        return (targetHourlyPercent / 576.0) * storeCost;
+    }
+
+    public double getBaseRateForPlayer(PlayerData pd) {
+        return getBaseRatePerMinuteForPlayer(pd) / 60.0;
+    }
+
     public long getBaseRateForStore(int storeTier) {
         return CryptoUpgradeManager.getStoreBaseRate(storeTier);
     }
