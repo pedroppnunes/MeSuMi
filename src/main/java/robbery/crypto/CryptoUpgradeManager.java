@@ -101,6 +101,11 @@ public class CryptoUpgradeManager {
         };
     }
 
+    public static long getUpgradeCost(int currentLevel) {
+        if (currentLevel >= getMaxLevel()) return -1L;
+        return getCreditCost(currentLevel + 1);
+    }
+
     public static boolean upgradeMachine(Player player, CryptoMachine machine) {
         if (player == null || machine == null) return false;
 

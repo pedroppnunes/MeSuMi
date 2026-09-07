@@ -228,7 +228,28 @@ public class CryptoManager {
         return getBaseRatePerMinuteForPlayer(pd) / 60.0;
     }
 
-    public long getBaseRateForStore(int storeTier) {
-        return CryptoUpgradeManager.getStoreBaseRate(storeTier);
+    public double getBaseRateForStore(int storeTier) {
+        robbery.keys.Keys storeKey = robbery.keys.KeyManager.getKeyByOrder(storeTier);
+        if (storeKey == null) return 15.80;
+        java.util.List<robbery.items.Items> storeItems = new java.util.ArrayList<>();
+        if (robbery.core.Robbery.getItemsMap() != null) {
+            for (java.util.Map.Entry<String, robbery.items.Items> entry : robbery.core.Robbery.getItemsMap().entrySet()) {
+                String itemId = entry.getKey();
+                robbery.items.Items itemObj = entry.getValue();
+                if (itemId == null || itemObj == null) continue;
+                int itemStoreNum = CryptoMachine.extractStoreNumStatic(itemId);
+                if (itemStoreNum == storeTier || (storeTier == 12 && itemStoreNum == 13) || (storeTier == 13 && itemStoreNum == 12)) {
+                    storeItems.add(itemObj);
+                }
+            }
+        }
+        if (storeItems.isEmpty()) return 15.80;
+        storeItems.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
+        int count = Math.min(5, storeItems.size());
+        double sum = 0;
+        for (int i = 0; i < count; i++) {
+            sum += storeItems.get(i).getValue();
+        }
+        return sum / count;
     }
 }

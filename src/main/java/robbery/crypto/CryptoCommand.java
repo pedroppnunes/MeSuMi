@@ -171,6 +171,7 @@ public class CryptoCommand implements CommandExecutor {
                 Messages.send(sender, "global.player-not-found");
                 return true;
             }
+            CryptoMachine machine = plugin.getCryptoManager().getOrCreateMachine(target.getUniqueId());
 
             if (action.equalsIgnoreCase("resetnpc")) {
                 PlayerData pd = PlayerDataManager.getPlayerData(target);

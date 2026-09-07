@@ -35,6 +35,21 @@ public class HideoutListener implements Listener {
         String message = event.getMessage().toLowerCase().trim();
         Player player = event.getPlayer();
 
+        String[] parts = message.split("\\s+");
+        if (parts.length >= 2) {
+            String mainCmd = parts[0].toLowerCase();
+            String subCmd = parts[1].toLowerCase();
+            if (mainCmd.equals("/h") || mainCmd.equals("/ho") || mainCmd.equals("/hideout") ||
+                mainCmd.equals("/is") || mainCmd.equals("/island")) {
+                if (subCmd.equals("value") || subCmd.equals("values") ||
+                    subCmd.equals("count") || subCmd.equals("counts")) {
+                    event.setCancelled(true);
+                    player.sendMessage("§5§lRobbery §8> §cThis command has been disabled because hideout values are calculated using custom systems.");
+                    return;
+                }
+            }
+        }
+
         if (message.equalsIgnoreCase("/hocontrib") || message.equalsIgnoreCase("/hideoutcontrib") ||
                 message.equalsIgnoreCase("/hocontributors") || message.equalsIgnoreCase("/hideoutcontributors") ||
                 message.equalsIgnoreCase("/ho contrib") || message.equalsIgnoreCase("/hideout contrib") ||

@@ -242,20 +242,6 @@ public class CryptoMachine {
     public void setBatteryTimeLevel(int batteryTimeLevel) {
         this.fuelTimeLevel = batteryTimeLevel;
     }
-
-    public double getRewardMultiplier() {
-        // Multiplier Curve:
-        // Early game (L0-9): 1.0x to 1.09x (+1%/lvl) - Gentle curve prevents early abuse
-        // Mid game (L10-29): 1.10x to 1.48x (+2%/lvl)
-        // Late game (L30-50): 1.50x to 2.50x (+5%/lvl) - Late game reward boost
-        if (rewardLevel < 10) {
-            return 1.0 + (rewardLevel * 0.01);
-        } else if (rewardLevel < 30) {
-            return 1.10 + ((rewardLevel - 10) * 0.019);
-        } else {
-            return Math.min(2.50, 1.50 + ((rewardLevel - 30) * 0.05));
-        }
-    }
     
     public void updateHologram() {
         if (!isPlaced()) {
@@ -431,7 +417,7 @@ public class CryptoMachine {
         return sum / count;
     }
 
-    private static int extractStoreNumStatic(String id) {
+    public static int extractStoreNumStatic(String id) {
         if (id == null) return 1;
         java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\d+").matcher(id);
         if (m.find()) {
