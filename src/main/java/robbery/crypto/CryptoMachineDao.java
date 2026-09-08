@@ -28,7 +28,7 @@ public class CryptoMachineDao {
                         "uuid VARCHAR(36) PRIMARY KEY, " +
                         "world VARCHAR(64), " +
                         "x INT, y INT, z INT, " +
-                        "unclaimed_money BIGINT DEFAULT 0, " +
+                        "unclaimed_money DOUBLE DEFAULT 0.0, " +
                         "fuel_ticks BIGINT DEFAULT 0, " +
                         "fuel_quality DOUBLE DEFAULT 0.0, " +
                         "speed_level INT DEFAULT 0, " +
@@ -82,21 +82,27 @@ public class CryptoMachineDao {
         });
     }
 
+    public CryptoMachine loadMachineSync(UUID ownerId) {
+        if (ownerId == null) return null;
+        String query = "SELECT * FROM crypto_machines WHERE uuid = ?";
+        try (Connection conn = plugin.getDatabaseManager().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+             
+            stmt.setString(1, ownerId.toString());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return parseMachine(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public CompletableFuture<CryptoMachine> loadMachine(UUID ownerId) {
         return CompletableFuture.supplyAsync(() -> {
-            String query = "SELECT * FROM crypto_machines WHERE uuid = ?";
-            try (Connection conn = plugin.getDatabaseManager().getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(query)) {
-                 
-                stmt.setString(1, ownerId.toString());
-                ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    return parseMachine(rs);
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            return new CryptoMachine(ownerId, null, null, null, null, 0, 0, 0.0, 0, 0, 0, 0L);
+            CryptoMachine m = loadMachineSync(ownerId);
+            return (m != null) ? m : new CryptoMachine(ownerId, null, null, null, null, 0, 0, 0.0, 0, 0, 0, 0L);
         });
     }
 

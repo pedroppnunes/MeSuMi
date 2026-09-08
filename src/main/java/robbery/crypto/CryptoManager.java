@@ -38,12 +38,12 @@ public class CryptoManager {
     }
     
     public void loadPlayer(Player player) {
+        if (player == null) return;
         dao.loadMachine(player.getUniqueId()).thenAccept(machine -> {
-            
             PlayerData pd = PlayerDataManager.getPlayerData(player);
             
             // Offline progress calculation (item stealing batches)
-            if (pd != null && machine.getFuelTicks() > 0 && machine.getLastUpdated() > 0) {
+            if (pd != null && machine != null && machine.isPlaced() && machine.getFuelTicks() > 0 && machine.getLastUpdated() > 0) {
                 long now = System.currentTimeMillis();
                 long secondsPassed = (now - machine.getLastUpdated()) / 1000L;
                 int intervalSeconds = machine.getStealIntervalSeconds();
@@ -66,33 +66,37 @@ public class CryptoManager {
                 }
             }
             
-            // Update last updated to now so we don't double count
-            machine.setLastUpdated(System.currentTimeMillis());
-            
-            // Preserve existing higher levels/progress if machine was already in memory
-            CryptoMachine existing = activeMachines.get(player.getUniqueId());
-            if (existing != null) {
-                if (existing.getSpeedLevel() > machine.getSpeedLevel()) machine.setSpeedLevel(existing.getSpeedLevel());
-                if (existing.getFuelTimeLevel() > machine.getFuelTimeLevel()) machine.setFuelTimeLevel(existing.getFuelTimeLevel());
-                if (existing.getRewardLevel() > machine.getRewardLevel()) machine.setRewardLevel(existing.getRewardLevel());
-                if (existing.getUnclaimedMoneyDouble() > machine.getUnclaimedMoneyDouble()) machine.setUnclaimedMoney(existing.getUnclaimedMoneyDouble());
-                if (existing.getStoredFuels().size() > machine.getStoredFuels().size()) {
-                    machine.getStoredFuels().clear();
-                    machine.getStoredFuels().addAll(existing.getStoredFuels());
+            if (machine != null) {
+                machine.setLastUpdated(System.currentTimeMillis());
+                
+                CryptoMachine existing = activeMachines.get(player.getUniqueId());
+                if (existing != null && existing != machine) {
+                    if (existing.getSpeedLevel() > machine.getSpeedLevel()) machine.setSpeedLevel(existing.getSpeedLevel());
+                    if (existing.getFuelTimeLevel() > machine.getFuelTimeLevel()) machine.setFuelTimeLevel(existing.getFuelTimeLevel());
+                    if (existing.getRewardLevel() > machine.getRewardLevel()) machine.setRewardLevel(existing.getRewardLevel());
+                    if (existing.getUnclaimedMoneyDouble() > machine.getUnclaimedMoneyDouble()) machine.setUnclaimedMoney(existing.getUnclaimedMoneyDouble());
+                    if (existing.getStoredFuels().size() > machine.getStoredFuels().size()) {
+                        machine.getStoredFuels().clear();
+                        machine.getStoredFuels().addAll(existing.getStoredFuels());
+                    }
+                    if (existing.isPlaced()) {
+                        machine.setLocation(existing.getLocation());
+                    }
                 }
-            }
 
-            activeMachines.put(player.getUniqueId(), machine);
-            dao.saveMachine(machine);
-            
-            if (machine.isPlaced()) {
-                Bukkit.getScheduler().runTask(plugin, machine::updateHologram);
+                activeMachines.put(player.getUniqueId(), machine);
+                dao.saveMachine(machine);
+                
+                if (machine.isPlaced()) {
+                    Bukkit.getScheduler().runTask(plugin, machine::updateHologram);
+                }
             }
         });
     }
     
     public void unloadPlayer(Player player) {
-        CryptoMachine machine = activeMachines.remove(player.getUniqueId());
+        if (player == null) return;
+        CryptoMachine machine = activeMachines.get(player.getUniqueId());
         if (machine != null) {
             machine.removeHologram();
             dao.saveMachineSync(machine);
@@ -100,15 +104,27 @@ public class CryptoManager {
     }
     
     public CryptoMachine getMachine(UUID uuid) {
-        return activeMachines.get(uuid);
+        if (uuid == null) return null;
+        CryptoMachine m = activeMachines.get(uuid);
+        if (m == null) {
+            m = dao.loadMachineSync(uuid);
+            if (m != null) {
+                activeMachines.put(uuid, m);
+            }
+        }
+        return m;
     }
 
     public CryptoMachine getOrCreateMachine(UUID uuid) {
+        if (uuid == null) return null;
         CryptoMachine m = activeMachines.get(uuid);
         if (m == null) {
-            m = new CryptoMachine(uuid, null, null, null, null, 0L, 0L, 0.0, 0, 0, 0, System.currentTimeMillis());
+            m = dao.loadMachineSync(uuid);
+            if (m == null) {
+                m = new CryptoMachine(uuid, null, null, null, null, 0L, 0L, 0.0, 0, 0, 0, System.currentTimeMillis());
+                dao.saveMachine(m);
+            }
             activeMachines.put(uuid, m);
-            dao.saveMachine(m);
         }
         return m;
     }
