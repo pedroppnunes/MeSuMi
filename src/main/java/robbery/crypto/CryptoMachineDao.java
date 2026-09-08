@@ -126,7 +126,17 @@ public class CryptoMachineDao {
         if (hasColumn(rs, "machine_level") && speedLvl == 0 && rewardLvl == 0) {
             int oldLvl = rs.getInt("machine_level");
             speedLvl = oldLvl;
+            fuelTimeLvl = oldLvl;
             rewardLvl = oldLvl;
+        }
+
+        // Automatic migration for old 50-level system -> new 10-level system
+        int maxLvl = Math.max(speedLvl, Math.max(fuelTimeLvl, rewardLvl));
+        if (maxLvl > 10) {
+            int scaledLvl = Math.min(10, Math.max(1, (int) Math.ceil(maxLvl / 5.0)));
+            speedLvl = scaledLvl;
+            fuelTimeLvl = scaledLvl;
+            rewardLvl = scaledLvl;
         }
 
         CryptoMachine machine = new CryptoMachine(ownerId, world, x, y, z, money, fuel, quality, speedLvl, fuelTimeLvl, rewardLvl, lastUpdated);

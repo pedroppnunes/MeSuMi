@@ -128,6 +128,7 @@ public class Robbery extends JavaPlugin implements Listener {
     private robbery.crypto.CryptoBatteryStorageGUI cryptoBatteryStorageGUI;
     private robbery.crypto.SacrificeManager sacrificeManager;
     private robbery.backpacks.BackpackGUI backpackGUI;
+    private robbery.keys.CratesMenuGUI cratesMenuGUI;
 
     public robbery.crypto.CryptoManager getCryptoManager() { return cryptoManager; }
     public robbery.crypto.CryptoDealerGUI getCryptoDealerGUI() { return cryptoDealerGUI; }
@@ -136,6 +137,7 @@ public class Robbery extends JavaPlugin implements Listener {
     public robbery.crypto.CryptoBatteryStorageGUI getCryptoBatteryStorageGUI() { return cryptoBatteryStorageGUI; }
     public robbery.crypto.SacrificeManager getSacrificeManager() { return sacrificeManager; }
     public robbery.backpacks.BackpackGUI getBackpackGUI() { return backpackGUI; }
+    public robbery.keys.CratesMenuGUI getCratesMenuGUI() { return cratesMenuGUI; }
 
     private robbery.storeMastery.StoreCatalogGUI storeCatalogGUI;
     private robbery.storeMastery.StorePlaytimeTask storePlaytimeTask;
@@ -224,6 +226,9 @@ public class Robbery extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new ClaimGuiListener(), main);
         getServer().getPluginManager().registerEvents(new SkillTreeItem(main), main);
         getServer().getPluginManager().registerEvents(new HotbarListener(main), main);
+        this.cratesMenuGUI = new robbery.keys.CratesMenuGUI(main);
+        getServer().getPluginManager().registerEvents(cratesMenuGUI, main);
+        if (getCommand("cratesmenu") != null) getCommand("cratesmenu").setExecutor(new robbery.keys.CratesMenuCommand(main));
         Objects.requireNonNull(getCommand("additem")).setExecutor(new AddItem(main));
         Objects.requireNonNull(getCommand("removeItem")).setExecutor(new RemoveItem(main));
         Objects.requireNonNull(getCommand("sellrob")).setExecutor(new Sell(main));
