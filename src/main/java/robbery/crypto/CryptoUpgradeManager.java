@@ -131,7 +131,7 @@ public class CryptoUpgradeManager {
 
         int creditCost = getCreditCost(targetLevel);
         if (pd.getCryptoCredits() < creditCost) {
-            player.sendMessage(Messages.colorize("&cYou need &e" + creditCost + " Crypto Credits &cto upgrade to Level " + targetLevel + "! (You have: &e" + pd.getCryptoCredits() + "&c)"));
+            player.sendMessage(Messages.colorize("&cYou need &6&l⛁ " + creditCost + " Crypto Credits &cto upgrade to Level " + targetLevel + "! (You have: &6⛁ " + pd.getCryptoCredits() + "&c)"));
             return false;
         }
 
@@ -141,7 +141,7 @@ public class CryptoUpgradeManager {
         machine.setRewardLevel(targetLevel);
         Robbery.getInstance().getCryptoManager().saveMachine(machine);
 
-        player.sendMessage(Messages.colorize("&aSuccessfully upgraded your &eCrypto Machine &ato &bLevel " + targetLevel + "&a for &e" + creditCost + " Crypto Credits&a!"));
+        player.sendMessage(Messages.colorize("&aSuccessfully upgraded your &eCrypto Machine &ato &bLevel " + targetLevel + "&a for &6&l⛁ " + creditCost + " Crypto Credits&a!"));
         player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.2f);
         return true;
     }

@@ -172,7 +172,7 @@ public class PlayerStatsGUI implements Listener {
             lore.add(Component.text("Skill Points: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text(String.valueOf(pd.getSkillPoints())).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Crypto Credits: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text(String.valueOf(pd.getCryptoCredits())).color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)));
+                    .append(Component.text("⛁ " + pd.getCryptoCredits()).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Total Items Stolen: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text(String.valueOf(pd.getItemsStolen())).color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)));
             lore.add(Component.text("Total Times Busted: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
@@ -341,7 +341,7 @@ public class PlayerStatsGUI implements Listener {
                     .append(Component.text("$" + NumberFormatter.formatDoubleNumber(unclaimed)).color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)));
 
             lore.add(Component.text("Crypto Credits: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text(pd.getCryptoCredits() + " Credits").color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false)));
+                    .append(Component.text("⛁ " + pd.getCryptoCredits() + " Credits").color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
 
             lore.add(Component.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
             csMeta.lore(lore);

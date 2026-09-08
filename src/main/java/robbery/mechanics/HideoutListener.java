@@ -13,15 +13,6 @@ import robbery.player.PlayerDataManager;
 
 /**
  * Handles hideout-related restrictions and world-specific protections.
- * <p>
- * Features:
- * <ul>
- *     <li>Prevents players from entering the hideout if they have items in their backpack.</li>
- *     <li>Blocks teleportation commands (/spawn, /lobby, /server) if the player has items in their backpack.</li>
- *     <li>Prevents access to certain world-specific interactive commands in "world" (hideout chests, enchanter, tinkerer, alchemist, workbench).</li>
- *     <li>Prevents copper oxidation in the world to keep copper blocks intact.</li>
- * </ul>
- *
  */
 public class HideoutListener implements Listener {
 
@@ -41,12 +32,21 @@ public class HideoutListener implements Listener {
             String subCmd = parts[1].toLowerCase();
             if (mainCmd.equals("/h") || mainCmd.equals("/ho") || mainCmd.equals("/hideout") ||
                 mainCmd.equals("/is") || mainCmd.equals("/island")) {
-                if (subCmd.equals("value") || subCmd.equals("values") ||
-                    subCmd.equals("count") || subCmd.equals("counts")) {
+                if (subCmd.equalsIgnoreCase("value") || subCmd.equalsIgnoreCase("values") ||
+                    subCmd.equalsIgnoreCase("count") || subCmd.equalsIgnoreCase("counts")) {
                     event.setCancelled(true);
                     return;
                 }
             }
+        }
+
+        if (message.startsWith("/h value") || message.startsWith("/h values") ||
+            message.startsWith("/ho value") || message.startsWith("/ho values") ||
+            message.startsWith("/hideout value") || message.startsWith("/hideout values") ||
+            message.startsWith("/is value") || message.startsWith("/is values") ||
+            message.startsWith("/island value") || message.startsWith("/island values")) {
+            event.setCancelled(true);
+            return;
         }
 
         if (message.equalsIgnoreCase("/hocontrib") || message.equalsIgnoreCase("/hideoutcontrib") ||

@@ -269,6 +269,8 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                 yield String.valueOf(machine != null && machine.isPlaced());
             }
             case "crypto_credits" -> String.valueOf(pd.getCryptoCredits());
+            case "crypto_credits_symbol" -> "⛁";
+            case "crypto_credits_formatted" -> "§6§l⛁ " + pd.getCryptoCredits();
             case "crypto_level" -> {
                 robbery.crypto.CryptoMachine machine = main.getCryptoManager().getMachine(p.getUniqueId());
                 yield (machine != null) ? String.valueOf(machine.getMachineLevel()) : "1";

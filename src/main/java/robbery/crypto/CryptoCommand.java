@@ -96,7 +96,7 @@ public class CryptoCommand implements CommandExecutor {
             if (sender instanceof Player p) {
                 PlayerData pd = PlayerDataManager.getPlayerData(p);
                 int credits = (pd != null) ? pd.getCryptoCredits() : 0;
-                p.sendMessage(Messages.colorize("&8[&dCrypto&8] &7Your Crypto Credits: &e" + credits + " Credits"));
+                p.sendMessage(Messages.colorize("&8[&dCrypto&8] &7Your Crypto Credits: &6&l⛁ " + credits + " Credits"));
             }
             return true;
         }
@@ -129,7 +129,7 @@ public class CryptoCommand implements CommandExecutor {
 
             int currentTotalExp = getTotalExperience(p);
             if (currentTotalExp < totalXpNeeded) {
-                p.sendMessage(Messages.colorize("&cYou need &e" + String.format("%,d", totalXpNeeded) + " XP &cto buy &e" + amount + " Crypto Credit(s)&c! (You have: &e" + String.format("%,d", currentTotalExp) + " XP&c)"));
+                p.sendMessage(Messages.colorize("&cYou need &e" + String.format("%,d", totalXpNeeded) + " XP &cto buy &6&l⛁ " + amount + " Crypto Credit(s)&c! (You have: &e" + String.format("%,d", currentTotalExp) + " XP&c)"));
                 return true;
             }
 
@@ -140,7 +140,7 @@ public class CryptoCommand implements CommandExecutor {
                 plugin.getPlayerEventListener().savePlayerData(p, pd);
             }
 
-            p.sendMessage(Messages.colorize("&aSuccessfully purchased &e" + amount + " Crypto Credit(s) &afor &e" + String.format("%,d", totalXpNeeded) + " XP&a!"));
+            p.sendMessage(Messages.colorize("&aSuccessfully purchased &6&l⛁ " + amount + " Crypto Credit(s) &afor &e" + String.format("%,d", totalXpNeeded) + " XP&a!"));
             p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.4f);
             return true;
         }

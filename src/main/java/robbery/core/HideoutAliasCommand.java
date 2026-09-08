@@ -14,6 +14,10 @@ public class HideoutAliasCommand implements CommandExecutor {
                 HideoutTopCommand.sendHideoutTop(p);
                 return true;
             }
+            if (args.length > 0 && (args[0].equalsIgnoreCase("value") || args[0].equalsIgnoreCase("values") ||
+                    args[0].equalsIgnoreCase("count") || args[0].equalsIgnoreCase("counts"))) {
+                return true; // Silent: don't perform command or output any message
+            }
             String cmd = "hideout" + (args.length > 0 ? " " + String.join(" ", args) : "");
             p.performCommand(cmd);
         }
