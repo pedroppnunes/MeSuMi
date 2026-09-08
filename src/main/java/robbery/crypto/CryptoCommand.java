@@ -59,7 +59,7 @@ public class CryptoCommand implements CommandExecutor {
                     Messages.send(p, "crypto.must-talk-npc");
                     return true;
                 }
-                org.bukkit.Bukkit.dispatchCommand(org.bukkit.Bukkit.getConsoleSender(), "dm open crypto_machine " + p.getName());
+                plugin.getCryptoMachineGUI().open(p);
             } else {
                 Messages.send(sender, "global.player-only");
             }

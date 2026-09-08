@@ -129,6 +129,7 @@ public class Robbery extends JavaPlugin implements Listener {
     private robbery.crypto.FuelRouletteGUI fuelRouletteGUI;
     private robbery.crypto.CryptoSacrificeGUI cryptoSacrificeGUI;
     private robbery.crypto.CryptoBatteryStorageGUI cryptoBatteryStorageGUI;
+    private robbery.crypto.CryptoMachineGUI cryptoMachineGUI;
     private robbery.crypto.SacrificeManager sacrificeManager;
     private robbery.backpacks.BackpackGUI backpackGUI;
     private robbery.keys.CratesMenuGUI cratesMenuGUI;
@@ -138,6 +139,7 @@ public class Robbery extends JavaPlugin implements Listener {
     public robbery.crypto.FuelRouletteGUI getFuelRouletteGUI() { return fuelRouletteGUI; }
     public robbery.crypto.CryptoSacrificeGUI getCryptoSacrificeGUI() { return cryptoSacrificeGUI; }
     public robbery.crypto.CryptoBatteryStorageGUI getCryptoBatteryStorageGUI() { return cryptoBatteryStorageGUI; }
+    public robbery.crypto.CryptoMachineGUI getCryptoMachineGUI() { return cryptoMachineGUI; }
     public robbery.crypto.SacrificeManager getSacrificeManager() { return sacrificeManager; }
     public robbery.backpacks.BackpackGUI getBackpackGUI() { return backpackGUI; }
     public robbery.keys.CratesMenuGUI getCratesMenuGUI() { return cratesMenuGUI; }
@@ -272,6 +274,7 @@ public class Robbery extends JavaPlugin implements Listener {
         this.fuelRouletteGUI = new robbery.crypto.FuelRouletteGUI(this);
         this.cryptoSacrificeGUI = new robbery.crypto.CryptoSacrificeGUI(this);
         this.cryptoBatteryStorageGUI = new robbery.crypto.CryptoBatteryStorageGUI(this);
+        this.cryptoMachineGUI = new robbery.crypto.CryptoMachineGUI(this);
         this.sacrificeManager = new robbery.crypto.SacrificeManager();
         this.backpackGUI = new robbery.backpacks.BackpackGUI(this);
         this.storeCatalogGUI = new robbery.storeMastery.StoreCatalogGUI(this);
@@ -284,6 +287,7 @@ public class Robbery extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(fuelRouletteGUI, this);
         getServer().getPluginManager().registerEvents(cryptoSacrificeGUI, this);
         getServer().getPluginManager().registerEvents(cryptoBatteryStorageGUI, this);
+        getServer().getPluginManager().registerEvents(cryptoMachineGUI, this);
         getServer().getPluginManager().registerEvents(backpackGUI, this);
         getServer().getPluginManager().registerEvents(storeCatalogGUI, this);
         getServer().getPluginManager().registerEvents(playerStatsGUI, this);
