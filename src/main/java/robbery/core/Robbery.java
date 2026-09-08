@@ -228,41 +228,40 @@ public class Robbery extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new HotbarListener(main), main);
         this.cratesMenuGUI = new robbery.keys.CratesMenuGUI(main);
         getServer().getPluginManager().registerEvents(cratesMenuGUI, main);
-        if (getCommand("cratesmenu") != null) getCommand("cratesmenu").setExecutor(new robbery.keys.CratesMenuCommand(main));
-        Objects.requireNonNull(getCommand("additem")).setExecutor(new AddItem(main));
-        Objects.requireNonNull(getCommand("removeItem")).setExecutor(new RemoveItem(main));
-        Objects.requireNonNull(getCommand("sellrob")).setExecutor(new Sell(main));
-        Objects.requireNonNull(getCommand("buyback")).setExecutor(new BuyBackpack(main));
-        Objects.requireNonNull(getCommand("buytool")).setExecutor(new BuyTool(main));
-        Objects.requireNonNull(getCommand("buykey")).setExecutor(new BuyKey(main));
-        Objects.requireNonNull(getCommand("busted")).setExecutor(new Busted(main));
-        Objects.requireNonNull(getCommand("prestige")).setExecutor(new Prestige(main));
-        Objects.requireNonNull(getCommand("load")).setExecutor(new Load(main));
-        Objects.requireNonNull(getCommand("usebooster")).setExecutor(new UseBooster(main));
-        Objects.requireNonNull(getCommand("toggledoublejump")).setExecutor(new ToggleDoubleJump(main));
-        Objects.requireNonNull(getCommand("hp")).setExecutor(hidePlayers);
-        Objects.requireNonNull(getCommand("mall")).setExecutor(new Mall(main));
-        Objects.requireNonNull(getCommand("rankupdate")).setExecutor(new RankUpdate(main));
-        if (getCommand("awardrank") != null) getCommand("awardrank").setExecutor(new robbery.ranks.AwardRankCommand(main));
-        if (getCommand("giftrank") != null) getCommand("giftrank").setExecutor(new robbery.ranks.GiftRankCommand(main));
-        Objects.requireNonNull(getCommand("nv")).setExecutor(new NightVision(main));
-        Objects.requireNonNull(getCommand("pv")).setExecutor(new PvCommand());
-        Objects.requireNonNull(getCommand("warn")).setExecutor(new WarnCommand(main));
+        safeRegisterCommand("cratesmenu", new robbery.keys.CratesMenuCommand(main));
+        safeRegisterCommand("additem", new AddItem(main));
+        safeRegisterCommand("removeItem", new RemoveItem(main));
+        safeRegisterCommand("sellrob", new Sell(main));
+        safeRegisterCommand("buyback", new BuyBackpack(main));
+        safeRegisterCommand("buytool", new BuyTool(main));
+        safeRegisterCommand("buykey", new BuyKey(main));
+        safeRegisterCommand("busted", new Busted(main));
+        safeRegisterCommand("prestige", new Prestige(main));
+        safeRegisterCommand("load", new Load(main));
+        safeRegisterCommand("usebooster", new UseBooster(main));
+        safeRegisterCommand("toggledoublejump", new ToggleDoubleJump(main));
+        safeRegisterCommand("hp", hidePlayers);
+        safeRegisterCommand("mall", new Mall(main));
+        safeRegisterCommand("rankupdate", new RankUpdate(main));
+        safeRegisterCommand("awardrank", new robbery.ranks.AwardRankCommand(main));
+        safeRegisterCommand("giftrank", new robbery.ranks.GiftRankCommand(main));
+        safeRegisterCommand("nv", new NightVision(main));
+        safeRegisterCommand("pv", new PvCommand());
+        safeRegisterCommand("warn", new WarnCommand(main));
         RobberyReload robberyCmd = new RobberyReload(main);
-        Objects.requireNonNull(getCommand("robbery")).setExecutor(robberyCmd);
-        Objects.requireNonNull(getCommand("robbery")).setTabCompleter(robberyCmd);
-        Objects.requireNonNull(getCommand("rcrate")).setExecutor(rcrate);
-        if (getCommand("claim") != null) getCommand("claim").setExecutor(new Claim());
-        Objects.requireNonNull(getCommand("rankup")).setExecutor(new RankUp(main));
-        Objects.requireNonNull(getCommand("store")).setExecutor(new StoreTeleport());
-        Objects.requireNonNull(getCommand("warnings")).setExecutor(new WarningsCommand(warningManager));
-        Objects.requireNonNull(getCommand("mute")).setExecutor(new MuteCommand(muteManager));
-        Objects.requireNonNull(getCommand("unmute")).setExecutor(new UnmuteCommand(muteManager));
-        Objects.requireNonNull(getCommand("muteinfo")).setExecutor(new MuteInfoCommand(muteManager));
-        Objects.requireNonNull(getCommand("baltop")).setExecutor(new Baltop());
-        Objects.requireNonNull(getCommand("help")).setExecutor(new HelpCommand(main));
+        safeRegisterCommand("robbery", robberyCmd, robberyCmd);
+        safeRegisterCommand("rcrate", rcrate);
+        safeRegisterCommand("claim", new Claim());
+        safeRegisterCommand("rankup", new RankUp(main));
+        safeRegisterCommand("store", new StoreTeleport());
+        safeRegisterCommand("warnings", new WarningsCommand(warningManager));
+        safeRegisterCommand("mute", new MuteCommand(muteManager));
+        safeRegisterCommand("unmute", new UnmuteCommand(muteManager));
+        safeRegisterCommand("muteinfo", new MuteInfoCommand(muteManager));
+        safeRegisterCommand("baltop", new Baltop());
+        safeRegisterCommand("help", new HelpCommand(main));
         SpawnCommand s = new SpawnCommand();
-        Objects.requireNonNull(getCommand("spawn")).setExecutor(s);
+        safeRegisterCommand("spawn", s);
 
         this.cryptoManager = new robbery.crypto.CryptoManager(this);
         robbery.crypto.CryptoUpgradeManager.loadConfig();
@@ -306,13 +305,13 @@ public class Robbery extends JavaPlugin implements Listener {
             getCommand("stats").setExecutor(catalogCmd);
         }
 
-        Objects.requireNonNull(getCommand("crypto")).setExecutor(new robbery.crypto.CryptoCommand(this));
+        safeRegisterCommand("crypto", new robbery.crypto.CryptoCommand(this));
         if (getCommand("backpack") != null) {
             getCommand("backpack").setExecutor(new robbery.backpacks.BackpackCommand(this));
         } else if (getCommand("backpacks") != null) {
             getCommand("backpacks").setExecutor(new robbery.backpacks.BackpackCommand(this));
         }
-        Objects.requireNonNull(getCommand("ho")).setExecutor(new robbery.core.HideoutAliasCommand());
+        safeRegisterCommand("ho", new robbery.core.HideoutAliasCommand());
         robbery.core.HideoutTopCommand hideoutTopCmd = new robbery.core.HideoutTopCommand();
         if (getCommand("hocontrib") != null) {
             getCommand("hocontrib").setExecutor(hideoutTopCmd);
@@ -326,16 +325,16 @@ public class Robbery extends JavaPlugin implements Listener {
         if (getCommand("hideoutcontributors") != null) {
             getCommand("hideoutcontributors").setExecutor(hideoutTopCmd);
         }
-        Objects.requireNonNull(getCommand("s")).setExecutor(s);
-        Objects.requireNonNull(getCommand("ct")).setExecutor(new ChatColorCommand(main));
+        safeRegisterCommand("s", s);
+        safeRegisterCommand("ct", new ChatColorCommand(main));
         Lobby l = new Lobby(main);
-        Objects.requireNonNull(getCommand("lobby")).setExecutor(l);
-        Objects.requireNonNull(getCommand("l")).setExecutor(l);
-        Objects.requireNonNull(getCommand("weeklyleaderboard")).setExecutor(new WeeklyLeaderboardCommand(main));
-        Objects.requireNonNull(getCommand("loadbackup")).setExecutor(new LoadBackup(main));
-        Objects.requireNonNull(getCommand("migrate")).setExecutor(new MigrateBackup(main));
-        Objects.requireNonNull(getCommand("migrate-to-sql")).setExecutor(new robbery.database.MigrateToSQLCommand(main));
-        Objects.requireNonNull(getCommand("migratehideoutworth")).setExecutor(new MigrateHideoutWorthCommand(main));
+        safeRegisterCommand("lobby", l);
+        safeRegisterCommand("l", l);
+        safeRegisterCommand("weeklyleaderboard", new WeeklyLeaderboardCommand(main));
+        safeRegisterCommand("loadbackup", new LoadBackup(main));
+        safeRegisterCommand("migrate", new MigrateBackup(main));
+        safeRegisterCommand("migrate-to-sql", new robbery.database.MigrateToSQLCommand(main));
+        safeRegisterCommand("migratehideoutworth", new MigrateHideoutWorthCommand(main));
         if (getCommand("migrate-economy") != null) getCommand("migrate-economy").setExecutor(new MigrateEconomyCommand(main));
         HideoutAdminCommand hoAdminCmd = new HideoutAdminCommand(main);
         if (getCommand("resethideoutworth") != null) getCommand("resethideoutworth").setExecutor(hoAdminCmd);
@@ -344,12 +343,12 @@ public class Robbery extends JavaPlugin implements Listener {
         if (getCommand("dqhideout") != null) getCommand("dqhideout").setExecutor(hoAdminCmd);
         if (getCommand("undqhideout") != null) getCommand("undqhideout").setExecutor(hoAdminCmd);
         if (getCommand("dqlist") != null) getCommand("dqlist").setExecutor(hoAdminCmd);
-        Objects.requireNonNull(getCommand("stopbooster")).setExecutor(new StopBoosterCommand());
-        Objects.requireNonNull(getCommand("adminxp")).setExecutor(new AdminXPCommand(main));
+        safeRegisterCommand("stopbooster", new StopBoosterCommand());
+        safeRegisterCommand("adminxp", new AdminXPCommand(main));
         skillTreeConfig = new SkillTreeConfig(main);
         this.skillService = new SkillService(main, skillTreeConfig);
-        Objects.requireNonNull(getCommand("skillbuy")).setExecutor(new SkillPerkBuyCommand(skillService,skillTreeConfig));
-        Objects.requireNonNull(getCommand("resetskilltree")).setExecutor(new SkillTreeResetCommand(main));
+        safeRegisterCommand("skillbuy", new SkillPerkBuyCommand(skillService,skillTreeConfig));
+        safeRegisterCommand("resetskilltree", new SkillTreeResetCommand(main));
         robbery.skilltree.SkillTreeCommand skillTreeCmd = new robbery.skilltree.SkillTreeCommand(main);
         if (getCommand("skilltree") != null) {
             getCommand("skilltree").setExecutor(skillTreeCmd);
@@ -360,7 +359,7 @@ public class Robbery extends JavaPlugin implements Listener {
         questManager = new QuestManager(main);
         questManager.loadFromConfig("quests.yml");
         questService = new QuestService(questManager,main);
-        Objects.requireNonNull(getCommand("acceptalldaily")).setExecutor(new AcceptAllDailyQuestsCommand(main,questService));
+        safeRegisterCommand("acceptalldaily", new AcceptAllDailyQuestsCommand(main,questService));
         if (getCommand("outpost") != null) {
             getCommand("outpost").setExecutor(new robbery.outpost.Outpost());
         }
@@ -372,7 +371,7 @@ public class Robbery extends JavaPlugin implements Listener {
                 return true;
             });
         }
-        Objects.requireNonNull(getCommand("quests")).setExecutor(new QuestsCommand(main));
+        safeRegisterCommand("quests", new QuestsCommand(main));
         getServer().getMessenger().registerOutgoingPluginChannel(main, "BungeeCord");
         PrestigeCountManager.load();
         blockCraft.removeRecipes();
@@ -1053,4 +1052,20 @@ public class Robbery extends JavaPlugin implements Listener {
         return questService;
     }
     public QuestManager getQuestManager(){return this.questManager;}
+
+    public void safeRegisterCommand(String name, CommandExecutor executor) {
+        safeRegisterCommand(name, executor, null);
+    }
+
+    public void safeRegisterCommand(String name, CommandExecutor executor, TabCompleter completer) {
+        PluginCommand cmd = getCommand(name);
+        if (cmd != null) {
+            cmd.setExecutor(executor);
+            if (completer != null) {
+                cmd.setTabCompleter(completer);
+            }
+        } else {
+            getLogger().warning("Command '" + name + "' could not be registered because it is missing from plugin.yml.");
+        }
+    }
 }
