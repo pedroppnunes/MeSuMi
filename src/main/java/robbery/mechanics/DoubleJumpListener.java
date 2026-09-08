@@ -167,23 +167,32 @@ public class DoubleJumpListener implements Listener {
 
         if (canDoubleJump.contains(uuid)) {
 
+            double hForce = main.getConfig().getDouble("doublejump.horizontal-force", main.getConfig().getDouble("settings.doublejump.horizontal-force", 1.2));
+            double vForce = main.getConfig().getDouble("doublejump.vertical-force", main.getConfig().getDouble("settings.doublejump.vertical-force", 1.2));
+            int cdSeconds = main.getConfig().getInt("doublejump.cooldown-seconds", main.getConfig().getInt("settings.doublejump.cooldown-seconds", 3));
+
             if (!player.hasPermission("robbery.rank7")) {
                 long now = System.currentTimeMillis();
                 long cooldownEnd = doubleJumpCooldowns.getOrDefault(uuid, 0L);
 
                 if (now < cooldownEnd) {
                     long seconds = (cooldownEnd - now) / 1000;
+                    if (seconds <= 0) seconds = 1;
                     Messages.sendActionBarFormatted(player, "events.doublejump.cooldown",
                             Map.of("seconds", String.valueOf(seconds)));
                     return;
                 }
 
-                doubleJumpCooldowns.put(uuid, now + 3000);
+                doubleJumpCooldowns.put(uuid, now + (cdSeconds * 1000L));
             }
 
-            Vector direction = player.getLocation().getDirection().normalize();
-            Vector jumpBoost = direction.multiply(1.2).setY(1.2);
-            player.setVelocity(jumpBoost);
+            Vector direction = player.getLocation().getDirection();
+            Vector horiz = new Vector(direction.getX(), 0, direction.getZ());
+            if (horiz.lengthSquared() > 0) {
+                horiz.normalize().multiply(hForce);
+            }
+            horiz.setY(vForce);
+            player.setVelocity(horiz);
 
             canDoubleJump.remove(uuid);
         }

@@ -330,7 +330,10 @@ public class PlayerSkillTreeGUI implements Listener {
         if ("itemstreakspeed1".equals(perkId)) {
             lore.add(Component.text("(Stacks per item, Max 35%)").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
         } else if ("doublejump".equals(perkId)) {
-            lore.add(Component.text("Cooldown: 5 seconds").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+            int cd = plugin.getConfig().getInt("doublejump.cooldown-seconds", plugin.getConfig().getInt("settings.doublejump.cooldown-seconds", 3));
+            lore.add(Component.text("Cooldown: " + cd + " seconds").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+        } else if ("featherflight".equals(perkId)) {
+            lore.add(Component.text("Cooldown: 5 minutes").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
         } else if ("keyschance".equals(perkId)) {
             lore.add(Component.text("(Vote, Epic, Legendary, Tags, Booster)").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
         }
@@ -348,9 +351,9 @@ public class PlayerSkillTreeGUI implements Listener {
             case "abilityspinquests2" -> "Increases the amount of Skill Points quests give by +2";
             case "chancemoneymultiplier1" -> "5% Chance for +0.5x Money Multiplier (10s)";
             case "chancestealspeed1" -> "5% Chance for +50% Speed (10s)";
-            case "doublejump" -> "Ability to Double Jump";
+            case "doublejump" -> "Ability to Double Jump (3s Cooldown)";
             case "keyschance" -> "Ability to receive Keys while stealing";
-            case "featherflight" -> "Feather Flight effect for 5 seconds";
+            case "featherflight" -> "Feather Flight effect for 5 seconds (5m Cooldown)";
             default -> "+" + val;
         };
     }

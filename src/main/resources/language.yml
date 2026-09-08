@@ -205,6 +205,8 @@ events:
     end: "&eFlight ended!"
     cooldown: "&cYou must wait %seconds%s to use this item again."
     no-permission: "&cYou can't use this."
+  doublejump:
+    cooldown: "&cYou must wait %seconds%s before double jumping again."
   hideout:
     has_items: "&5&lRobbery &8> &cYou cannot use this command while your backpack has items!"
     chest_blocked: "&5&lRobbery &8> &cYou can't use that command here."

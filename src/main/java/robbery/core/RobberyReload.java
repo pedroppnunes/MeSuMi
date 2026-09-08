@@ -122,6 +122,7 @@ public class RobberyReload implements CommandExecutor, TabCompleter {
     }
 
     private void handleReload(CommandSender sender) {
+        main.reloadConfig();
         reloadAddItems();
         Messages.reload();
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lRobbery &8> &aConfiguration and items reloaded successfully!"));
