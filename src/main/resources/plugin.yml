@@ -44,6 +44,9 @@ commands:
     permission: robbery.op
   chatcolor:
     usage: /chatcolor
+  claim:
+    description: Opens the rewards GUI
+    usage: /claim
   cratesmenu:
     description: Opens the crates menu GUI
     aliases: [crates]

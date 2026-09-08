@@ -252,7 +252,7 @@ public class Robbery extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("robbery")).setExecutor(robberyCmd);
         Objects.requireNonNull(getCommand("robbery")).setTabCompleter(robberyCmd);
         Objects.requireNonNull(getCommand("rcrate")).setExecutor(rcrate);
-        Objects.requireNonNull(getCommand("claim")).setExecutor(new Claim());
+        if (getCommand("claim") != null) getCommand("claim").setExecutor(new Claim());
         Objects.requireNonNull(getCommand("rankup")).setExecutor(new RankUp(main));
         Objects.requireNonNull(getCommand("store")).setExecutor(new StoreTeleport());
         Objects.requireNonNull(getCommand("warnings")).setExecutor(new WarningsCommand(warningManager));
