@@ -191,9 +191,11 @@ public class Sell implements CommandExecutor {
             }
         }
 
-        if (totalXp > 0) {
+        long finalXp = lucky ? (totalXp * 2) : totalXp;
+
+        if (finalXp > 0) {
             try {
-                main.getXpManager().addXP(player, totalXp);
+                main.getXpManager().addXP(player, finalXp);
                 long playerXP = p.getXp();
                 int level = p.getLevel();
                 long xpNeeded = main.getXpManager().xpNext(level);
@@ -201,11 +203,11 @@ public class Sell implements CommandExecutor {
                 long xpIntoLevel = xpNeeded - xpRemaining;
 
                 player.sendActionBar(
-                        Component.text("+" + NumberFormatter.formatDoubleNumber(totalXp) + " Robbery XP (" + NumberFormatter.formatDoubleNumber(xpIntoLevel) + "/" + NumberFormatter.formatDoubleNumber(xpNeeded) + " XP)")
+                        Component.text("+" + NumberFormatter.formatDoubleNumber(finalXp) + " Robbery XP (" + NumberFormatter.formatDoubleNumber(xpIntoLevel) + "/" + NumberFormatter.formatDoubleNumber(xpNeeded) + " XP)")
                                 .color(NamedTextColor.DARK_AQUA));
 
                 if (p.isNotificationEnabled(NotificationType.ROBBERY_XP)) {
-                    Map<String, String> xpearned = Map.of("xp", String.valueOf(NumberFormatter.formatDoubleNumber(totalXp)));
+                    Map<String, String> xpearned = Map.of("xp", String.valueOf(NumberFormatter.formatDoubleNumber(finalXp)));
                     Messages.sendFormatted(player, "command.sell.xp-earned", xpearned);
                 }
             } catch (Exception ex) {
