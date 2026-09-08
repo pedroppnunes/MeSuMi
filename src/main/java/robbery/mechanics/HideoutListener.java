@@ -44,7 +44,6 @@ public class HideoutListener implements Listener {
                 if (subCmd.equals("value") || subCmd.equals("values") ||
                     subCmd.equals("count") || subCmd.equals("counts")) {
                     event.setCancelled(true);
-                    player.sendMessage("§5§lRobbery §8> §cThis command has been disabled because hideout values are calculated using custom systems.");
                     return;
                 }
             }
