@@ -56,10 +56,8 @@ public class CryptoManager {
                     double avgTop5Val = CryptoMachine.getAverageTop5ItemValue(pd);
                     double rewardMult = machine.getRewardMultiplier();
                     double qualityMult = machine.getQualityMultiplier();
-                    int storeOrder = (pd.getKey() != null) ? pd.getKey().getOrder() : 1;
-                    double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
 
-                    double moneyGenerated = activeBatches * capacity * avgTop5Val * rewardMult * qualityMult * storeEfficiency;
+                    double moneyGenerated = activeBatches * capacity * avgTop5Val * rewardMult * qualityMult;
                     
                     machine.addUnclaimedMoney(moneyGenerated);
                     machine.setFuelTicks(machine.getFuelTicks() - (activeBatches * intervalSeconds));
@@ -178,10 +176,8 @@ public class CryptoManager {
                         double rewardMult = machine.getRewardMultiplier();
                         double qualityMult = machine.getQualityMultiplier();
                         double onlineBuff = (p != null && p.isOnline()) ? 1.20 : 1.0;
-                        int storeOrder = (pd != null && pd.getKey() != null) ? pd.getKey().getOrder() : 1;
-                        double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
 
-                        double moneyGenerated = capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency;
+                        double moneyGenerated = capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff;
 
                         machine.addUnclaimedMoney(moneyGenerated);
                         machine.setFuelTicks(machine.getFuelTicks() - intervalSeconds);
@@ -246,28 +242,7 @@ public class CryptoManager {
     }
 
     public double getBaseRateForStore(int storeTier) {
-        robbery.keys.Keys storeKey = robbery.keys.KeyManager.getKeyByOrder(storeTier);
-        if (storeKey == null) return 15.80;
-        java.util.List<robbery.items.Items> storeItems = new java.util.ArrayList<>();
-        if (robbery.core.Robbery.getItemsMap() != null) {
-            for (java.util.Map.Entry<String, robbery.items.Items> entry : robbery.core.Robbery.getItemsMap().entrySet()) {
-                String itemId = entry.getKey();
-                robbery.items.Items itemObj = entry.getValue();
-                if (itemId == null || itemObj == null) continue;
-                int itemStoreNum = CryptoMachine.extractStoreNumStatic(itemId);
-                if (itemStoreNum == storeTier || (storeTier == 12 && itemStoreNum == 13) || (storeTier == 13 && itemStoreNum == 12)) {
-                    storeItems.add(itemObj);
-                }
-            }
-        }
-        if (storeItems.isEmpty()) return 15.80;
-        storeItems.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
-        int count = Math.min(5, storeItems.size());
-        double sum = 0;
-        for (int i = 0; i < count; i++) {
-            sum += storeItems.get(i).getValue();
-        }
-        return sum / count;
+        return CryptoMachine.getAverageTop5ItemValueForStore(storeTier);
     }
 
     public double getBatchPayout(CryptoMachine machine) {
@@ -280,10 +255,8 @@ public class CryptoManager {
         double rewardMult = machine.getRewardMultiplier();
         double qualityMult = machine.getQualityMultiplier();
         double onlineBuff = (p != null && p.isOnline() && machine.getFuelTicks() > 0) ? 1.20 : 1.0;
-        int storeOrder = (pd != null && pd.getKey() != null) ? pd.getKey().getOrder() : 1;
-        double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
 
-        return capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency;
+        return capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff;
     }
 
     public double getMoneyPerSecond(CryptoMachine machine) {
@@ -297,15 +270,12 @@ public class CryptoManager {
     public double getMultiplier(CryptoMachine machine) {
         if (machine == null) return 1.0;
         Player p = Bukkit.getPlayer(machine.getOwnerId());
-        PlayerData pd = (p != null && p.isOnline()) ? PlayerDataManager.getPlayerData(p) : null;
 
         double rewardMult = machine.getRewardMultiplier();
         double qualityMult = machine.getQualityMultiplier();
         double onlineBuff = (p != null && p.isOnline() && machine.getFuelTicks() > 0) ? 1.20 : 1.0;
-        int storeOrder = (pd != null && pd.getKey() != null) ? pd.getKey().getOrder() : 1;
-        double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
 
-        return rewardMult * qualityMult * onlineBuff * storeEfficiency;
+        return rewardMult * qualityMult * onlineBuff;
     }
 
     public void claimMoney(Player player) {

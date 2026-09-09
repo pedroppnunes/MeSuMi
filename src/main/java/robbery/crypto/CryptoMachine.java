@@ -374,32 +374,52 @@ public class CryptoMachine {
     }
 
     public static double getAverageTop5ItemValue(robbery.player.PlayerData pd) {
-        if (pd == null || pd.getKey() == null) return 15.80;
-        String storeId = pd.getKey().getName();
-        int targetStoreNum = extractStoreNumStatic(storeId);
+        int storeOrder = (pd != null && pd.getKey() != null) ? pd.getKey().getOrder() : 1;
+        return getAverageTop5ItemValueForStore(storeOrder);
+    }
 
-        java.util.List<robbery.items.Items> storeItems = new java.util.ArrayList<>();
-        if (robbery.core.Robbery.getItemsMap() != null) {
+    public static double getAverageTop5ItemValueForStore(int storeOrder) {
+        if (storeOrder <= 0) storeOrder = 1;
+        if (robbery.core.Robbery.getItemsMap() != null && !robbery.core.Robbery.getItemsMap().isEmpty()) {
+            String prefix = "s" + storeOrder + "_";
+            java.util.List<robbery.items.Items> storeItems = new java.util.ArrayList<>();
             for (java.util.Map.Entry<String, robbery.items.Items> entry : robbery.core.Robbery.getItemsMap().entrySet()) {
                 String itemId = entry.getKey();
                 robbery.items.Items itemObj = entry.getValue();
-                if (itemId == null || itemObj == null) continue;
-                int itemStoreNum = extractStoreNumStatic(itemId);
-                if (itemStoreNum == targetStoreNum || (targetStoreNum == 12 && itemStoreNum == 13) || (targetStoreNum == 13 && itemStoreNum == 12)) {
+                if (itemId != null && itemObj != null && (itemId.startsWith(prefix) || (storeOrder == 12 && itemId.startsWith("s13_")))) {
                     storeItems.add(itemObj);
                 }
             }
+            if (!storeItems.isEmpty()) {
+                storeItems.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
+                int count = Math.min(5, storeItems.size());
+                double sum = 0.0;
+                for (int i = 0; i < count; i++) {
+                    sum += storeItems.get(i).getValue();
+                }
+                return sum / count;
+            }
         }
+        return getStaticStoreTop5Average(storeOrder);
+    }
 
-        if (storeItems.isEmpty()) return 15.80;
-
-        storeItems.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
-        int count = Math.min(5, storeItems.size());
-        double sum = 0.0;
-        for (int i = 0; i < count; i++) {
-            sum += storeItems.get(i).getValue();
-        }
-        return sum / count;
+    public static double getStaticStoreTop5Average(int storeOrder) {
+        return switch (storeOrder) {
+            case 1 -> 15.80;       // Supermarket
+            case 2 -> 82.80;       // The Griffin's
+            case 3 -> 336.40;      // Gym
+            case 4 -> 1600.00;     // Arcade
+            case 5 -> 9350.00;     // School
+            case 6 -> 32100.00;    // Casino
+            case 7 -> 122000.00;   // Oceanarium
+            case 8 -> 350000.00;   // Steakhouse
+            case 9 -> 600000.00;   // Diamond Store
+            case 10 -> 924000.00;  // Balenziaga
+            case 11 -> 1226000.00; // Samzung
+            case 12 -> 1714000.00; // The Bank
+            case 13 -> 2451000.00; // The Vault
+            default -> 15.80;
+        };
     }
 
     public static int extractStoreNumStatic(String id) {
@@ -414,9 +434,6 @@ public class CryptoMachine {
     }
 
     public static double getStoreEfficiencyMultiplier(int storeOrder) {
-        if (storeOrder <= 3) return 1.00;
-        if (storeOrder <= 6) return 0.50;
-        if (storeOrder <= 9) return 0.15;
-        return 0.025;
+        return 1.00;
     }
 }

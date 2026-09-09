@@ -312,11 +312,9 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                 double rewardMult = machine.getRewardMultiplier();
                 double qualityMult = machine.getQualityMultiplier();
                 double onlineBuff = (p.isOnline() && machine.getFuelTicks() > 0) ? 1.20 : 1.0;
-                int storeOrder = (pd.getKey() != null) ? pd.getKey().getOrder() : 1;
-                double storeEfficiency = robbery.crypto.CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
 
                 double stealsPerMin = 60.0 / (double) machine.getStealIntervalSeconds();
-                double totalPm = stealsPerMin * capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency;
+                double totalPm = stealsPerMin * capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff;
                 yield NumberFormatter.formatDoubleNumber(totalPm);
             }
             case "crypto_money_pm_raw" -> {
@@ -327,11 +325,9 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                 double rewardMult = machine.getRewardMultiplier();
                 double qualityMult = machine.getQualityMultiplier();
                 double onlineBuff = (p.isOnline() && machine.getFuelTicks() > 0) ? 1.20 : 1.0;
-                int storeOrder = (pd.getKey() != null) ? pd.getKey().getOrder() : 1;
-                double storeEfficiency = robbery.crypto.CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
 
                 double stealsPerMin = 60.0 / (double) machine.getStealIntervalSeconds();
-                double totalPm = stealsPerMin * capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency;
+                double totalPm = stealsPerMin * capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff;
                 yield String.format("%.2f", totalPm);
             }
             case "crypto_money_ps" -> {
@@ -342,11 +338,9 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                 double rewardMult = machine.getRewardMultiplier();
                 double qualityMult = machine.getQualityMultiplier();
                 double onlineBuff = (p.isOnline() && machine.getFuelTicks() > 0) ? 1.20 : 1.0;
-                int storeOrder = (pd.getKey() != null) ? pd.getKey().getOrder() : 1;
-                double storeEfficiency = robbery.crypto.CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
 
                 double stealsPerMin = 60.0 / (double) machine.getStealIntervalSeconds();
-                double totalPs = (stealsPerMin * capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency) / 60.0;
+                double totalPs = (stealsPerMin * capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff) / 60.0;
                 yield NumberFormatter.formatDoubleNumber(totalPs);
             }
             case "crypto_money_ps_raw" -> {
@@ -357,11 +351,9 @@ public class RobberyPlaceholderExpansion extends PlaceholderExpansion {
                 double rewardMult = machine.getRewardMultiplier();
                 double qualityMult = machine.getQualityMultiplier();
                 double onlineBuff = (p.isOnline() && machine.getFuelTicks() > 0) ? 1.20 : 1.0;
-                int storeOrder = (pd.getKey() != null) ? pd.getKey().getOrder() : 1;
-                double storeEfficiency = robbery.crypto.CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
 
                 double stealsPerMin = 60.0 / (double) machine.getStealIntervalSeconds();
-                double totalPs = (stealsPerMin * capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency) / 60.0;
+                double totalPs = (stealsPerMin * capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff) / 60.0;
                 yield String.format("%.2f", totalPs);
             }
             case "crypto_quality" -> {
