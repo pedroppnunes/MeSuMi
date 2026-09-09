@@ -268,4 +268,86 @@ public class CryptoManager {
         }
         return sum / count;
     }
+
+    public double getMoneyPerSecond(CryptoMachine machine) {
+        if (machine == null) return 0.0;
+        int intervalSeconds = machine.getStealIntervalSeconds();
+        if (intervalSeconds <= 0) return 0.0;
+
+        Player p = Bukkit.getPlayer(machine.getOwnerId());
+        PlayerData pd = (p != null && p.isOnline()) ? PlayerDataManager.getPlayerData(p) : null;
+
+        int capacity = machine.getCapacity();
+        double avgTop5Val = CryptoMachine.getAverageTop5ItemValue(pd);
+        double rewardMult = machine.getRewardMultiplier();
+        double qualityMult = machine.getQualityMultiplier();
+        double onlineBuff = (p != null && p.isOnline() && machine.getFuelTicks() > 0) ? 1.20 : 1.0;
+        int storeOrder = (pd != null && pd.getKey() != null) ? pd.getKey().getOrder() : 1;
+        double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
+
+        double batchPayout = capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency;
+        return batchPayout / (double) intervalSeconds;
+    }
+
+    public double getMultiplier(CryptoMachine machine) {
+        if (machine == null) return 1.0;
+        Player p = Bukkit.getPlayer(machine.getOwnerId());
+        PlayerData pd = (p != null && p.isOnline()) ? PlayerDataManager.getPlayerData(p) : null;
+
+        double rewardMult = machine.getRewardMultiplier();
+        double qualityMult = machine.getQualityMultiplier();
+        double onlineBuff = (p != null && p.isOnline() && machine.getFuelTicks() > 0) ? 1.20 : 1.0;
+        int storeOrder = (pd != null && pd.getKey() != null) ? pd.getKey().getOrder() : 1;
+        double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
+
+        return rewardMult * qualityMult * onlineBuff * storeEfficiency;
+    }
+
+    public void claimMoney(Player player) {
+        if (player == null || !player.isOnline()) return;
+        CryptoMachine machine = getMachine(player.getUniqueId());
+        if (machine == null || machine.getUnclaimedMoneyDouble() <= 0) {
+            Messages.send(player, "crypto.no-money");
+            return;
+        }
+
+        double amount = machine.getUnclaimedMoneyDouble();
+        machine.setUnclaimedMoney(0.0);
+        saveMachine(machine);
+
+        if (Robbery.getMoneyManager() != null) {
+            Robbery.getMoneyManager().addMoney(player.getUniqueId(), amount);
+        } else if (Robbery.getEconomy() != null) {
+            Robbery.getEconomy().depositPlayer(player, amount);
+        }
+
+        player.sendMessage(Messages.colorize("&aClaimed &e$" + robbery.number.NumberFormatter.formatDoubleNumber(amount) + " &afrom your Crypto Machine!"));
+    }
+
+    public void pickupMachine(Player player) {
+        if (player == null || !player.isOnline()) return;
+        CryptoMachine machine = getMachine(player.getUniqueId());
+        if (machine == null || !machine.isPlaced()) {
+            Messages.send(player, "crypto.not-placed");
+            return;
+        }
+
+        org.bukkit.Location loc = machine.getLocation();
+        if (loc != null && loc.getWorld() != null) {
+            loc.getBlock().setType(org.bukkit.Material.AIR);
+        }
+
+        machine.removeHologram();
+        machine.setLocation(null);
+        saveMachine(machine);
+
+        org.bukkit.inventory.ItemStack item = CryptoItemHelper.createMachineItem(plugin);
+        if (player.getInventory().firstEmpty() == -1) {
+            player.getWorld().dropItem(player.getLocation(), item);
+            player.sendMessage(Messages.colorize("&aYour &eCrypto Machine &ahas been picked up and dropped on the ground!"));
+        } else {
+            player.getInventory().addItem(item);
+            player.sendMessage(Messages.colorize("&aYour &eCrypto Machine &ahas been picked up and added to your inventory!"));
+        }
+    }
 }
