@@ -497,7 +497,7 @@ public class CryptoCommand implements CommandExecutor, TabCompleter {
                 return true;
             } else if (args[0].equalsIgnoreCase("pickup")) {
                 String worldName = p.getWorld().getName();
-                if (!worldName.equalsIgnoreCase("outpost") && !worldName.equalsIgnoreCase("SuperiorWorld")) {
+                if (!worldName.equalsIgnoreCase("SuperiorWorld")) {
                     Messages.send(p, "global.not-here");
                     return true;
                 }

@@ -331,6 +331,10 @@ public class CryptoManager {
 
     public void pickupMachine(Player player) {
         if (player == null || !player.isOnline()) return;
+        if (!player.getWorld().getName().equalsIgnoreCase("SuperiorWorld")) {
+            Messages.send(player, "global.not-here");
+            return;
+        }
         CryptoMachine machine = getMachine(player.getUniqueId());
         if (machine == null || !machine.isPlaced()) {
             Messages.send(player, "crypto.not-placed");
