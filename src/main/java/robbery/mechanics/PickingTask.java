@@ -183,8 +183,20 @@ public class PickingTask extends BukkitRunnable {
             double keyChance = p.getPerkValue(PERK_SPECIAL_KEYCHANCE);
             double keyProb = keyChance / 100.0;
             if (keyProb > 0 && random.nextDouble() < keyProb) {
-                String[] keyTypes = {"boosters_key", "epic", "vote", "legendary"};
-                String keyType = keyTypes[random.nextInt(keyTypes.length)];
+                double keyRoll = random.nextDouble() * 100.0;
+                String keyType;
+                if (keyRoll < 55.0) {
+                    keyType = "vote";
+                } else if (keyRoll < 80.0) {
+                    keyType = "booster";
+                } else if (keyRoll < 92.0) {
+                    keyType = "epic";
+                } else if (keyRoll < 98.0) {
+                    keyType = "legendary";
+                } else {
+                    keyType = "tags";
+                }
+
                 player.sendTitle(
                         Messages.get("events.picking.keychance_title"),
                         Messages.get("events.picking.keychance_subtitle"),
@@ -193,7 +205,7 @@ public class PickingTask extends BukkitRunnable {
                 if (p.isNotificationEnabled(NotificationType.ABILITY_PROCS)) {
                     Messages.send(player, "events.picking.keychance_chat");
                 }
-                Bukkit.dispatchCommand(player, "crates key give " + player.getName() + " " + keyType);
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "crate key give " + player.getName() + " " + keyType + " 1");
             }
 
             main.getQuestService().onPlayerStealItem(p, storeId, 1);

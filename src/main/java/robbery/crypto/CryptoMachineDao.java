@@ -130,13 +130,11 @@ public class CryptoMachineDao {
             rewardLvl = oldLvl;
         }
 
-        // Automatic migration for old 50-level system -> new 10-level system
-        int maxLvl = Math.max(speedLvl, Math.max(fuelTimeLvl, rewardLvl));
-        if (maxLvl > 10) {
-            int scaledLvl = Math.min(10, Math.max(1, (int) Math.ceil(maxLvl / 5.0)));
-            speedLvl = scaledLvl;
-            fuelTimeLvl = scaledLvl;
-            rewardLvl = scaledLvl;
+        // Automatic migration for old 50-level system -> new 10-level system (scaled down using Math.floor)
+        if (speedLvl > 10 || fuelTimeLvl > 10 || rewardLvl > 10) {
+            speedLvl = Math.min(10, Math.max(0, (int) Math.floor(speedLvl / 5.0)));
+            fuelTimeLvl = Math.min(10, Math.max(0, (int) Math.floor(fuelTimeLvl / 5.0)));
+            rewardLvl = Math.min(10, Math.max(0, (int) Math.floor(rewardLvl / 5.0)));
         }
 
         CryptoMachine machine = new CryptoMachine(ownerId, world, x, y, z, money, fuel, quality, speedLvl, fuelTimeLvl, rewardLvl, lastUpdated);

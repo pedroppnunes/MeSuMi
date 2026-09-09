@@ -79,10 +79,10 @@ public class CryptoMachineGUI implements Listener {
             lore.add(getComponent("&7Active Battery Remaining: &a" + batteryRem));
             lore.add(getComponent("&7Active Battery Duration: &b" + CryptoMachine.getFuelDurationFormattedForLevel(machine.getFuelTimeLevel())));
             lore.add(Component.empty());
-            lore.add(getComponent("&7Upgrade Levels (Max 50):"));
-            lore.add(getComponent(" &8- &7Speed: &e" + machine.getSpeedLevel() + " &8/ &750"));
-            lore.add(getComponent(" &8- &7Duration: &b" + machine.getFuelTimeLevel() + " &8/ &750"));
-            lore.add(getComponent(" &8- &7Reward: &a" + machine.getRewardLevel() + " &8/ &750"));
+            lore.add(getComponent("&7Upgrade Levels (Max 10):"));
+            lore.add(getComponent(" &8- &7Speed: &e" + machine.getSpeedLevel() + " &8/ &710"));
+            lore.add(getComponent(" &8- &7Duration: &b" + machine.getFuelTimeLevel() + " &8/ &710"));
+            lore.add(getComponent(" &8- &7Reward: &a" + machine.getRewardLevel() + " &8/ &710"));
             lore.add(Component.empty());
 
             double mult = plugin.getCryptoManager().getMultiplier(machine);
@@ -130,7 +130,7 @@ public class CryptoMachineGUI implements Listener {
         if (speedMeta != null) {
             speedMeta.displayName(getComponent("&fUpgrade Speed"));
             List<Component> lore = new ArrayList<>();
-            lore.add(getComponent("&7Current Level: &e" + machine.getSpeedLevel() + " &8/ &750"));
+            lore.add(getComponent("&7Current Level: &e" + machine.getSpeedLevel() + " &8/ &710"));
             lore.add(getComponent("&7Increases generation speed per second."));
             lore.add(Component.empty());
 
@@ -155,7 +155,7 @@ public class CryptoMachineGUI implements Listener {
         if (durationMeta != null) {
             durationMeta.displayName(getComponent("&fUpgrade Battery Duration"));
             List<Component> lore = new ArrayList<>();
-            lore.add(getComponent("&7Current Level: &b" + machine.getFuelTimeLevel() + " &8/ &750"));
+            lore.add(getComponent("&7Current Level: &b" + machine.getFuelTimeLevel() + " &8/ &710"));
             lore.add(getComponent("&7Current Duration: &b" + CryptoMachine.getFuelDurationFormattedForLevel(machine.getFuelTimeLevel())));
             lore.add(getComponent("&7Increases active battery duration."));
             lore.add(Component.empty());
@@ -181,7 +181,7 @@ public class CryptoMachineGUI implements Listener {
         if (rewardMeta != null) {
             rewardMeta.displayName(getComponent("&fUpgrade Money Reward"));
             List<Component> lore = new ArrayList<>();
-            lore.add(getComponent("&7Current Level: &a" + machine.getRewardLevel() + " &8/ &750"));
+            lore.add(getComponent("&7Current Level: &a" + machine.getRewardLevel() + " &8/ &710"));
             lore.add(getComponent("&7Increases money payout multiplier."));
             lore.add(Component.empty());
 

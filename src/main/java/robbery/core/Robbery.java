@@ -351,7 +351,8 @@ public class Robbery extends JavaPlugin implements Listener {
         if (getCommand("undqhideout") != null) getCommand("undqhideout").setExecutor(hoAdminCmd);
         if (getCommand("dqlist") != null) getCommand("dqlist").setExecutor(hoAdminCmd);
         safeRegisterCommand("stopbooster", new StopBoosterCommand());
-        safeRegisterCommand("adminxp", new AdminXPCommand(main));
+        AdminXPCommand adminXpCmd = new AdminXPCommand(main);
+        safeRegisterCommand("adminxp", adminXpCmd, adminXpCmd);
         skillTreeConfig = new SkillTreeConfig(main);
         this.skillService = new SkillService(main, skillTreeConfig);
         safeRegisterCommand("skillbuy", new SkillPerkBuyCommand(skillService,skillTreeConfig));
