@@ -428,21 +428,9 @@ public class CryptoMachine {
     }
 
     public static double getStoreEfficiencyMultiplier(int storeOrder) {
-        return switch (storeOrder) {
-            case 1 -> 0.060;  // Supermarket (~15 min online to $500)
-            case 2 -> 0.067;  // The Griffin's (~30 min online to $6k)
-            case 3 -> 0.138;  // Gym (~45 min online to $75k)
-            case 4 -> 0.145;  // Arcade (~1 hr online to $500k)
-            case 5 -> 0.120;  // School (~1.25 hrs online to $3M)
-            case 6 -> 0.192;  // Casino (~1.5 hrs online to $20M)
-            case 7 -> 0.173;  // Oceanarium (~1.75 hrs online to $80M)
-            case 8 -> 0.200;  // Steakhouse (~2.0 hrs online / 3.4 hrs offline to $300M)
-            case 9 -> 0.193;  // Diamond Store (~2.0 hrs online / 3.4 hrs offline to $500M)
-            case 10 -> 0.200; // Balenziaga (~2.0 hrs online / 3.4 hrs offline to $800M)
-            case 11 -> 0.285; // Samzung (~2.25 hrs online / 3.8 hrs offline to $1.7B)
-            case 12 -> 0.270; // The Bank (~2.5 hrs online / 4.0 hrs offline to $2.5B)
-            case 13 -> 0.270; // The Vault
-            default -> 0.060;
-        };
+        if (storeOrder <= 5) return 0.50;  // Stores 1-5: 50%
+        if (storeOrder <= 8) return 0.25;  // Stores 6-8: 25%
+        if (storeOrder <= 10) return 0.15; // Stores 9-10: 15%
+        return 0.05;                       // Stores 11-12+: 5%
     }
 }

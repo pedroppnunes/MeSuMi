@@ -100,11 +100,6 @@ public class CryptoMachineGUI implements Listener {
             double mult = plugin.getCryptoManager().getMultiplier(machine);
             lore.add(getComponent("&7Total Multiplier: &a" + String.format("%.2f", mult) + "x"));
 
-            robbery.player.PlayerData pd = robbery.player.PlayerDataManager.getPlayerData(player);
-            int storeOrder = (pd != null && pd.getKey() != null) ? pd.getKey().getOrder() : 1;
-            double storeEff = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
-            lore.add(getComponent("&7Store Efficiency: &e" + String.format("%.1f", storeEff * 100.0) + "%"));
-
             statusMeta.lore(lore);
             statusItem.setItemMeta(statusMeta);
         }
