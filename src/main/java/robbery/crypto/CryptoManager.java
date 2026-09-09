@@ -56,8 +56,9 @@ public class CryptoManager {
                     double avgTop5Val = CryptoMachine.getAverageTop5ItemValue(pd);
                     double rewardMult = machine.getRewardMultiplier();
                     double qualityMult = machine.getQualityMultiplier();
-                    int storeOrder = (pd.getKey() != null) ? pd.getKey().getOrder() : 1;
-                    double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder) * machine.getMachineLevelEfficiencyMultiplier();
+                    int storeOrder = (pd != null && pd.getKey() != null) ? pd.getKey().getOrder() : 1;
+                    int prestige = (pd != null) ? pd.getPrestige() : 0;
+                    double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder, prestige) * machine.getMachineLevelEfficiencyMultiplier();
 
                     double moneyGenerated = activeBatches * capacity * avgTop5Val * rewardMult * qualityMult * storeEfficiency;
                     
@@ -179,7 +180,8 @@ public class CryptoManager {
                         double qualityMult = machine.getQualityMultiplier();
                         double onlineBuff = (p != null && p.isOnline()) ? 1.20 : 1.0;
                         int storeOrder = (pd != null && pd.getKey() != null) ? pd.getKey().getOrder() : 1;
-                        double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder) * machine.getMachineLevelEfficiencyMultiplier();
+                        int prestige = (pd != null) ? pd.getPrestige() : 0;
+                        double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder, prestige) * machine.getMachineLevelEfficiencyMultiplier();
 
                         double moneyGenerated = capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency;
 
@@ -260,7 +262,8 @@ public class CryptoManager {
         double qualityMult = machine.getQualityMultiplier();
         double onlineBuff = (p != null && p.isOnline() && machine.getFuelTicks() > 0) ? 1.20 : 1.0;
         int storeOrder = (pd != null && pd.getKey() != null) ? pd.getKey().getOrder() : 1;
-        double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder) * machine.getMachineLevelEfficiencyMultiplier();
+        int prestige = (pd != null) ? pd.getPrestige() : 0;
+        double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder, prestige) * machine.getMachineLevelEfficiencyMultiplier();
 
         return capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency;
     }

@@ -432,10 +432,33 @@ public class CryptoMachine {
         return 1.00 + (avgLevel / 10.0) * 1.00;
     }
 
+    public static double getStoreEfficiencyMultiplier(int storeOrder, int prestige) {
+        double baseEfficiency;
+        if (storeOrder <= 5) {
+            baseEfficiency = 0.50;  // Stores 1-5: 50%
+        } else if (storeOrder <= 8) {
+            baseEfficiency = 0.25;  // Stores 6-8: 25%
+        } else if (storeOrder <= 10) {
+            baseEfficiency = 0.15; // Stores 9-10: 15%
+        } else {
+            baseEfficiency = 0.12; // Stores 11-12+: 12%
+        }
+
+        double prestigeBoost;
+        if (prestige <= 0) {
+            prestigeBoost = 1.60;  // +60% boost for P0 (80% efficiency on Stores 1-5)
+        } else if (prestige == 1) {
+            prestigeBoost = 1.40;  // +40% boost for P1 (70% efficiency on Stores 1-5)
+        } else if (prestige == 2) {
+            prestigeBoost = 1.20;  // +20% boost for P2 (60% efficiency on Stores 1-5)
+        } else {
+            prestigeBoost = 1.00;
+        }
+
+        return Math.min(1.00, baseEfficiency * prestigeBoost);
+    }
+
     public static double getStoreEfficiencyMultiplier(int storeOrder) {
-        if (storeOrder <= 5) return 0.1333; // Stores 1-5: 13.33%
-        if (storeOrder <= 7) return 0.10;   // Stores 6-7: 10.0%
-        if (storeOrder <= 10) return 0.0667;// Stores 8-10: 6.67%
-        return 0.08;                        // Stores 11-12+: 8.0%
+        return getStoreEfficiencyMultiplier(storeOrder, 0);
     }
 }
