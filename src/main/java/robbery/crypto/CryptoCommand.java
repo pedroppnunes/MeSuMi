@@ -7,20 +7,25 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.Location;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import robbery.core.Robbery;
 import robbery.items.Items;
 import robbery.messages.Messages;
 import robbery.player.PlayerData;
 import robbery.player.PlayerDataManager;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class CryptoCommand implements CommandExecutor {
+public class CryptoCommand implements CommandExecutor, TabCompleter {
 
     private final Robbery plugin;
 
@@ -29,19 +34,21 @@ public class CryptoCommand implements CommandExecutor {
     }
 
     private void sendAdminUsage(CommandSender sender) {
-        sender.sendMessage(Messages.colorize("&cAdmin Commands:"));
+        sender.sendMessage(Messages.colorize("&cAdmin Crypto Commands:"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin givecredits <player> <amount>"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin setcredits <player> <amount>"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin removecredits <player> <amount>"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin resetcredits <player>"));
         sender.sendMessage(Messages.colorize("&e/crypto admin resetnpc <player>"));
         sender.sendMessage(Messages.colorize("&e/crypto admin givemachine <player> [force]"));
         sender.sendMessage(Messages.colorize("&e/crypto admin check <player>"));
-        sender.sendMessage(Messages.colorize("&e/crypto admin addcredits <player> <amount>"));
         sender.sendMessage(Messages.colorize("&e/crypto admin upgrade <player>"));
         sender.sendMessage(Messages.colorize("&e/crypto admin addstoredfuel <player> <quality>"));
-        sender.sendMessage(Messages.colorize("&e/crypto admin addstoredbattery <player> <quality>"));
         sender.sendMessage(Messages.colorize("&e/crypto admin sacrifice <player>"));
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (args.length == 0) {
             if (sender instanceof Player p) {
                 PlayerData pd = PlayerDataManager.getPlayerData(p);
@@ -203,7 +210,7 @@ public class CryptoCommand implements CommandExecutor {
                 return true;
             }
 
-            if (action.equalsIgnoreCase("addcredits") || action.equalsIgnoreCase("addcredit")) {
+            if (action.equalsIgnoreCase("addcredits") || action.equalsIgnoreCase("addcredit") || action.equalsIgnoreCase("givecredits") || action.equalsIgnoreCase("givecredit")) {
                 if (args.length < 4) {
                     sendAdminUsage(sender);
                     return true;
@@ -214,13 +221,67 @@ public class CryptoCommand implements CommandExecutor {
                     if (targetPd != null) {
                         targetPd.addCryptoCredits(amt);
                         Robbery.getInstance().getPlayerEventListener().savePlayerData(target, targetPd);
-                        sender.sendMessage(Messages.colorize("&aAdded &e" + amt + " Crypto Credit(s) &ato &b" + target.getName() + "&a!"));
+                        sender.sendMessage(Messages.colorize("&aAdded &6&l⛁ " + amt + " Crypto Credit(s) &ato &b" + target.getName() + "&a (Total: &6&l⛁ " + targetPd.getCryptoCredits() + "&a)!"));
                         if (target.isOnline()) {
-                            target.sendMessage(Messages.colorize("&aYou received &e" + amt + " Crypto Credit(s)&a!"));
+                            target.sendMessage(Messages.colorize("&aYou received &6&l⛁ " + amt + " Crypto Credit(s)&a!"));
                         }
                     }
                 } catch (NumberFormatException e) {
                     sendAdminUsage(sender);
+                }
+                return true;
+            }
+
+            if (action.equalsIgnoreCase("setcredits") || action.equalsIgnoreCase("setcredit")) {
+                if (args.length < 4) {
+                    sendAdminUsage(sender);
+                    return true;
+                }
+                try {
+                    int amt = Math.max(0, Integer.parseInt(args[3]));
+                    PlayerData targetPd = PlayerDataManager.getPlayerData(target);
+                    if (targetPd != null) {
+                        targetPd.setCryptoCredits(amt);
+                        Robbery.getInstance().getPlayerEventListener().savePlayerData(target, targetPd);
+                        sender.sendMessage(Messages.colorize("&aSet &b" + target.getName() + "'s &aCrypto Credits to &6&l⛁ " + amt + "&a!"));
+                        if (target.isOnline()) {
+                            target.sendMessage(Messages.colorize("&aYour Crypto Credits were set to &6&l⛁ " + amt + "&a!"));
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    sendAdminUsage(sender);
+                }
+                return true;
+            }
+
+            if (action.equalsIgnoreCase("removecredits") || action.equalsIgnoreCase("removecredit") || action.equalsIgnoreCase("takecredits")) {
+                if (args.length < 4) {
+                    sendAdminUsage(sender);
+                    return true;
+                }
+                try {
+                    int amt = Math.max(1, Integer.parseInt(args[3]));
+                    PlayerData targetPd = PlayerDataManager.getPlayerData(target);
+                    if (targetPd != null) {
+                        targetPd.removeCryptoCredits(amt);
+                        Robbery.getInstance().getPlayerEventListener().savePlayerData(target, targetPd);
+                        sender.sendMessage(Messages.colorize("&aRemoved &6&l⛁ " + amt + " Crypto Credit(s) &afrom &b" + target.getName() + "&a (Total: &6&l⛁ " + targetPd.getCryptoCredits() + "&a)!"));
+                        if (target.isOnline()) {
+                            target.sendMessage(Messages.colorize("&cRemoved &6&l⛁ " + amt + " Crypto Credit(s) from your account."));
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    sendAdminUsage(sender);
+                }
+                return true;
+            }
+
+            if (action.equalsIgnoreCase("resetcredits") || action.equalsIgnoreCase("resetcredit")) {
+                PlayerData targetPd = PlayerDataManager.getPlayerData(target);
+                if (targetPd != null) {
+                    targetPd.setCryptoCredits(0);
+                    Robbery.getInstance().getPlayerEventListener().savePlayerData(target, targetPd);
+                    sender.sendMessage(Messages.colorize("&aReset &b" + target.getName() + "'s &aCrypto Credits to 0."));
                 }
                 return true;
             }
@@ -443,6 +504,44 @@ public class CryptoCommand implements CommandExecutor {
             }
         }
         return true;
+    }
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (args.length == 1) {
+            List<String> sub = new ArrayList<>(List.of("credits", "balance", "battery", "storage", "sacrifice", "claim", "pickup"));
+            if (sender.hasPermission("robbery.op") || sender.isOp()) {
+                sub.addAll(List.of("admin", "buycredits", "reload", "resetnpc"));
+            }
+            return filter(sub, args[0]);
+        }
+
+        if (args.length == 2 && args[0].equalsIgnoreCase("admin") && (sender.hasPermission("robbery.op") || sender.isOp())) {
+            List<String> adminActions = List.of(
+                    "givecredits", "addcredits", "setcredits", "removecredits", "resetcredits",
+                    "givemachine", "resetnpc", "check", "upgrade", "addstoredfuel", "sacrifice"
+            );
+            return filter(adminActions, args[1]);
+        }
+
+        if (args.length == 3 && args[0].equalsIgnoreCase("admin") && (sender.hasPermission("robbery.op") || sender.isOp())) {
+            List<String> players = new ArrayList<>();
+            for (Player p : Bukkit.getOnlinePlayers()) players.add(p.getName());
+            return filter(players, args[2]);
+        }
+
+        return Collections.emptyList();
+    }
+
+    private List<String> filter(List<String> list, String prefix) {
+        if (prefix == null || prefix.isEmpty()) return list;
+        List<String> res = new ArrayList<>();
+        for (String s : list) {
+            if (s.toLowerCase().startsWith(prefix.toLowerCase())) {
+                res.add(s);
+            }
+        }
+        return res;
     }
 
     public static int getTotalExperience(Player player) {

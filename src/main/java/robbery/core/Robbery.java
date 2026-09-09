@@ -312,7 +312,8 @@ public class Robbery extends JavaPlugin implements Listener {
             getCommand("stats").setExecutor(catalogCmd);
         }
 
-        safeRegisterCommand("crypto", new robbery.crypto.CryptoCommand(this));
+        robbery.crypto.CryptoCommand cryptoCmd = new robbery.crypto.CryptoCommand(this);
+        safeRegisterCommand("crypto", cryptoCmd, cryptoCmd);
         if (getCommand("backpack") != null) {
             getCommand("backpack").setExecutor(new robbery.backpacks.BackpackCommand(this));
         } else if (getCommand("backpacks") != null) {
