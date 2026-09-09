@@ -97,8 +97,8 @@ public class CryptoMachineGUI implements Listener {
             lore.add(getComponent(" &8- &7Reward: &a" + rewardStr));
             lore.add(Component.empty());
 
-            double mult = plugin.getCryptoManager().getMultiplier(machine);
-            lore.add(getComponent("&7Total Multiplier: &a" + String.format("%.2f", mult) + "x"));
+            double mult = machine.getRewardMultiplier();
+            lore.add(getComponent("&7Money Multiplier: &a" + String.format("%.2f", mult) + "x"));
 
             statusMeta.lore(lore);
             statusItem.setItemMeta(statusMeta);
@@ -145,15 +145,23 @@ public class CryptoMachineGUI implements Listener {
             int speedLvl = machine.getSpeedLevel();
 
             if (speedLvl >= 10) {
+                int maxInterval = Math.max(1, machine.getStealIntervalSeconds() / 60);
                 lore.add(getComponent("&7Current Level: &aLevel 10 (MAX)"));
-                lore.add(getComponent("&7Steal Interval: &e1 Minute per cycle"));
+                lore.add(getComponent("&7Steal Interval: &e" + maxInterval + " Minutes per cycle"));
                 lore.add(Component.empty());
                 lore.add(getComponent("&fNext Cost: &aMAXED"));
                 lore.add(getComponent("&fPrestige Req: &aMAXED"));
             } else {
                 int nextLvl = speedLvl + 1;
                 int curMin = Math.max(1, machine.getStealIntervalSeconds() / 60);
-                int nextMin = Math.max(1, (600 - (Math.min(9, nextLvl) * 60)) / 60);
+                // New formula: L0-6: 600 - (lvl*40), L7-10: 360 - ((lvl-6)*30), min 240
+                int nextIntervalSec;
+                if (nextLvl <= 6) {
+                    nextIntervalSec = 600 - (nextLvl * 40);
+                } else {
+                    nextIntervalSec = Math.max(240, 360 - ((nextLvl - 6) * 30));
+                }
+                int nextMin = Math.max(1, nextIntervalSec / 60);
 
                 lore.add(getComponent("&7Current Level: &eLevel " + speedLvl + " &8/ &710"));
                 lore.add(getComponent("&7Steal Interval: &e" + curMin + "m &7-> &a" + nextMin + "m"));
@@ -188,7 +196,12 @@ public class CryptoMachineGUI implements Listener {
             } else {
                 int nextLvl = capLvl + 1;
                 int curCap = machine.getCapacity();
-                int nextCap = Math.min(10, nextLvl + 1);
+                // Match getCapacity() logic: L0=1, L1-6=lvl, L7-8=7, L9-10=8
+                int nextCap;
+                if (nextLvl <= 0) nextCap = 1;
+                else if (nextLvl <= 6) nextCap = nextLvl;
+                else if (nextLvl <= 8) nextCap = 7;
+                else nextCap = 8;
 
                 lore.add(getComponent("&7Current Level: &eLevel " + capLvl + " &8/ &710"));
                 lore.add(getComponent("&7Batch Capacity: &e" + curCap + " items &7-> &a" + nextCap + " items"));
@@ -258,7 +271,7 @@ public class CryptoMachineGUI implements Listener {
             } else {
                 int nextLvl = rewardLvl + 1;
                 double curMult = machine.getRewardMultiplier();
-                double nextMult = (nextLvl >= 10) ? 3.0 : (1.0 + (nextLvl * (2.0 / 9.0)));
+                double nextMult = 1.0 + (nextLvl * 0.06);
 
                 lore.add(getComponent("&7Current Level: &aLevel " + rewardLvl + " &8/ &710"));
                 lore.add(getComponent("&7Money Multiplier: &a" + String.format("%.2fx", curMult) + " &7-> &a" + String.format("%.2fx", nextMult)));

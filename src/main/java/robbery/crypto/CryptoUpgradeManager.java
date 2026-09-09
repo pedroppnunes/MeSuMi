@@ -77,9 +77,9 @@ public class CryptoUpgradeManager {
         }
         if (targetLevel >= 10) return 5;
         if (targetLevel >= 9) return 4;
-        if (targetLevel >= 7) return 3;
-        if (targetLevel >= 5) return 2;
-        if (targetLevel >= 3) return 1;
+        if (targetLevel >= 8) return 3;
+        if (targetLevel >= 7) return 2;
+        if (targetLevel >= 5) return 1;
         return 0;
     }
 

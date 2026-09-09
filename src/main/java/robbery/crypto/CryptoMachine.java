@@ -344,18 +344,20 @@ public class CryptoMachine {
 
     public int getCapacity() {
         if (capacityLevel <= 0) return 1;
-        return Math.min(10, capacityLevel + 1);
+        if (capacityLevel <= 6) return capacityLevel;
+        if (capacityLevel <= 8) return 7;
+        return 8;
     }
 
     public int getStealIntervalSeconds() {
         if (speedLevel <= 0) return 600;
-        return Math.max(60, 600 - (Math.min(9, speedLevel) * 60));
+        if (speedLevel <= 6) return 600 - (speedLevel * 40);
+        return Math.max(240, 360 - ((speedLevel - 6) * 30));
     }
 
     public double getRewardMultiplier() {
         if (rewardLevel <= 0) return 1.0;
-        if (rewardLevel >= 10) return 3.0;
-        return 1.0 + (rewardLevel * (2.0 / 9.0));
+        return 1.0 + (rewardLevel * 0.06);
     }
 
     public double getSpeedMultiplier() {
@@ -429,36 +431,14 @@ public class CryptoMachine {
 
     public double getMachineLevelEfficiencyMultiplier() {
         double avgLevel = (speedLevel + capacityLevel + fuelTimeLevel + rewardLevel) / 4.0;
-        return 1.00 + (avgLevel / 10.0) * 1.00;
+        return 1.00 + (avgLevel / 10.0) * 0.50;
     }
 
     public static double getStoreEfficiencyMultiplier(int storeOrder, int prestige) {
-        double baseEfficiency;
-        if (storeOrder <= 5) {
-            baseEfficiency = 0.50;  // Stores 1-5: 50%
-        } else if (storeOrder <= 8) {
-            baseEfficiency = 0.25;  // Stores 6-8: 25%
-        } else if (storeOrder <= 10) {
-            baseEfficiency = 0.15; // Stores 9-10: 15%
-        } else {
-            baseEfficiency = 0.12; // Stores 11-12+: 12%
-        }
-
-        double prestigeBoost;
-        if (prestige <= 0) {
-            prestigeBoost = 1.60;  // +60% boost for P0 (80% efficiency on Stores 1-5)
-        } else if (prestige == 1) {
-            prestigeBoost = 1.40;  // +40% boost for P1 (70% efficiency on Stores 1-5)
-        } else if (prestige == 2) {
-            prestigeBoost = 1.20;  // +20% boost for P2 (60% efficiency on Stores 1-5)
-        } else {
-            prestigeBoost = 1.00;
-        }
-
-        return Math.min(1.00, baseEfficiency * prestigeBoost);
+        return 1.00;
     }
 
     public static double getStoreEfficiencyMultiplier(int storeOrder) {
-        return getStoreEfficiencyMultiplier(storeOrder, 0);
+        return 1.00;
     }
 }
