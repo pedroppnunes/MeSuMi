@@ -199,10 +199,10 @@ commands:
     description: View your backpack contents
     usage: /backpack
     aliases: [backpacks]
-  ho:
-    description: Alias for hideout
-    usage: /ho
-    aliases: [h]
+  hideout:
+    description: Teleport to or manage your hideout
+    usage: /hideout
+    aliases: [ho, h]
   hocontrib:
     description: View top contributors to your hideout
     usage: /hocontrib
