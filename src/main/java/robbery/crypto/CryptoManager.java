@@ -56,8 +56,10 @@ public class CryptoManager {
                     double avgTop5Val = CryptoMachine.getAverageTop5ItemValue(pd);
                     double rewardMult = machine.getRewardMultiplier();
                     double qualityMult = machine.getQualityMultiplier();
+                    int storeOrder = (pd.getKey() != null) ? pd.getKey().getOrder() : 1;
+                    double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
 
-                    double moneyGenerated = activeBatches * capacity * avgTop5Val * rewardMult * qualityMult;
+                    double moneyGenerated = activeBatches * capacity * avgTop5Val * rewardMult * qualityMult * storeEfficiency;
                     
                     machine.addUnclaimedMoney(moneyGenerated);
                     machine.setFuelTicks(machine.getFuelTicks() - (activeBatches * intervalSeconds));
@@ -176,8 +178,10 @@ public class CryptoManager {
                         double rewardMult = machine.getRewardMultiplier();
                         double qualityMult = machine.getQualityMultiplier();
                         double onlineBuff = (p != null && p.isOnline()) ? 1.20 : 1.0;
+                        int storeOrder = (pd != null && pd.getKey() != null) ? pd.getKey().getOrder() : 1;
+                        double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
 
-                        double moneyGenerated = capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff;
+                        double moneyGenerated = capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency;
 
                         machine.addUnclaimedMoney(moneyGenerated);
                         machine.setFuelTicks(machine.getFuelTicks() - intervalSeconds);
@@ -255,8 +259,10 @@ public class CryptoManager {
         double rewardMult = machine.getRewardMultiplier();
         double qualityMult = machine.getQualityMultiplier();
         double onlineBuff = (p != null && p.isOnline() && machine.getFuelTicks() > 0) ? 1.20 : 1.0;
+        int storeOrder = (pd != null && pd.getKey() != null) ? pd.getKey().getOrder() : 1;
+        double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
 
-        return capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff;
+        return capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency;
     }
 
     public double getMoneyPerSecond(CryptoMachine machine) {

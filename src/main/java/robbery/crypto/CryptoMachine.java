@@ -363,14 +363,8 @@ public class CryptoMachine {
     }
 
     public double getQualityMultiplier() {
-        // Base/default battery starts at 1.0x so early game isn't heavily penalized
-        if (fuelQuality <= 1.0) {
-            return 1.00;
-        } else if (fuelQuality <= 50.0) {
-            return 1.00 + (0.25 * ((fuelQuality - 1.0) / 49.0));
-        } else {
-            return 1.25 + (0.35 * ((fuelQuality - 50.0) / 50.0));
-        }
+        if (fuelQuality <= 0.0) return 0.10;
+        return Math.max(0.10, fuelQuality / 100.0);
     }
 
     public static double getAverageTop5ItemValue(robbery.player.PlayerData pd) {
@@ -434,6 +428,21 @@ public class CryptoMachine {
     }
 
     public static double getStoreEfficiencyMultiplier(int storeOrder) {
-        return 1.00;
+        return switch (storeOrder) {
+            case 1 -> 0.030;  // Supermarket (~30 min to $500)
+            case 2 -> 0.022;  // The Griffin's (~1.5 hrs to $6k)
+            case 3 -> 0.034;  // Gym (~3 hrs to $75k)
+            case 4 -> 0.036;  // Arcade (~4 hrs to $500k)
+            case 5 -> 0.025;  // School (~6 hrs to $3M)
+            case 6 -> 0.036;  // Casino (~8 hrs to $20M)
+            case 7 -> 0.034;  // Oceanarium (~9 hrs to $80M)
+            case 8 -> 0.040;  // Steakhouse (~10 hrs to $300M)
+            case 9 -> 0.0385; // Diamond Store (~10 hrs to $500M)
+            case 10 -> 0.040; // Balenziaga (~10 hrs to $800M)
+            case 11 -> 0.0535;// Samzung (~12 hrs to $1.7B)
+            case 12 -> 0.056; // The Bank (~12 hrs to $2.5B)
+            case 13 -> 0.056; // The Vault
+            default -> 0.030;
+        };
     }
 }
