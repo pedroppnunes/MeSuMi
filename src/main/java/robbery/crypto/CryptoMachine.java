@@ -433,9 +433,9 @@ public class CryptoMachine {
     }
 
     public static double getStoreEfficiencyMultiplier(int storeOrder) {
-        if (storeOrder <= 5) return 0.20;  // Stores 1-5: 20%
-        if (storeOrder <= 7) return 0.15;  // Stores 6-7: 15%
-        if (storeOrder <= 10) return 0.10; // Stores 8-10: 10%
-        return 0.12;                       // Stores 11-12+: 12%
+        if (storeOrder <= 5) return 0.1333; // Stores 1-5: 13.33%
+        if (storeOrder <= 7) return 0.10;   // Stores 6-7: 10.0%
+        if (storeOrder <= 10) return 0.0667;// Stores 8-10: 6.67%
+        return 0.08;                        // Stores 11-12+: 8.0%
     }
 }
