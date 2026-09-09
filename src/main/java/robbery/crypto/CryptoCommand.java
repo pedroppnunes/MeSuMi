@@ -163,6 +163,15 @@ public class CryptoCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (args[0].equalsIgnoreCase("migrate") || args[0].equalsIgnoreCase("resetalllevels")) {
+            if (!sender.hasPermission("robbery.op") && !sender.isOp()) {
+                Messages.send(sender, "global.no-permission");
+                return true;
+            }
+            plugin.getCryptoManager().resetAllMachineLevels(sender);
+            return true;
+        }
+
         if (args[0].equalsIgnoreCase("admin")) {
             if (!sender.hasPermission("robbery.op") && !sender.isOp()) {
                 Messages.send(sender, "global.no-permission");
@@ -525,7 +534,7 @@ public class CryptoCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             List<String> sub = new ArrayList<>(List.of("credits", "balance", "battery", "storage", "sacrifice", "claim", "pickup", "upgrade"));
             if (sender.hasPermission("robbery.op") || sender.isOp()) {
-                sub.addAll(List.of("admin", "buycredits", "reload", "resetnpc"));
+                sub.addAll(List.of("admin", "buycredits", "reload", "resetnpc", "migrate"));
             }
             return filter(sub, args[0]);
         }
@@ -537,7 +546,7 @@ public class CryptoCommand implements CommandExecutor, TabCompleter {
         if (args.length == 2 && args[0].equalsIgnoreCase("admin") && (sender.hasPermission("robbery.op") || sender.isOp())) {
             List<String> adminActions = List.of(
                     "givecredits", "addcredits", "setcredits", "removecredits", "resetcredits",
-                    "givemachine", "resetnpc", "resetalllevels", "check", "upgrade", "addstoredfuel", "sacrifice"
+                    "givemachine", "resetnpc", "resetalllevels", "migrate", "check", "upgrade", "addstoredfuel", "sacrifice"
             );
             return filter(adminActions, args[1]);
         }
