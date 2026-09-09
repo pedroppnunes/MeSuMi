@@ -121,22 +121,6 @@ public class CryptoMachineDao {
         int fuelTimeLvl = getIntSafe(rs, "fuel_time_level", 0);
         int rewardLvl = getIntSafe(rs, "reward_level", 0);
         long lastUpdated = getLongSafe(rs, "last_updated", 0L);
-        
-        // Backwards compatibility if machine_level column was present
-        if (hasColumn(rs, "machine_level") && speedLvl == 0 && rewardLvl == 0) {
-            int oldLvl = rs.getInt("machine_level");
-            speedLvl = oldLvl;
-            fuelTimeLvl = oldLvl;
-            rewardLvl = oldLvl;
-        }
-
-        // Automatic migration for old 50-level system -> new 10-level system (scaled down using Math.floor)
-        if (speedLvl > 10 || fuelTimeLvl > 10 || rewardLvl > 10) {
-            speedLvl = Math.min(10, Math.max(0, (int) Math.floor(speedLvl / 5.0)));
-            fuelTimeLvl = Math.min(10, Math.max(0, (int) Math.floor(fuelTimeLvl / 5.0)));
-            rewardLvl = Math.min(10, Math.max(0, (int) Math.floor(rewardLvl / 5.0)));
-        }
-
         CryptoMachine machine = new CryptoMachine(ownerId, world, x, y, z, money, fuel, quality, speedLvl, fuelTimeLvl, rewardLvl, lastUpdated);
         
         // Parse stored fuels
@@ -255,5 +239,18 @@ public class CryptoMachineDao {
         } else {
             CompletableFuture.runAsync(task);
         }
+    }
+
+    public CompletableFuture<Integer> resetAllMachineLevels() {
+        return CompletableFuture.supplyAsync(() -> {
+            String query = "UPDATE crypto_machines SET speed_level = 0, fuel_time_level = 0, reward_level = 0";
+            try (Connection conn = plugin.getDatabaseManager().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(query)) {
+                return stmt.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return 0;
+            }
+        });
     }
 }

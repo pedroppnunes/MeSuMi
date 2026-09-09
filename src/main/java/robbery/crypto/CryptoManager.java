@@ -350,4 +350,17 @@ public class CryptoManager {
             player.sendMessage(Messages.colorize("&aYour &eCrypto Machine &ahas been picked up and added to your inventory!"));
         }
     }
+
+    public void resetAllMachineLevels(org.bukkit.command.CommandSender sender) {
+        for (CryptoMachine m : activeMachines.values()) {
+            if (m != null) {
+                m.setSpeedLevel(0);
+                m.setFuelTimeLevel(0);
+                m.setRewardLevel(0);
+            }
+        }
+        dao.resetAllMachineLevels().thenAccept(rows -> {
+            sender.sendMessage(Messages.colorize("&aSuccessfully reset Crypto Machine levels to 0 for &e" + rows + " &aplayers/machines in the database!"));
+        });
+    }
 }

@@ -40,6 +40,7 @@ public class CryptoCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage(Messages.colorize("&e/crypto admin removecredits <player> <amount>"));
         sender.sendMessage(Messages.colorize("&e/crypto admin resetcredits <player>"));
         sender.sendMessage(Messages.colorize("&e/crypto admin resetnpc <player>"));
+        sender.sendMessage(Messages.colorize("&e/crypto admin resetalllevels"));
         sender.sendMessage(Messages.colorize("&e/crypto admin givemachine <player> [force]"));
         sender.sendMessage(Messages.colorize("&e/crypto admin check <player>"));
         sender.sendMessage(Messages.colorize("&e/crypto admin upgrade <player>"));
@@ -167,12 +168,23 @@ public class CryptoCommand implements CommandExecutor, TabCompleter {
                 Messages.send(sender, "global.no-permission");
                 return true;
             }
-            if (args.length < 3) {
+            if (args.length < 2) {
                 sendAdminUsage(sender);
                 return true;
             }
 
             String action = args[1];
+
+            if (action.equalsIgnoreCase("resetalllevels") || action.equalsIgnoreCase("resetlevels") || action.equalsIgnoreCase("resetall") || action.equalsIgnoreCase("migrate")) {
+                plugin.getCryptoManager().resetAllMachineLevels(sender);
+                return true;
+            }
+
+            if (args.length < 3) {
+                sendAdminUsage(sender);
+                return true;
+            }
+
             Player target = Bukkit.getPlayer(args[2]);
             if (target == null) {
                 Messages.send(sender, "global.player-not-found");
@@ -519,7 +531,7 @@ public class CryptoCommand implements CommandExecutor, TabCompleter {
         if (args.length == 2 && args[0].equalsIgnoreCase("admin") && (sender.hasPermission("robbery.op") || sender.isOp())) {
             List<String> adminActions = List.of(
                     "givecredits", "addcredits", "setcredits", "removecredits", "resetcredits",
-                    "givemachine", "resetnpc", "check", "upgrade", "addstoredfuel", "sacrifice"
+                    "givemachine", "resetnpc", "resetalllevels", "check", "upgrade", "addstoredfuel", "sacrifice"
             );
             return filter(adminActions, args[1]);
         }

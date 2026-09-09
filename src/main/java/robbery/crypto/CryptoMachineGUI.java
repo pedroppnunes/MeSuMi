@@ -68,6 +68,10 @@ public class CryptoMachineGUI implements Listener {
 
             double moneyPerSec = plugin.getCryptoManager().getMoneyPerSecond(machine);
             lore.add(getComponent("&7Generating: &a$" + NumberFormatter.formatDoubleNumber(moneyPerSec) + " / sec"));
+            
+            int intervalMin = Math.max(1, machine.getStealIntervalSeconds() / 60);
+            int capacity = machine.getCapacity();
+            lore.add(getComponent("&7Steal Interval: &e" + intervalMin + " min &7(Batch: &e" + capacity + " items&7)"));
             lore.add(getComponent("&7Active Battery Quality: &e" + String.format("%.1f", machine.getFuelQuality()) + "%"));
 
             long totalSeconds = machine.getFuelTicks();
@@ -80,9 +84,14 @@ public class CryptoMachineGUI implements Listener {
             lore.add(getComponent("&7Active Battery Duration: &b" + CryptoMachine.getFuelDurationFormattedForLevel(machine.getFuelTimeLevel())));
             lore.add(Component.empty());
             lore.add(getComponent("&7Upgrade Levels (Max 10):"));
-            lore.add(getComponent(" &8- &7Speed: &e" + machine.getSpeedLevel() + " &8/ &710"));
-            lore.add(getComponent(" &8- &7Duration: &b" + machine.getFuelTimeLevel() + " &8/ &710"));
-            lore.add(getComponent(" &8- &7Reward: &a" + machine.getRewardLevel() + " &8/ &710"));
+            
+            String speedStr = machine.getSpeedLevel() >= 10 ? "&aMAXED" : machine.getSpeedLevel() + " &8/ &710";
+            String durationStr = machine.getFuelTimeLevel() >= 10 ? "&aMAXED" : machine.getFuelTimeLevel() + " &8/ &710";
+            String rewardStr = machine.getRewardLevel() >= 10 ? "&aMAXED" : machine.getRewardLevel() + " &8/ &710";
+
+            lore.add(getComponent(" &8- &7Speed: &e" + speedStr));
+            lore.add(getComponent(" &8- &7Duration: &b" + durationStr));
+            lore.add(getComponent(" &8- &7Reward: &a" + rewardStr));
             lore.add(Component.empty());
 
             double mult = plugin.getCryptoManager().getMultiplier(machine);
@@ -130,20 +139,34 @@ public class CryptoMachineGUI implements Listener {
         if (speedMeta != null) {
             speedMeta.displayName(getComponent("&fUpgrade Speed"));
             List<Component> lore = new ArrayList<>();
-            lore.add(getComponent("&7Current Level: &e" + machine.getSpeedLevel() + " &8/ &710"));
-            lore.add(getComponent("&7Increases generation speed per second."));
-            lore.add(Component.empty());
+            int speedLvl = machine.getSpeedLevel();
 
-            int nextLvl = machine.getSpeedLevel() + 1;
-            if (machine.getSpeedLevel() >= CryptoUpgradeManager.getMaxLevel()) {
+            if (speedLvl >= 10) {
+                lore.add(getComponent("&7Current Level: &aLevel 10 (MAX)"));
+                lore.add(getComponent("&7Steal Interval: &e1 Minute per cycle"));
+                lore.add(getComponent("&7Batch Capacity: &e10 Items per cycle"));
+                lore.add(Component.empty());
                 lore.add(getComponent("&fNext Cost: &aMAXED"));
+                lore.add(getComponent("&fPrestige Req: &aMAXED"));
             } else {
+                int nextLvl = speedLvl + 1;
+                int curMin = Math.max(1, machine.getStealIntervalSeconds() / 60);
+                int nextMin = Math.max(1, (600 - ((nextLvl - 1) * 60)) / 60);
+                int curCap = machine.getCapacity();
+                int nextCap = Math.min(10, Math.max(1, nextLvl));
+
+                lore.add(getComponent("&7Current Level: &eLevel " + speedLvl + " &8/ &710"));
+                lore.add(getComponent("&7Steal Interval: &e" + curMin + "m &7-> &a" + nextMin + "m"));
+                lore.add(getComponent("&7Batch Capacity: &e" + curCap + " items &7-> &a" + nextCap + " items"));
+                lore.add(getComponent("&7Reduces steal interval & increases batch capacity."));
+                lore.add(Component.empty());
+
                 int cost = CryptoUpgradeManager.getCreditCost(nextLvl);
                 lore.add(getComponent("&fNext Cost: &6&l⛁ " + cost + " Crypto Credits"));
+                lore.add(getComponent("&fPrestige Req: &ePrestige " + CryptoUpgradeManager.getRequiredPrestige(nextLvl)));
+                lore.add(Component.empty());
+                lore.add(getComponent("&eClick to upgrade!"));
             }
-            lore.add(getComponent("&fPrestige Req: &ePrestige " + CryptoUpgradeManager.getRequiredPrestige(nextLvl)));
-            lore.add(Component.empty());
-            lore.add(getComponent("&eClick to upgrade!"));
             speedMeta.lore(lore);
             speedItem.setItemMeta(speedMeta);
         }
@@ -155,21 +178,30 @@ public class CryptoMachineGUI implements Listener {
         if (durationMeta != null) {
             durationMeta.displayName(getComponent("&fUpgrade Battery Duration"));
             List<Component> lore = new ArrayList<>();
-            lore.add(getComponent("&7Current Level: &b" + machine.getFuelTimeLevel() + " &8/ &710"));
-            lore.add(getComponent("&7Current Duration: &b" + CryptoMachine.getFuelDurationFormattedForLevel(machine.getFuelTimeLevel())));
-            lore.add(getComponent("&7Increases active battery duration."));
-            lore.add(Component.empty());
+            int durationLvl = machine.getFuelTimeLevel();
 
-            int nextLvl = machine.getFuelTimeLevel() + 1;
-            if (machine.getFuelTimeLevel() >= CryptoUpgradeManager.getMaxLevel()) {
+            if (durationLvl >= 10) {
+                lore.add(getComponent("&7Current Level: &bLevel 10 (MAX)"));
+                lore.add(getComponent("&7Active Duration: &b" + CryptoMachine.getFuelDurationFormattedForLevel(10)));
+                lore.add(Component.empty());
                 lore.add(getComponent("&fNext Cost: &aMAXED"));
+                lore.add(getComponent("&fPrestige Req: &aMAXED"));
             } else {
+                int nextLvl = durationLvl + 1;
+                String curDur = CryptoMachine.getFuelDurationFormattedForLevel(durationLvl);
+                String nextDur = CryptoMachine.getFuelDurationFormattedForLevel(nextLvl);
+
+                lore.add(getComponent("&7Current Level: &bLevel " + durationLvl + " &8/ &710"));
+                lore.add(getComponent("&7Active Duration: &b" + curDur + " &7-> &a" + nextDur));
+                lore.add(getComponent("&7Increases active battery duration per canister."));
+                lore.add(Component.empty());
+
                 int cost = CryptoUpgradeManager.getCreditCost(nextLvl);
                 lore.add(getComponent("&fNext Cost: &6&l⛁ " + cost + " Crypto Credits"));
+                lore.add(getComponent("&fPrestige Req: &ePrestige " + CryptoUpgradeManager.getRequiredPrestige(nextLvl)));
+                lore.add(Component.empty());
+                lore.add(getComponent("&eClick to upgrade!"));
             }
-            lore.add(getComponent("&fPrestige Req: &ePrestige " + CryptoUpgradeManager.getRequiredPrestige(nextLvl)));
-            lore.add(Component.empty());
-            lore.add(getComponent("&eClick to upgrade!"));
             durationMeta.lore(lore);
             durationItem.setItemMeta(durationMeta);
         }
@@ -181,20 +213,30 @@ public class CryptoMachineGUI implements Listener {
         if (rewardMeta != null) {
             rewardMeta.displayName(getComponent("&fUpgrade Money Reward"));
             List<Component> lore = new ArrayList<>();
-            lore.add(getComponent("&7Current Level: &a" + machine.getRewardLevel() + " &8/ &710"));
-            lore.add(getComponent("&7Increases money payout multiplier."));
-            lore.add(Component.empty());
+            int rewardLvl = machine.getRewardLevel();
 
-            int nextLvl = machine.getRewardLevel() + 1;
-            if (machine.getRewardLevel() >= CryptoUpgradeManager.getMaxLevel()) {
+            if (rewardLvl >= 10) {
+                lore.add(getComponent("&7Current Level: &aLevel 10 (MAX)"));
+                lore.add(getComponent("&7Money Multiplier: &a" + String.format("%.2fx", machine.getRewardMultiplier())));
+                lore.add(Component.empty());
                 lore.add(getComponent("&fNext Cost: &aMAXED"));
+                lore.add(getComponent("&fPrestige Req: &aMAXED"));
             } else {
+                int nextLvl = rewardLvl + 1;
+                double curMult = machine.getRewardMultiplier();
+                double nextMult = (nextLvl >= 10) ? 3.0 : (1.0 + ((nextLvl - 1) * (2.0 / 9.0)));
+
+                lore.add(getComponent("&7Current Level: &aLevel " + rewardLvl + " &8/ &710"));
+                lore.add(getComponent("&7Money Multiplier: &a" + String.format("%.2fx", curMult) + " &7-> &a" + String.format("%.2fx", nextMult)));
+                lore.add(getComponent("&7Increases money payout multiplier."));
+                lore.add(Component.empty());
+
                 int cost = CryptoUpgradeManager.getCreditCost(nextLvl);
                 lore.add(getComponent("&fNext Cost: &6&l⛁ " + cost + " Crypto Credits"));
+                lore.add(getComponent("&fPrestige Req: &ePrestige " + CryptoUpgradeManager.getRequiredPrestige(nextLvl)));
+                lore.add(Component.empty());
+                lore.add(getComponent("&eClick to upgrade!"));
             }
-            lore.add(getComponent("&fPrestige Req: &ePrestige " + CryptoUpgradeManager.getRequiredPrestige(nextLvl)));
-            lore.add(Component.empty());
-            lore.add(getComponent("&eClick to upgrade!"));
             rewardMeta.lore(lore);
             rewardItem.setItemMeta(rewardMeta);
         }
