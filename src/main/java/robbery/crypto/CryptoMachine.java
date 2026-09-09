@@ -338,6 +338,10 @@ public class CryptoMachine {
         }
     }
 
+    public int getMachineLevel() {
+        return Math.max(0, speedLevel);
+    }
+
     public int getCapacity() {
         if (capacityLevel <= 0) return 1;
         return Math.min(10, capacityLevel + 1);

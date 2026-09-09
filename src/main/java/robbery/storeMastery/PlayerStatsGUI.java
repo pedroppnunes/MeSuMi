@@ -324,9 +324,12 @@ public class PlayerStatsGUI implements Listener {
             lore.add(Component.text("Machine Status: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     .append(Component.text(status).color(statusColor).decoration(TextDecoration.ITALIC, false)));
 
-            int level = (machine != null) ? machine.getMachineLevel() : 1;
-            lore.add(Component.text("Machine Level: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                    .append(Component.text("Level " + level + "/10").color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)));
+            int speedLvl = (machine != null) ? machine.getSpeedLevel() : 0;
+            int capLvl = (machine != null) ? machine.getCapacityLevel() : 0;
+            lore.add(Component.text("Speed Level: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text("Level " + speedLvl + "/10").color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)));
+            lore.add(Component.text("Capacity Level: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                    .append(Component.text("Level " + capLvl + "/10").color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)));
 
             int capacity = (machine != null) ? machine.getCapacity() : 1;
             lore.add(Component.text("Stolen Items / Batch: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
