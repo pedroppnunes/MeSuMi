@@ -48,19 +48,29 @@ public class Mall implements CommandExecutor {
             return true;
         }
 
-        // Check rank permission
-        if (player.hasPermission("robbery.rank4")
+        // Check rank permission: Outlaw+ (ranks 4, 5, 6, 7), robbery.mall, OP, or admin
+        boolean hasAccess = player.hasPermission("robbery.mall")
+                || player.hasPermission("robbery.op")
+                || player.hasPermission("robbery.bypass")
+                || player.isOp()
+                || (pd != null && robbery.ranks.RankManager.getRankOrder(pd.getRank()) >= 4)
+                || player.hasPermission("robbery.rank4")
                 || player.hasPermission("robbery.rank5")
                 || player.hasPermission("robbery.rank6")
-                || player.hasPermission("robbery.rank7")) {
+                || player.hasPermission("robbery.rank7")
+                || player.hasPermission("robbery.outlaw")
+                || player.hasPermission("robbery.heister")
+                || player.hasPermission("robbery.kingpin")
+                || player.hasPermission("robbery.mafiaboss")
+                || player.hasPermission("robbery.mafia_boss");
 
+        if (hasAccess) {
             World targetWorld = Bukkit.getWorld("world");
-            if (targetWorld != null) {
-                Location mallLocation = new Location(targetWorld, 20064.5, 101, 20033.5);
-                player.teleport(mallLocation);
-            } else {
-                Messages.send(player, "command.mall.world-not-found");
+            if (targetWorld == null) {
+                targetWorld = player.getWorld();
             }
+            Location mallLocation = new Location(targetWorld, 20064.5, 101, 20033.5);
+            player.teleport(mallLocation);
         } else {
             Messages.send(player, "command.mall.no-permission");
         }

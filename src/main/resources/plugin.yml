@@ -266,7 +266,17 @@ permissions:
     default: false
     children:
       robbery.mall: true
+  robbery.outlaw:
+    description: Outlaw
+    default: false
+    children:
+      robbery.mall: true
   robbery.rank5:
+    description: Heister
+    default: false
+    children:
+      robbery.mall: true
+  robbery.heister:
     description: Heister
     default: false
     children:
@@ -276,7 +286,17 @@ permissions:
     default: false
     children:
       robbery.mall: true
+  robbery.kingpin:
+    description: Kingpin
+    default: false
+    children:
+      robbery.mall: true
   robbery.rank7:
+    description: Mafia Boss
+    default: false
+    children:
+      robbery.mall: true
+  robbery.mafiaboss:
     description: Mafia Boss
     default: false
     children:
