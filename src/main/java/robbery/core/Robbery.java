@@ -319,10 +319,7 @@ public class Robbery extends JavaPlugin implements Listener {
         } else if (getCommand("backpacks") != null) {
             getCommand("backpacks").setExecutor(new robbery.backpacks.BackpackCommand(this));
         }
-        robbery.core.HideoutAliasCommand hideoutCmd = new robbery.core.HideoutAliasCommand();
-        safeRegisterCommand("hideout", hideoutCmd);
-        safeRegisterCommand("ho", hideoutCmd);
-        safeRegisterCommand("h", hideoutCmd);
+        safeRegisterCommand("ho", new robbery.core.HideoutAliasCommand());
         robbery.core.HideoutTopCommand hideoutTopCmd = new robbery.core.HideoutTopCommand();
         if (getCommand("hocontrib") != null) {
             getCommand("hocontrib").setExecutor(hideoutTopCmd);
