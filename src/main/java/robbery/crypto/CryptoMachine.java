@@ -427,6 +427,11 @@ public class CryptoMachine {
         return 1;
     }
 
+    public double getMachineLevelEfficiencyMultiplier() {
+        double avgLevel = (speedLevel + capacityLevel + fuelTimeLevel + rewardLevel) / 4.0;
+        return 0.50 + (avgLevel / 10.0) * 1.50;
+    }
+
     public static double getStoreEfficiencyMultiplier(int storeOrder) {
         if (storeOrder <= 5) return 0.20;  // Stores 1-5: 20%
         if (storeOrder <= 7) return 0.15;  // Stores 6-7: 15%
