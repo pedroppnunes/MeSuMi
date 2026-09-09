@@ -72,6 +72,7 @@ public class CryptoManager {
                 CryptoMachine existing = activeMachines.get(player.getUniqueId());
                 if (existing != null && existing != machine) {
                     if (existing.getSpeedLevel() > machine.getSpeedLevel()) machine.setSpeedLevel(existing.getSpeedLevel());
+                    if (existing.getCapacityLevel() > machine.getCapacityLevel()) machine.setCapacityLevel(existing.getCapacityLevel());
                     if (existing.getFuelTimeLevel() > machine.getFuelTimeLevel()) machine.setFuelTimeLevel(existing.getFuelTimeLevel());
                     if (existing.getRewardLevel() > machine.getRewardLevel()) machine.setRewardLevel(existing.getRewardLevel());
                     if (existing.getUnclaimedMoneyDouble() > machine.getUnclaimedMoneyDouble()) machine.setUnclaimedMoney(existing.getUnclaimedMoneyDouble());
@@ -269,11 +270,8 @@ public class CryptoManager {
         return sum / count;
     }
 
-    public double getMoneyPerSecond(CryptoMachine machine) {
+    public double getBatchPayout(CryptoMachine machine) {
         if (machine == null) return 0.0;
-        int intervalSeconds = machine.getStealIntervalSeconds();
-        if (intervalSeconds <= 0) return 0.0;
-
         Player p = Bukkit.getPlayer(machine.getOwnerId());
         PlayerData pd = (p != null && p.isOnline()) ? PlayerDataManager.getPlayerData(p) : null;
 
@@ -285,8 +283,15 @@ public class CryptoManager {
         int storeOrder = (pd != null && pd.getKey() != null) ? pd.getKey().getOrder() : 1;
         double storeEfficiency = CryptoMachine.getStoreEfficiencyMultiplier(storeOrder);
 
-        double batchPayout = capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency;
-        return batchPayout / (double) intervalSeconds;
+        return capacity * avgTop5Val * rewardMult * qualityMult * onlineBuff * storeEfficiency;
+    }
+
+    public double getMoneyPerSecond(CryptoMachine machine) {
+        if (machine == null) return 0.0;
+        int intervalSeconds = machine.getStealIntervalSeconds();
+        if (intervalSeconds <= 0) return 0.0;
+
+        return getBatchPayout(machine) / (double) intervalSeconds;
     }
 
     public double getMultiplier(CryptoMachine machine) {
@@ -355,6 +360,7 @@ public class CryptoManager {
         for (CryptoMachine m : activeMachines.values()) {
             if (m != null) {
                 m.setSpeedLevel(0);
+                m.setCapacityLevel(0);
                 m.setFuelTimeLevel(0);
                 m.setRewardLevel(0);
             }

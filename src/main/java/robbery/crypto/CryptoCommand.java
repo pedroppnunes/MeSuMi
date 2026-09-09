@@ -299,8 +299,9 @@ public class CryptoCommand implements CommandExecutor, TabCompleter {
             }
 
             if (action.equalsIgnoreCase("upgrade")) {
-                CryptoUpgradeManager.upgradeMachine(target, machine);
-                sender.sendMessage(Messages.colorize("&aAttempted upgrade for " + target.getName()));
+                String track = args.length >= 4 ? args[3] : "speed";
+                CryptoUpgradeManager.upgradeTrack(target, machine, track);
+                sender.sendMessage(Messages.colorize("&aAttempted upgrade (" + track + ") for " + target.getName()));
                 return true;
             } else if (action.equalsIgnoreCase("addstoredfuel") || action.equalsIgnoreCase("addstoredbattery")) {
                 if (args.length < 4) {
@@ -329,6 +330,7 @@ public class CryptoCommand implements CommandExecutor, TabCompleter {
                     sender.sendMessage(Messages.colorize(" &7- &fCurrent Fuel Quality: &e" + String.format("%.1f%%", machine.getFuelQuality())));
                 }
                 sender.sendMessage(Messages.colorize(" &7- &fSpeed Level: &a" + machine.getSpeedLevel() + "&8/&a" + CryptoUpgradeManager.getMaxLevel()));
+                sender.sendMessage(Messages.colorize(" &7- &fBatch Capacity Level: &a" + machine.getCapacityLevel() + "&8/&a" + CryptoUpgradeManager.getMaxLevel()));
                 sender.sendMessage(Messages.colorize(" &7- &fBattery Time Level: &a" + machine.getFuelTimeLevel() + "&8/&a" + CryptoUpgradeManager.getMaxLevel()));
                 sender.sendMessage(Messages.colorize(" &7- &fReward Level: &a" + machine.getRewardLevel() + "&8/&a" + CryptoUpgradeManager.getMaxLevel()));
                 sender.sendMessage(Messages.colorize(" &7- &fStored Batteries: &e" + machine.getStoredFuels().size() + "&8/&a36"));
@@ -521,11 +523,15 @@ public class CryptoCommand implements CommandExecutor, TabCompleter {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 1) {
-            List<String> sub = new ArrayList<>(List.of("credits", "balance", "battery", "storage", "sacrifice", "claim", "pickup"));
+            List<String> sub = new ArrayList<>(List.of("credits", "balance", "battery", "storage", "sacrifice", "claim", "pickup", "upgrade"));
             if (sender.hasPermission("robbery.op") || sender.isOp()) {
                 sub.addAll(List.of("admin", "buycredits", "reload", "resetnpc"));
             }
             return filter(sub, args[0]);
+        }
+
+        if (args.length == 2 && args[0].equalsIgnoreCase("upgrade")) {
+            return filter(List.of("speed", "capacity", "duration", "reward"), args[1]);
         }
 
         if (args.length == 2 && args[0].equalsIgnoreCase("admin") && (sender.hasPermission("robbery.op") || sender.isOp())) {

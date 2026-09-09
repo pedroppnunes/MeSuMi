@@ -106,13 +106,34 @@ public class CryptoUpgradeManager {
         return getCreditCost(currentLevel + 1);
     }
 
-    public static boolean upgradeMachine(Player player, CryptoMachine machine) {
-        if (player == null || machine == null) return false;
+    public static String getTrackDisplayName(String track) {
+        if (track == null) return "Upgrade";
+        return switch (track.toLowerCase().trim()) {
+            case "speed", "interval" -> "Steal Speed";
+            case "capacity", "batch" -> "Batch Capacity";
+            case "duration", "time", "battery" -> "Battery Duration";
+            case "reward", "money" -> "Money Reward";
+            default -> "Upgrade";
+        };
+    }
+
+    public static boolean upgradeTrack(Player player, CryptoMachine machine, String track) {
+        if (player == null || machine == null || track == null) return false;
 
         PlayerData pd = PlayerDataManager.getPlayerData(player);
         if (pd == null) return false;
 
-        int currentLevel = machine.getMachineLevel();
+        String normTrack = track.toLowerCase().trim();
+        int currentLevel = switch (normTrack) {
+            case "speed", "interval" -> machine.getSpeedLevel();
+            case "capacity", "batch" -> machine.getCapacityLevel();
+            case "duration", "time", "battery" -> machine.getFuelTimeLevel();
+            case "reward", "money" -> machine.getRewardLevel();
+            default -> -1;
+        };
+
+        if (currentLevel < 0) return false;
+
         if (currentLevel >= getMaxLevel()) {
             Messages.send(player, "crypto.upgrade-max-level");
             return false;
@@ -124,29 +145,34 @@ public class CryptoUpgradeManager {
             Messages.sendFormatted(player, "crypto.upgrade-req-prestige", Map.of(
                     "prestige", String.valueOf(reqPrestige),
                     "level", String.valueOf(targetLevel),
-                    "track", "Crypto Machine"
+                    "track", getTrackDisplayName(normTrack)
             ));
             return false;
         }
 
         int creditCost = getCreditCost(targetLevel);
         if (pd.getCryptoCredits() < creditCost) {
-            player.sendMessage(Messages.colorize("&cYou need &6&l⛁ " + creditCost + " Crypto Credits &cto upgrade to Level " + targetLevel + "! (You have: &6⛁ " + pd.getCryptoCredits() + "&c)"));
+            player.sendMessage(Messages.colorize("&cYou need &6&l⛁ " + creditCost + " Crypto Credits &cto upgrade " + getTrackDisplayName(normTrack) + " to Level " + targetLevel + "! (You have: &6⛁ " + pd.getCryptoCredits() + "&c)"));
             return false;
         }
 
         pd.removeCryptoCredits(creditCost);
-        machine.setSpeedLevel(targetLevel);
-        machine.setFuelTimeLevel(targetLevel);
-        machine.setRewardLevel(targetLevel);
+
+        switch (normTrack) {
+            case "speed", "interval" -> machine.setSpeedLevel(targetLevel);
+            case "capacity", "batch" -> machine.setCapacityLevel(targetLevel);
+            case "duration", "time", "battery" -> machine.setFuelTimeLevel(targetLevel);
+            case "reward", "money" -> machine.setRewardLevel(targetLevel);
+        }
+
         Robbery.getInstance().getCryptoManager().saveMachine(machine);
 
-        player.sendMessage(Messages.colorize("&aSuccessfully upgraded your &eCrypto Machine &ato &bLevel " + targetLevel + "&a for &6&l⛁ " + creditCost + " Crypto Credits&a!"));
+        player.sendMessage(Messages.colorize("&aSuccessfully upgraded &e" + getTrackDisplayName(normTrack) + " &ato &bLevel " + targetLevel + "&a for &6&l⛁ " + creditCost + " Crypto Credits&a!"));
         player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.2f);
         return true;
     }
 
-    public static boolean upgradeTrack(Player player, CryptoMachine machine, String track) {
-        return upgradeMachine(player, machine);
+    public static boolean upgradeMachine(Player player, CryptoMachine machine) {
+        return upgradeTrack(player, machine, "speed");
     }
 }

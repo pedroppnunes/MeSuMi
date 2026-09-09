@@ -32,6 +32,7 @@ public class CryptoMachineDao {
                         "fuel_ticks BIGINT DEFAULT 0, " +
                         "fuel_quality DOUBLE DEFAULT 0.0, " +
                         "speed_level INT DEFAULT 0, " +
+                        "capacity_level INT DEFAULT 0, " +
                         "fuel_time_level INT DEFAULT 0, " +
                         "reward_level INT DEFAULT 0, " +
                         "stored_fuels TEXT" +
@@ -42,6 +43,7 @@ public class CryptoMachineDao {
 
                 // Migration for existing tables
                 addColumnIfNotExists(conn, "speed_level", "INT DEFAULT 0");
+                addColumnIfNotExists(conn, "capacity_level", "INT DEFAULT 0");
                 addColumnIfNotExists(conn, "fuel_time_level", "INT DEFAULT 0");
                 addColumnIfNotExists(conn, "reward_level", "INT DEFAULT 0");
                 addColumnIfNotExists(conn, "last_updated", "BIGINT DEFAULT 0");
@@ -118,10 +120,11 @@ public class CryptoMachineDao {
         double quality = rs.getDouble("fuel_quality");
         
         int speedLvl = getIntSafe(rs, "speed_level", 0);
+        int capacityLvl = getIntSafe(rs, "capacity_level", 0);
         int fuelTimeLvl = getIntSafe(rs, "fuel_time_level", 0);
         int rewardLvl = getIntSafe(rs, "reward_level", 0);
         long lastUpdated = getLongSafe(rs, "last_updated", 0L);
-        CryptoMachine machine = new CryptoMachine(ownerId, world, x, y, z, money, fuel, quality, speedLvl, fuelTimeLvl, rewardLvl, lastUpdated);
+        CryptoMachine machine = new CryptoMachine(ownerId, world, x, y, z, money, fuel, quality, speedLvl, fuelTimeLvl, rewardLvl, capacityLvl, lastUpdated);
         
         // Parse stored fuels
         String storedRaw = getStringSafe(rs, "stored_fuels");
@@ -186,9 +189,9 @@ public class CryptoMachineDao {
     public void saveMachine(CryptoMachine machine, boolean sync) {
         if (machine == null) return;
         Runnable task = () -> {
-            String query = "INSERT INTO crypto_machines (uuid, world, x, y, z, unclaimed_money, fuel_ticks, fuel_quality, speed_level, fuel_time_level, reward_level, last_updated, stored_fuels) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
-                    "ON DUPLICATE KEY UPDATE world=?, x=?, y=?, z=?, unclaimed_money=?, fuel_ticks=?, fuel_quality=?, speed_level=?, fuel_time_level=?, reward_level=?, last_updated=?, stored_fuels=?";
+            String query = "INSERT INTO crypto_machines (uuid, world, x, y, z, unclaimed_money, fuel_ticks, fuel_quality, speed_level, capacity_level, fuel_time_level, reward_level, last_updated, stored_fuels) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                    "ON DUPLICATE KEY UPDATE world=?, x=?, y=?, z=?, unclaimed_money=?, fuel_ticks=?, fuel_quality=?, speed_level=?, capacity_level=?, fuel_time_level=?, reward_level=?, last_updated=?, stored_fuels=?";
                     
             try (Connection conn = plugin.getDatabaseManager().getConnection();
                  PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -210,23 +213,25 @@ public class CryptoMachineDao {
                 stmt.setLong(7, machine.getFuelTicks());
                 stmt.setDouble(8, machine.getFuelQuality());
                 stmt.setInt(9, machine.getSpeedLevel());
-                stmt.setInt(10, machine.getFuelTimeLevel());
-                stmt.setInt(11, machine.getRewardLevel());
-                stmt.setLong(12, machine.getLastUpdated());
-                stmt.setString(13, storedStr);
+                stmt.setInt(10, machine.getCapacityLevel());
+                stmt.setInt(11, machine.getFuelTimeLevel());
+                stmt.setInt(12, machine.getRewardLevel());
+                stmt.setLong(13, machine.getLastUpdated());
+                stmt.setString(14, storedStr);
                 
-                stmt.setString(14, machine.getWorldName());
-                stmt.setObject(15, machine.getX());
-                stmt.setObject(16, machine.getY());
-                stmt.setObject(17, machine.getZ());
-                stmt.setDouble(18, machine.getUnclaimedMoneyDouble());
-                stmt.setLong(19, machine.getFuelTicks());
-                stmt.setDouble(20, machine.getFuelQuality());
-                stmt.setInt(21, machine.getSpeedLevel());
-                stmt.setInt(22, machine.getFuelTimeLevel());
-                stmt.setInt(23, machine.getRewardLevel());
-                stmt.setLong(24, machine.getLastUpdated());
-                stmt.setString(25, storedStr);
+                stmt.setString(15, machine.getWorldName());
+                stmt.setObject(16, machine.getX());
+                stmt.setObject(17, machine.getY());
+                stmt.setObject(18, machine.getZ());
+                stmt.setDouble(19, machine.getUnclaimedMoneyDouble());
+                stmt.setLong(20, machine.getFuelTicks());
+                stmt.setDouble(21, machine.getFuelQuality());
+                stmt.setInt(22, machine.getSpeedLevel());
+                stmt.setInt(23, machine.getCapacityLevel());
+                stmt.setInt(24, machine.getFuelTimeLevel());
+                stmt.setInt(25, machine.getRewardLevel());
+                stmt.setLong(26, machine.getLastUpdated());
+                stmt.setString(27, storedStr);
 
                 stmt.executeUpdate();
             } catch (SQLException e) {
@@ -243,7 +248,7 @@ public class CryptoMachineDao {
 
     public CompletableFuture<Integer> resetAllMachineLevels() {
         return CompletableFuture.supplyAsync(() -> {
-            String query = "UPDATE crypto_machines SET speed_level = 0, fuel_time_level = 0, reward_level = 0";
+            String query = "UPDATE crypto_machines SET speed_level = 0, capacity_level = 0, fuel_time_level = 0, reward_level = 0";
             try (Connection conn = plugin.getDatabaseManager().getConnection();
                  PreparedStatement stmt = conn.prepareStatement(query)) {
                 return stmt.executeUpdate();

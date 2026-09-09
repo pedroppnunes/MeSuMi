@@ -19,12 +19,11 @@ public class CryptoMachine {
     private long fuelTicks;
     private double fuelQuality;
     
-    // 3 Upgrade Tracks
+    // 4 Upgrade Tracks
     private int speedLevel;
+    private int capacityLevel;
     private int fuelTimeLevel;
-    // Deprecated: reward level upgrade track (no longer used for reward scaling)
     private int rewardLevel;
-    // New field: reward tier based on highest owned store (ignores prestige)
     private int rewardTier;
 
     // Virtual Fuel Storage
@@ -37,7 +36,7 @@ public class CryptoMachine {
 
     public CryptoMachine(UUID ownerId, String worldName, Integer x, Integer y, Integer z,
                          double unclaimedMoney, long fuelTicks, double fuelQuality,
-                         int speedLevel, int fuelTimeLevel, int rewardLevel, long lastUpdated) {
+                         int speedLevel, int fuelTimeLevel, int rewardLevel, int capacityLevel, long lastUpdated) {
         this.ownerId = ownerId;
         this.worldName = worldName;
         this.x = x;
@@ -49,13 +48,20 @@ public class CryptoMachine {
         this.speedLevel = speedLevel;
         this.fuelTimeLevel = fuelTimeLevel;
         this.rewardLevel = rewardLevel;
+        this.capacityLevel = capacityLevel;
         this.lastUpdated = lastUpdated;
+    }
+
+    public CryptoMachine(UUID ownerId, String worldName, Integer x, Integer y, Integer z,
+                         double unclaimedMoney, long fuelTicks, double fuelQuality,
+                         int speedLevel, int fuelTimeLevel, int rewardLevel, long lastUpdated) {
+        this(ownerId, worldName, x, y, z, unclaimedMoney, fuelTicks, fuelQuality, speedLevel, fuelTimeLevel, rewardLevel, 0, lastUpdated);
     }
 
     public CryptoMachine(UUID ownerId, String worldName, Integer x, Integer y, Integer z,
                          long unclaimedMoney, long fuelTicks, double fuelQuality,
                          int speedLevel, int fuelTimeLevel, int rewardLevel, long lastUpdated) {
-        this(ownerId, worldName, x, y, z, (double) unclaimedMoney, fuelTicks, fuelQuality, speedLevel, fuelTimeLevel, rewardLevel, lastUpdated);
+        this(ownerId, worldName, x, y, z, (double) unclaimedMoney, fuelTicks, fuelQuality, speedLevel, fuelTimeLevel, rewardLevel, 0, lastUpdated);
     }
 
     public long getLastUpdated() { return lastUpdated; }
@@ -141,6 +147,9 @@ public class CryptoMachine {
     public int getSpeedLevel() { return speedLevel; }
     public void setSpeedLevel(int speedLevel) { this.speedLevel = speedLevel; }
 
+    public int getCapacityLevel() { return capacityLevel; }
+    public void setCapacityLevel(int capacityLevel) { this.capacityLevel = capacityLevel; }
+
     public int getFuelTimeLevel() { return fuelTimeLevel; }
     public void setFuelTimeLevel(int fuelTimeLevel) { this.fuelTimeLevel = fuelTimeLevel; }
 
@@ -162,7 +171,7 @@ public class CryptoMachine {
         return storedFuels.removeIf(f -> f.getId().equals(fuelId));
     }
 
-    // Duration mapping based on fuelTimeLevel / batteryTimeLevel (Levels 0-39)
+    // Duration mapping based on fuelTimeLevel / batteryTimeLevel (Levels 0-10)
     public long getFuelDurationTicks() {
         return getFuelDurationTicksForLevel(this.fuelTimeLevel);
     }
@@ -173,41 +182,18 @@ public class CryptoMachine {
 
     public static long getFuelDurationTicksForLevel(int level) {
         if (level <= 0) return 600L; // 10 min
-        if (level >= 50) return 86400L; // 24 Hours max level
-
-        // Tier 0 (1 to 9): 20m up to 2.5h
-        if (level < 10) {
-            return switch (level) {
-                case 1 -> 1200L;   // 20 min
-                case 2 -> 1800L;   // 30 min
-                case 3 -> 2700L;   // 45 min
-                case 4 -> 3600L;   // 1 hour
-                case 5 -> 4500L;   // 1h 15m
-                case 6 -> 5400L;   // 1h 30m
-                case 7 -> 6300L;   // 1h 45m
-                case 8 -> 7200L;   // 2 hours
-                case 9 -> 9000L;   // 2.5 hours
-                default -> 1200L;
-            };
-        }
-
-        // Tier 1 (10 to 19): 3h up to 8h
-        if (level < 20) {
-            return 10800L + (long) (level - 10) * 1800L; // 3h to 7.5h
-        }
-
-        // Tier 2 (20 to 29): 9h up to 15h
-        if (level < 30) {
-            return 32400L + (long) (level - 20) * 2400L; // 9h to 15h
-        }
-
-        // Tier 3 (30 to 39): 16h up to 20h
-        if (level < 40) {
-            return 57600L + (long) (level - 30) * 1440L; // 16h to 20h
-        }
-
-        // Tier 4 (40 to 49): 20.5h up to 23.5h
-        return Math.min(86400L, 73800L + (long) (level - 40) * 1080L);
+        return switch (level) {
+            case 1 -> 1800L;   // 30 min
+            case 2 -> 3600L;   // 1 hour
+            case 3 -> 7200L;   // 2 hours
+            case 4 -> 14400L;  // 4 hours
+            case 5 -> 21600L;  // 6 hours
+            case 6 -> 32400L;  // 9 hours
+            case 7 -> 43200L;  // 12 hours
+            case 8 -> 57600L;  // 16 hours
+            case 9 -> 72000L;  // 20 hours
+            default -> 86400L; // 24 hours (Level 10+)
+        };
     }
 
     public static String getFuelDurationFormattedForTicks(long seconds) {
@@ -352,25 +338,20 @@ public class CryptoMachine {
         }
     }
 
-    public int getMachineLevel() {
-        if (speedLevel <= 0) return 1;
-        return Math.min(10, speedLevel);
-    }
-
     public int getCapacity() {
-        return Math.min(10, Math.max(1, getMachineLevel()));
+        if (capacityLevel <= 0) return 1;
+        return Math.min(10, capacityLevel + 1);
     }
 
     public int getStealIntervalSeconds() {
-        int lvl = getMachineLevel();
-        return Math.max(60, 600 - ((lvl - 1) * 60));
+        if (speedLevel <= 0) return 600;
+        return Math.max(60, 600 - (Math.min(9, speedLevel) * 60));
     }
 
     public double getRewardMultiplier() {
-        int lvl = getMachineLevel();
-        if (lvl <= 1) return 1.0;
-        if (lvl >= 10) return 3.0;
-        return 1.0 + ((lvl - 1) * (2.0 / 9.0));
+        if (rewardLevel <= 0) return 1.0;
+        if (rewardLevel >= 10) return 3.0;
+        return 1.0 + (rewardLevel * (2.0 / 9.0));
     }
 
     public double getSpeedMultiplier() {
